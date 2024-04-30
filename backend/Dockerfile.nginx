@@ -1,0 +1,5 @@
+# Используем официальный образ Nginx
+FROM nginx:latest
+
+# Удаляем дефолтный конфиг Nginx
+RUN rm /etc/nginx/conf.d/default.conf

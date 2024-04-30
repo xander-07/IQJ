@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1085659498297",
+    "project_id": "iqj-uniapp",
+    "storage_bucket": "iqj-uniapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085659498297:android:d4c8e9feed28a9c2000ae8",
+        "android_client_info": {
+          "package_name": "com.example.iqj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeVlz2pRezVz2ovO9xvMB_tTyjTeraOC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
