@@ -1,7 +1,5 @@
 # IQJ
 
----
-
 ![header](/projectSeting/header.png)
 
 ## О проекте
