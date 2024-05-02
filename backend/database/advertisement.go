@@ -39,15 +39,27 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 		return errors.New("Advertisement.Add: wrong data! provided *Advertisement is empty")
 	}
 
+	formattedCreationDate, err := time.Parse("02.01.2006", a.CreationDate)
+	if err != nil {
+		return err
+	}
+	a.CreationDate = formattedCreationDate.Format("2006-01-02 15:04:05")
+
+	formattedExpirationDate, err := time.Parse("02.01.2006", a.ExpirationDate)
+	if err != nil {
+		return err
+	}
+	a.ExpirationDate = formattedExpirationDate.Format("2006-01-02 15:04:05")
+
 	// Используем queryMaker для создания и исполнения insert запроса
-	err := at.qm.makeInsert(at.db,
+	err = at.qm.makeInsert(at.db,
 		`INSERT INTO advertisements (content, creation_date, expiration_date)
-		VALUES ($1, $2, $3)
+		SELECT $1, $2, $3
 		WHERE NOT EXISTS (
 			SELECT 1 FROM advertisements WHERE content = $1 AND creation_date = $2
-			)
+		)
 		`,
-		&a.Content, &a.CreationDate, &a.ExpirationDate,
+		a.Content, a.CreationDate, a.ExpirationDate,
 	)
 
 	if err != nil {
@@ -64,7 +76,7 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 // ads, err := ...Get() // err == nil если все хорошо
 func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 	rows, err := at.qm.makeSelect(at.db,
-		"SELECT content FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
+		"SELECT advertiesment_id, content FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
 		time.Now(),
 	)
 
@@ -79,8 +91,29 @@ func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 		rows.Scan(&resultAdvertisement.Content)
 		resultAdvertisementArr = append(resultAdvertisementArr, resultAdvertisement)
 	}
-
 	return &resultAdvertisementArr, nil
+}
+
+func (at *AdvertisementTable) Update(a *Advertisement) error {
+
+	if a.isDefault() {
+		return errors.New("Advertisement.Add: wrong data! provided *Advertisement is empty")
+	}
+
+	err := at.qm.makeUpdate(at.db,
+		`UPDATE advertisements
+		SET content = $1, 
+			creation_date = $2, 
+			expiration_date= $3
+			WHERE advertiesment_id = $4`,
+		a.Id, a.Content, a.CreationDate, a.ExpirationDate,
+	)
+
+	if err != nil {
+		return fmt.Errorf("Advertisement.Update: %v", err)
+	}
+
+	return nil
 }
 
 // Delete удаляет данные из базы данных по заданному Id.

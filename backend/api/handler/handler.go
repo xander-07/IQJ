@@ -43,6 +43,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		authGroup.POST("/news", h.HandleAddNews)
 		authGroup.POST("/ad", h.HandlePostAdvertisement)
+		authGroup.PUT("/ad", h.HandleUpdateAdvertisements)
 	}
 	return r
 }
