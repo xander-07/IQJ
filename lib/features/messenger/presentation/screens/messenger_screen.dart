@@ -22,8 +22,32 @@ class _MessengerBloc extends State<MessengerScreen> {
     });
   }
 
+  bool _isntSearch_chat = true;
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController SearchPickerController = TextEditingController();
+
+    Map<String,dynamic>userMap={
+
+    };
+
+    void onSearch() async {
+      FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+      await _firestore
+        .collection('users')
+        .where("email",isEqualTo: SearchPickerController.text)
+        .get()
+        .then( (value){
+          setState(() {
+            userMap = value.docs[0].data();
+            _isntSearch_chat = false;
+            print(userMap);
+            print(userMap['email']);
+          });
+        });
+    }
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 72,
@@ -39,6 +63,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextField(
+                    controller: SearchPickerController,
                     decoration: InputDecoration(
                       hintText: "Поиск по заголовку...",
                       hintFadeDuration: const Duration(milliseconds: 100),
@@ -60,7 +85,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                             Icons.search,
                           ),
                           onPressed: () {
-                            _isSearch = !_isSearch;
+                            onSearch();
                           },
                         ),
                       ),
@@ -205,12 +230,18 @@ class _MessengerBloc extends State<MessengerScreen> {
             child: ListView(
               children: [
                 // Чат текущей пары
-                HighlightChatBubble(
+                const HighlightChatBubble(
                     imageUrl:
                         'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
                     chatTitle: 'GroupName',
                     secondary: 'secondaryText',),
-                _buildUserList(),
+                _isntSearch_chat? _buildUserList() : ((userMap!=null)
+                  ?ChatBubble(imageUrl: '', 
+                  chatTitle: userMap['email'].toString(),
+                   secondary: 'text', 
+                   uid: userMap['uid'].toString())
+                  :Container()),
+                // ignore: unnecessary_null_comparison
                 // Чат обычный
                 // ChatBubble(
                 //     imageUrl:
@@ -259,6 +290,7 @@ class _MessengerBloc extends State<MessengerScreen> {
       },
       );
   }
+  
 
   Widget _buildUserListItem(DocumentSnapshot document){
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
