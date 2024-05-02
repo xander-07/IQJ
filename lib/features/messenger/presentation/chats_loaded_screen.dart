@@ -128,7 +128,7 @@ class _ChatsListState extends State<ChatsList> {
       alignment: alignment,
       child: ReceiverMessage(
         message: data['message'].toString(),
-        mainAxisAlignment: mainalignment,
+        //mainAxisAlignment: mainalignment,
         url: '', 
         receiver: data['senderId'] as String,
          compare: _firebaseAuth.currentUser!.uid, 
