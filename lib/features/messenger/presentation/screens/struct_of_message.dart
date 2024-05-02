@@ -50,61 +50,58 @@ class ReceiverMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-        maxWidth:double.infinity, // Максимальная ширина равна максимальному доступному значению
-      ),
-      padding: const EdgeInsets.only(top: 8, bottom: 5),
+      width: 200,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (receiver != compare) _buildThumbnailImage(url),
-          Expanded(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: receiver != compare
-                    ? Theme.of(context).colorScheme.onInverseSurface
-                    : Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                  bottomLeft: Radius.circular(receiver != compare ? 4 : 12),
-                  bottomRight: Radius.circular(12),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (receiver != compare) _buildThumbnailImage(url),
+            Expanded(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: receiver != compare
+                      ? Theme.of(context).colorScheme.onInverseSurface
+                      : Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                    bottomLeft: Radius.circular(receiver != compare ? 4 : 12),
+                    bottomRight: Radius.circular(12),
+                  ),
                 ),
-              ),
-              position: DecorationPosition.background,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message,
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
-                    SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            time,
-                            style: TextStyle(fontSize: 10),
-                          ),
-                          if (receiver != compare)
-                            SvgPicture.asset(
-                              'assets/icons/chat/send_mes.svg',
-                            ),
-                        ],
+                position: DecorationPosition.background,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        message,
+                        style: Theme.of(context).textTheme.bodyText1,
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              time,
+                              style: TextStyle(fontSize: 10),
+                            ),
+                            if (receiver != compare)
+                              SvgPicture.asset(
+                                'assets/icons/chat/send_mes.svg',
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }
