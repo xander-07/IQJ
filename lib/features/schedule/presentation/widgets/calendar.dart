@@ -24,7 +24,7 @@ class _CalendarState extends State<Calendar> {
   Widget content() {
     return TableCalendar(
       rowHeight: 47, // Высота строки
-      availableGestures: AvailableGestures.all, 
+      availableGestures: AvailableGestures.all,
       focusedDay: selectedDay, // День, на который сделан фокус
       firstDay: DateTime(2023, 1, 1), // Первый день
       lastDay: DateTime(2030, 1, 1), // Последний день
@@ -47,24 +47,23 @@ class _CalendarState extends State<Calendar> {
       selectedDayPredicate: (DateTime date) {
         return isSameDay(selectedDay, date);
       }, // Проверка, является ли день выбранным
-      calendarStyle: const CalendarStyle(
+      calendarStyle: CalendarStyle(
         isTodayHighlighted: true, // Выделение сегодняшнего дня
         defaultDecoration: const BoxDecoration(
           shape: BoxShape.circle,
         ), // Декорация дня по умолчанию
-        selectedDecoration: BoxDecoration(
-          color: Color(0xFFD1D1D1),
+        selectedDecoration: const BoxDecoration(
+          color: Color(0xaaEF9800),
           shape: BoxShape.circle,
         ), // Декорация выбранного дня
-        selectedTextStyle: TextStyle(color: Color(0xFF191919)), // Стиль текста выбранного дня
-        todayDecoration: BoxDecoration(
-          color: Color(0xFFEF9800),
+        todayDecoration: const BoxDecoration(
+          color: Color(0xFFD1D1D1),
           shape: BoxShape.circle,
-          
         ),
-        todayTextStyle: TextStyle(color: Color(0xFF191919)), // Декорация сегодняшнего дня
-        defaultTextStyle: TextStyle(color: Color(0xFF191919)), // Стиль текста дня по умолчанию
-        weekendTextStyle: TextStyle(color: Color(0xFF191919)), // Стиль текста выходного дня
+        selectedTextStyle: const TextStyle(color: Color(0xFFF8F8F8)), // Стиль текста выбранного дня
+        todayTextStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer), // Декорация сегодняшнего дня
+        defaultTextStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer), // Стиль текста дня по умолчанию
+        weekendTextStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer), // Стиль текста выходного дня
         weekendDecoration: BoxDecoration(
           shape: BoxShape.circle,
         ), // Декорация выходного дня
@@ -76,8 +75,8 @@ class _CalendarState extends State<Calendar> {
           color: Theme.of(context).colorScheme.background,
           borderRadius: BorderRadius.circular(5.0),
         ),
-        formatButtonTextStyle: const TextStyle(
-          color: Color(0xFF191919),
+        formatButtonTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -113,7 +112,7 @@ class CustomCalendarBuilder extends CalendarBuilders {
 
     return Container(
       constraints: const BoxConstraints(
-        minWidth: 50, 
+        minWidth: 50,
         minHeight: 50,
       ),
       child: Stack(
