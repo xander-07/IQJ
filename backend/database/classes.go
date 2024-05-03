@@ -161,6 +161,32 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 
 	for rows.Next() {
 		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups),&resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		resultClass.Teacher, resultClass.TeacherName, resultClass.Week, resultClass.Weekday = c.Teacher, c.TeacherName, c.Week, c.Weekday
+		resultClasses = append(resultClasses, resultClass)
+	}
+
+	return &resultClasses, nil
+}
+
+func (ct *ClassTable) GetByLocation (c *Class) (*[]Class,error){
+	if c.isDefault(){
+		return nil, errors.New("Class.GetByLocation: wrong data! provided *Class is empty")
+	}
+
+
+	rows, err := ct.qm.makeSelect(ct.db,
+		`SELECT class_id, сlass_group_ids, class_teacher_id, class_teacher_name, count, class_name, class_type
+		FROM classes
+		WHERE class_location = $1;`, c.Location)
+	if err != nil {
+		return nil, fmt.Errorf("Class.GetById: %v", err)
+	}
+
+	var resultClasses []Class
+	var resultClass Class
+
+	for rows.Next() {
+		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups),&resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		resultClass.Teacher, resultClass.Week, resultClass.Weekday = c.Teacher, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
 	}
