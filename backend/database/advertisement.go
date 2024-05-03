@@ -81,7 +81,7 @@ func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("News.GetLatest: %v", err)
+		return nil, fmt.Errorf("Advertisement.Get: %v", err)
 	}
 
 	var resultAdvertisementArr []Advertisement
@@ -100,7 +100,7 @@ func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("News.GetLatest: %v", err)
+		return nil, fmt.Errorf("Advertisement.GetAll: %v", err)
 	}
 
 	var resultAdvertisementArr []Advertisement
@@ -154,7 +154,7 @@ func (at *AdvertisementTable) Delete(a *Advertisement) error {
 		a.Id,
 	)
 	if err != nil {
-		return fmt.Errorf("Advertisement.DeleteAdvertisement: %v", err)
+		return fmt.Errorf("Advertisement.Delete: %v", err)
 	}
 
 	// Возвращаем nil, так как ошибок не случилось
