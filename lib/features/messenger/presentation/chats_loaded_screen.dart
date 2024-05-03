@@ -213,7 +213,7 @@ class _ChatsListState extends State<ChatsList> {
       child: ReceiverMessage(
         message: data['message'].toString(),
         //mainAxisAlignment: mainalignment,
-        url: '',
+        url: image_url!,
         receiver: data['senderId'] as String,
         compare: _firebaseAuth.currentUser!.uid,
         time: DateFormat('HH:mm')
