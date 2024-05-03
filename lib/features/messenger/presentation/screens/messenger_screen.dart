@@ -23,10 +23,7 @@ class _MessengerBloc extends State<MessengerScreen> {
   }
 
   bool _isntSearch_chat = true;
-
-  @override
-  Widget build(BuildContext context) {
-    TextEditingController SearchPickerController = TextEditingController();
+  TextEditingController SearchPickerController = TextEditingController();
 
     Map<String,dynamic>userMap={
 
@@ -48,6 +45,9 @@ class _MessengerBloc extends State<MessengerScreen> {
           });
         });
     }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 72,
