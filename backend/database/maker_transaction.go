@@ -24,7 +24,7 @@ type transactionMaker struct{}
 //	for rows.Next() {
 //	    // Обработка результатов запроса
 //	}
-func (tm *transactionMaker) makeSelect(db *sql.DB, query string, key interface{}) (*sql.Rows, error) {
+func (tm *transactionMaker) makeSelect(db *sql.DB, query string, key ...interface{}) (*sql.Rows, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return nil, err

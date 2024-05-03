@@ -72,5 +72,27 @@ CREATE TABLE IF NOT EXISTS advertisements (
     expiration_date TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS chat_messages (
+    message_id SERIAL PRIMARY KEY,
+    author INT NOT NULL,
+    message_dialogue INT NOT NULL,
+    message_type VARCHAR(50) NOT NULL,
+    message_attachment_id INT,
+    message_text TEXT NOT NULL,
+    is_special BOOL NOT NULL,
+    sending_time TIMESTAMP,
+);
+
+CREATE TABLE IF NOT EXISTS chat_attachments (
+    attachment_id SERIAL PRIMARY KEY,
+    attachment_link TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dialogues (
+    dialogue_id SERIAL PRIMARY KEY,
+    participants INT[] NOT NULL,
+    moderators INT[] NOT NULL
+);
+
 CREATE USER iqj_admin WITH PASSWORD 'aZCF131';
 GRANT ALL PRIVILEGES ON DATABASE iqj TO iqj_admin;
