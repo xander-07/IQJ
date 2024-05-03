@@ -7,6 +7,7 @@ import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
+import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
 import 'package:iqj/features/services/presentation/screens/about_screen.dart';
 import 'package:iqj/features/services/presentation/screens/services_screen.dart';
 import 'package:iqj/features/welcome/presentation/welcome.dart';
@@ -76,6 +77,7 @@ class _AppState extends State<App> {
         'chatslist': (context) => const ChatsList(),
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
+        'schedule': (context) => const ScheduleScreen(),
       },
       onUnknownRoute: (settings) {
         

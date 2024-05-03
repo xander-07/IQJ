@@ -9,10 +9,10 @@ import (
 
 // Структура объявления
 type Advertisement struct {
-	Id             int    `json:"ad_id"`           // id объявления
-	Content        string `json:"ad_content"`      // содержание объявления (текст)
-	CreationDate   string `json:"creation_date"`   // дата создания объявления
-	ExpirationDate string `json:"expiration_date"` // срок годности объявления
+	Id             int    `json:"ad_id"`                     // id объявления
+	Content        string `json:"ad_content"`                // содержание объявления (текст)
+	CreationDate   string `json:"creation_date,omitempty"`   // дата создания объявления
+	ExpirationDate string `json:"expiration_date,omitempty"` // срок годности объявления
 }
 
 // isDefault проверяет, переданы ли какие-либо данные в структуру Advertisement
@@ -76,19 +76,38 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 // ads, err := ...Get() // err == nil если все хорошо
 func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 	rows, err := at.qm.makeSelect(at.db,
-		"SELECT advertiesment_id, content FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
+		"SELECT advertiesment_id, content, creation_date, expiration_date FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
 		time.Now(),
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("News.GetLatest: %v", err)
+		return nil, fmt.Errorf("Advertisement.Get: %v", err)
 	}
 
 	var resultAdvertisementArr []Advertisement
 	var resultAdvertisement Advertisement
 
 	for rows.Next() {
-		rows.Scan(&resultAdvertisement.Content)
+		rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate)
+		resultAdvertisementArr = append(resultAdvertisementArr, resultAdvertisement)
+	}
+	return &resultAdvertisementArr, nil
+}
+
+func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
+	rows, err := at.qm.makeSelect(at.db,
+		"SELECT * FROM advertisements",
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("Advertisement.GetAll: %v", err)
+	}
+
+	var resultAdvertisementArr []Advertisement
+	var resultAdvertisement Advertisement
+
+	for rows.Next() {
+		rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate)
 		resultAdvertisementArr = append(resultAdvertisementArr, resultAdvertisement)
 	}
 	return &resultAdvertisementArr, nil
@@ -102,8 +121,8 @@ func (at *AdvertisementTable) Update(a *Advertisement) error {
 
 	err := at.qm.makeUpdate(at.db,
 		`UPDATE advertisements
-		SET content = $1, 
-			creation_date = $2, 
+		SET content = $1,
+			creation_date = $2,
 			expiration_date= $3
 			WHERE advertiesment_id = $4`,
 		a.Id, a.Content, a.CreationDate, a.ExpirationDate,
@@ -135,7 +154,7 @@ func (at *AdvertisementTable) Delete(a *Advertisement) error {
 		a.Id,
 	)
 	if err != nil {
-		return fmt.Errorf("Advertisement.DeleteAdvertisement: %v", err)
+		return fmt.Errorf("Advertisement.Delete: %v", err)
 	}
 
 	// Возвращаем nil, так как ошибок не случилось

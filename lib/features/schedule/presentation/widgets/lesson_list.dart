@@ -24,19 +24,9 @@ class Lessons extends StatelessWidget {
                 activeDay.lessons.length,
                 (index) => activeDay.lessons[index] == null
                     ? EmptyLessonCard(index)
-                    : LessonCard(activeDay.lessons[index]!, index),
+                    : LessonCard(activeDay.lessons[index]!, index, false),
               ),
-              // shrinkWrap: true,
-              // itemCount: activeDay.lessons.length,
-              // itemBuilder: (context, index) => activeDay.lessons[index] == null
-              //     ? EmptyLessonCard(index)
-              //     : LessonCard(activeDay.lessons[index]!, index),
-              // separatorBuilder: (_, __) => const SizedBox(
-              //   height: 12,
-              // ),
             );
-            // } else if (state.activeDay is DayOff) {
-            //   return const Center(child: Text('Выходной!'));
           } else {
             return const Center(child: Text('Выходной!'));
           }

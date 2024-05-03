@@ -2,9 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"iqj/database"
 	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Выдает массив с объявлениями, у которых срок годности
@@ -126,4 +128,33 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
 	}
+}
+
+// Функция для получения всех объявлений, имеющихся в бд на данный момент.
+// Извлекает из запроса параметр all_ads, который должен быть равен 1 для работы.
+// Используется функция GetAllAds, которая получает срез всех объявлений в бд.
+// Использование с GET: /news?all_ads=1
+func (h *Handler) HandleGetAllAdvertisements(c *gin.Context) {
+	all_adsStr := c.Query("all_ads")
+
+	all_ads, err := strconv.Atoi(all_adsStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleGetAllAdvertisements:", err)
+		return
+	}
+
+	if all_ads != 1 {
+		c.JSON(http.StatusBadRequest, "All_ads != 1")
+		fmt.Println("HandleGetAllAdvertisements: all_ads != 1")
+		return
+	}
+
+	allads, err := database.Database.Advertisement.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetAllAdvertisements:", err)
+		return
+	}
+	c.JSON(http.StatusOK, allads)
 }

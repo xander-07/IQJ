@@ -54,13 +54,14 @@ CREATE TABLE IF NOT EXISTS student_groups (
 CREATE TABLE IF NOT EXISTS classes (
     class_id SERIAL PRIMARY KEY,
     class_group_ids INT[] NOT NULL,
-    class_teacher_id INT NOT NULL,
+    class_teacher_id INT,
+    class_teacher_name VARCHAR(255),
     count INT NOT NULL,
     weekday INT NOT NULL,
     week INT NOT NULL,
     class_name VARCHAR(255),
     class_type VARCHAR(30),
-    class_location VARCHAR(40) NOT NULL
+    class_location VARCHAR(40)
 );
 
 -- Создание таблицы объявлений (ad)
@@ -69,6 +70,28 @@ CREATE TABLE IF NOT EXISTS advertisements (
     content TEXT NOT NULL,
     creation_date TIMESTAMP,
     expiration_date TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+    message_id SERIAL PRIMARY KEY,
+    author INT NOT NULL,
+    message_dialogue INT NOT NULL,
+    message_type VARCHAR(50) NOT NULL,
+    message_attachment_id INT,
+    message_text TEXT NOT NULL,
+    is_special BOOL NOT NULL,
+    sending_time TIMESTAMP,
+);
+
+CREATE TABLE IF NOT EXISTS chat_attachments (
+    attachment_id SERIAL PRIMARY KEY,
+    attachment_link TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dialogues (
+    dialogue_id SERIAL PRIMARY KEY,
+    participants INT[] NOT NULL,
+    moderators INT[] NOT NULL
 );
 
 CREATE USER iqj_admin WITH PASSWORD 'aZCF131';

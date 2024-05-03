@@ -5,8 +5,6 @@ import 'package:iqj/features/schedule/presentation/bloc/schedule_event.dart';
 import 'package:iqj/features/schedule/presentation/widgets/calendar.dart';
 import 'package:iqj/features/schedule/presentation/widgets/lesson_list.dart';
 
-// Всю логику новостей нужно сесть и хорошо обдумать, прежде чем писать этот код
-
 class ScheduleScreen extends StatelessWidget {
   const ScheduleScreen({super.key});
 
@@ -16,20 +14,22 @@ class ScheduleScreen extends StatelessWidget {
       create: (context) => ScheduleBloc()..add(LoadSchedule()),
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          scrolledUnderElevation: 0,
+          toolbarHeight: 72,
           title: Text(
             'Расписание',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           actions: [
             IconButton(
-              onPressed: () => DoNothingAction(),
+              onPressed: () => showModalBottomSheet<void>(
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  elevation: 0,
+                  context: context,
+                  builder: (context) => _buildBottomSheet(context)),
               icon: const Icon(Icons.more_vert),
             ),
-            // SvgPicture.asset(
-            //   'assets/schedule/dots.svg',
-            //   width: 4.17,
-            //   height: 16,
-            // ),
           ],
         ),
         body: ListView(
@@ -41,4 +41,24 @@ class ScheduleScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// MARK: Панель с настройками
+Container _buildBottomSheet(BuildContext context) {
+  return Container(
+    child: ListView(
+      padding: const EdgeInsets.all(8),
+      children: [
+        Text(
+          'Управление расписанием',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
+        ),
+      ],
+    ),
+  );
 }

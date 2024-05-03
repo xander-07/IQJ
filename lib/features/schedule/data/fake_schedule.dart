@@ -13,7 +13,8 @@ Future<List<Day>> getSchedule() async {
 }
 
 final List<Day> schedule = [
-  WorkingDay( DateTime(2024, 1, 1),
+  WorkingDay(
+    DateTime(2024, 5, 1),
     lessons: [
       Lesson(
         name: "Физика",
@@ -33,7 +34,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -42,7 +43,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -51,7 +52,8 @@ final List<Day> schedule = [
       null,
     ],
   ),
-  WorkingDay( DateTime(2024, 1, 2),
+  WorkingDay(
+    DateTime(2024, 5, 2),
     lessons: [
       Lesson(
         name: "Физика",
@@ -71,7 +73,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -80,7 +82,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -89,31 +91,12 @@ final List<Day> schedule = [
       null,
     ],
   ),
-  WorkingDay(DateTime(2024, 4, 30), 
-  lessons: [
-    Lesson(
-      name: 'Алгоритмы', 
-      type: 'Практика',
-      classroom: 'A-220 (В-78)',
-      groups: ['ЭФБО-01-23'],
-      professor: 'Яковлев М. С.'
-
-    )
-  ]),
-  DayOff(DateTime(2024, 1, 4)),
-  DayOff(DateTime(2024, 1, 5)),
-  DayOff(DateTime(2024, 1, 6)),
-  DayOff(DateTime(2024, 1, 7)),
-  DayOff(DateTime(2024, 1, 8)),
-  DayOff(DateTime(2024, 1, 9)),
-  DayOff(DateTime(2024, 1, 10)),
-  DayOff(DateTime(2024, 1, 11)),
-  WorkingDay( DateTime(2024, 4, 26),
+    WorkingDay( DateTime(2024, 5, 3),
     lessons: [
       Lesson(
         name: "Физика",
         type: "Лекция",
-        classroom: "A-63 (МП-1)",
+        classroom: "A-15 (В-78)",
         groups: [
           "ЭФБО-01-23",
           "ЭФБО-02-23",
@@ -121,14 +104,14 @@ final List<Day> schedule = [
           "ЭФБО-04-23",
           "ЭФБО-05-23",
         ],
-        professor: "Я не помню",
+        professor: "Сафронов А. А.",
       ),
       Lesson(
         name: 'Физика',
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -137,13 +120,25 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
       null,
       null,
       null,
+    ],
+  ),
+  WorkingDay(
+    DateTime(2024, 5, 30),
+    lessons: [
+      Lesson(
+        name: 'Алгоритмы',
+        type: 'Практика',
+        classroom: 'A-220 (В-78)',
+        groups: ['ЭФБО-01-23'],
+        professor: 'Яковлев М. С.',
+      ),
     ],
   ),
 ];
