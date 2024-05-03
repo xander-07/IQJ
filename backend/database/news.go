@@ -100,6 +100,27 @@ func (nt *NewsTable) GetById(n *News) (*News, error) {
 	return n, nil
 }
 
+func (nt *NewsTable) GetAll() (*[]News, error) {
+
+	rows, err := nt.qm.makeSelect(nt.db,
+		"SELECT news_id, header, link, news_text, image_links, tags, publication_time FROM news",
+	)
+	defer rows.Close()
+
+	if err != nil {
+		return nil, fmt.Errorf("News.GetById: %v", err)
+	}
+
+	var n News
+	var nArr []News
+	for rows.Next() {
+		rows.Scan(&n.Id, &n.Header, &n.Link, &n.Content, pq.Array(&n.ImageLinks), pq.Array(&n.Tags), &n.PublicationTime)
+		nArr = append(nArr, n)
+	}
+
+	return &nArr, nil
+}
+
 // GetLatestBlocks возвращает указанное количество последних новостных блоков.
 // Принимает количество блоков и смещение.
 // Возвращает срез News и nil при успешном запросе.

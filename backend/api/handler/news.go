@@ -2,10 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"iqj/database"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
