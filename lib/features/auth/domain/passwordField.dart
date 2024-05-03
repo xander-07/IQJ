@@ -28,54 +28,54 @@ class _PasswordFieldState extends State<PasswordField> {
         controller: widget.controllerPassword,
         obscureText: _ishidden,
         keyboardType: TextInputType.visiblePassword,
-        cursorColor: const Color.fromARGB(255, 239, 172, 0),
-        style: const TextStyle(
+        cursorColor: Theme.of(context).colorScheme.primary,
+        style: TextStyle(
           fontSize: 24,
-          color: Color(0xFF2E2E2E),
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         decoration: InputDecoration(
           floatingLabelBehavior: FloatingLabelBehavior.never,
           filled: true,
-          fillColor: boxFillColor,
+          fillColor: Theme.of(context).colorScheme.surfaceVariant,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           label: Container(
-            child: const Text(
+            child: Text(
               "Пароль",
               style: TextStyle(
-                color: Color(0xFFBDBDBD),
+                color: Theme.of(context).colorScheme.outline,
                 fontSize: 24,
               ),
             ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFE8E8E8),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
               width: 2,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFE8E8E8),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
               width: 2,
             ),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFDC0000),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.error,
               width: 2,
             ),
           ),
-          errorStyle: const TextStyle(
-            color: Color(0xFFDC0000),
+          errorStyle: TextStyle(
+            color: Theme.of(context).colorScheme.error,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color.fromARGB(255, 239, 172, 0),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
               width: 2,
             ),
           ),
@@ -98,15 +98,15 @@ class _PasswordFieldState extends State<PasswordField> {
           ),
         ),
         onChanged: (value) {
-          boxFillColor = const Color(0xFFF6F6F6);
+          boxFillColor = Theme.of(context).colorScheme.onError;
         },
         validator: (value) {
           // TODO сделать подсветку ошибок
           if (value == null) {
-            boxFillColor = const Color(0xFFFFE5E5);
+            boxFillColor = Theme.of(context).colorScheme.onError;
             return 'Введите пароль';
           } else if (value.length < 3) {
-            boxFillColor = const Color(0xFFFFE5E5);
+            boxFillColor = Theme.of(context).colorScheme.onError;
             return 'Пароль должен содержать минимум 3 символа.';
           }
           return null;

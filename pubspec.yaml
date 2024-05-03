@@ -49,6 +49,7 @@ dependencies:
   firebase_auth: ^4.19.4
   provider: ^6.1.2
   cloud_firestore: ^4.17.2
+  # emoji_picker_flutter: ^2.0.0 Это ломает сборку)))
 
 dev_dependencies:
   flutter_test:

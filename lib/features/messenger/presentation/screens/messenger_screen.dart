@@ -236,7 +236,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                     chatTitle: 'GroupName',
                     secondary: 'secondaryText',),
                 _isntSearch_chat? _buildUserList() : ((userMap!=null)
-                  ?ChatBubble(imageUrl: '', 
+                  ?ChatBubble(imageUrl: userMap['picture'].toString(), 
                   chatTitle: userMap['email'].toString(),
                    secondary: 'text', 
                    uid: userMap['uid'].toString())
@@ -304,7 +304,7 @@ class _MessengerBloc extends State<MessengerScreen> {
       //     );
       //   },
       // );
-      return ChatBubble(imageUrl: '', chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
+      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
     }
     return Padding(padding: EdgeInsets.zero);
   }
