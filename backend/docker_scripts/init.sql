@@ -55,13 +55,13 @@ CREATE TABLE IF NOT EXISTS classes (
     class_id SERIAL PRIMARY KEY,
     class_group_ids INT[] NOT NULL,
     class_teacher_id INT,
-    class_teacher_name VARCHAR(255) NOT NULL,
+    class_teacher_name VARCHAR(255),
     count INT NOT NULL,
     weekday INT NOT NULL,
     week INT NOT NULL,
     class_name VARCHAR(255),
     class_type VARCHAR(30),
-    class_location VARCHAR(40) NOT NULL
+    class_location VARCHAR(40)
 );
 
 -- Создание таблицы объявлений (ad)
