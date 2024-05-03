@@ -279,7 +279,9 @@ class _MessengerBloc extends State<MessengerScreen> {
           return const Text('err');
         }
         if (snapshot.connectionState == ConnectionState.waiting){
-          return const Text('loading');
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
         return Column(
           children: 
@@ -306,6 +308,6 @@ class _MessengerBloc extends State<MessengerScreen> {
       // );
       return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
     }
-    return Padding(padding: EdgeInsets.zero);
+    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
   }
 }
