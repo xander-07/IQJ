@@ -38,7 +38,12 @@ class _MessengerBloc extends State<MessengerScreen> {
         .get()
         .then( (value){
           setState(() {
-            userMap = value.docs[0].data();
+            try{
+              userMap = value.docs[0].data();
+            }catch(e){
+              userMap = {};
+            }
+ 
             _isntSearch_chat = false;
             print(userMap);
             print(userMap['email']);
@@ -70,7 +75,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 10,
+                        vertical: 16,
                       ),
                       hintStyle: const TextStyle(
                         fontFamily: 'Inter',
@@ -235,12 +240,14 @@ class _MessengerBloc extends State<MessengerScreen> {
                         'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
                     chatTitle: 'GroupName',
                     secondary: 'secondaryText',),
-                _isntSearch_chat? _buildUserList() : ((userMap!=null)
+                _isntSearch_chat? _buildUserList() : ((userMap.length!=0)
                   ?ChatBubble(imageUrl: userMap['picture'].toString(), 
                   chatTitle: userMap['email'].toString(),
                    secondary: 'text', 
                    uid: userMap['uid'].toString())
-                  :Container()),
+                  :Align(
+                    alignment:Alignment.center,
+                    child: Text("чат не найден"))),
                 // ignore: unnecessary_null_comparison
                 // Чат обычный
                 // ChatBubble(
