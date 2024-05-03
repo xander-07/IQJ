@@ -150,32 +150,32 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
 	}
 }
+
 // Функция для получения всех полных новостей, имеющихся в бд на данный момент.
 // Извлекает из запроса параметр all, который должен быть равен 1 для корректной работы
 // Используется функция GetAllNews, которая получает срез всех новостей в бд
 // Использование с GET: /news?all=1
 func (h *Handler) HandleGetAllNews(c *gin.Context) {
-  allStr := c.Query("all")
+	allStr := c.Query("all")
 
-  all, err := strconv.Atoi(allStr)
-  if err != nil {
-    c.String(http.StatusBadRequest, err.Error())
-    fmt.Println("HandleGetAllNews:", err)
-    return
-  }
+	all, err := strconv.Atoi(allStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleGetAllNews:", err)
+		return
+	}
 
-  if all != 1 {
-    c.JSON(http.StatusBadRequest, "All != 1")
-    fmt.Println("HandleGetAllNews: all != 1")
-    return
-  }
-  
-  allnews, err := database.Database.News.GetAllNews()
-  if err != nil {
-    c.JSON(http.StatusInternalServerError, err.Error())
-    fmt.Println("HandleGetAllNews:", err)
-    return
-  }
-  c.JSON(http.StatusOK, allnews)
+	if all != 1 {
+		c.JSON(http.StatusBadRequest, "All != 1")
+		fmt.Println("HandleGetAllNews: all != 1")
+		return
+	}
+
+	allnews, err := database.Database.News.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetAllNews:", err)
+		return
+	}
+	c.JSON(http.StatusOK, allnews)
 }
-

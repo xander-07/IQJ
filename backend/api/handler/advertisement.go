@@ -2,9 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"iqj/database"
 	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Выдает массив с объявлениями, у которых срок годности
@@ -133,26 +135,26 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 // Используется функция GetAllAds, которая получает срез всех объявлений в бд.
 // Использование с GET: /news?all_ads=1
 func (h *Handler) HandleGetAllAdvertisements(c *gin.Context) {
-  all_adsStr := c.Query("all_ads")
+	all_adsStr := c.Query("all_ads")
 
-  all_ads, err := strconv.Atoi(all_adsStr)
-  if err != nil{
-    c.String(http.StatusBadRequest, err.Error())
-    fmt.Println("HandleGetAllAdvertisements:", err)
-    return
-  }
+	all_ads, err := strconv.Atoi(all_adsStr)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleGetAllAdvertisements:", err)
+		return
+	}
 
-  if all_ads != 1 {
-    c.JSON(http.StatusBadRequest, "All_ads != 1")
-    fmt.Println("HandleGetAllAdvertisements: all_ads != 1")
-    return
-  }
+	if all_ads != 1 {
+		c.JSON(http.StatusBadRequest, "All_ads != 1")
+		fmt.Println("HandleGetAllAdvertisements: all_ads != 1")
+		return
+	}
 
-  allads, err := database.Database.News.GetAllAds()
-  if err != nil {
-    c.JSON(http.StatusInternalServerError, err.Error())
-    fmt.Println("HandleGetAllAdvertisements:", err)
-    return
-  }
-  c.JSON(http.StatusOK, allads)
+	allads, err := database.Database.Advertisement.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetAllAdvertisements:", err)
+		return
+	}
+	c.JSON(http.StatusOK, allads)
 }
