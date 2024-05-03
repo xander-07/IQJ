@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS student_groups (
 CREATE TABLE IF NOT EXISTS classes (
     class_id SERIAL PRIMARY KEY,
     class_group_ids INT[] NOT NULL,
-    class_teacher_id INT NOT NULL,
+    class_teacher_id INT,
+    class_teacher_name VARCHAR(255) NOT NULL,
     count INT NOT NULL,
     weekday INT NOT NULL,
     week INT NOT NULL,
