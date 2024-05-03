@@ -6,6 +6,8 @@ import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
 import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
+import 'package:flutter/foundation.dart' as foundation;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 class ChatsList extends StatefulWidget {
   const ChatsList({super.key});
@@ -53,6 +55,7 @@ class _ChatsListState extends State<ChatsList> {
   String uid = "";
   bool vol = false;
   bool pin = false;
+  bool _emojiPicking = true;
 
   @override
   void didChangeDependencies() {
@@ -73,6 +76,8 @@ class _ChatsListState extends State<ChatsList> {
   final TextEditingController _msgController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  DateTime? currentDate;
+  ScrollController _scrollController = ScrollController();
 
   void sendMessage() async {
     if (_msgController.text.isNotEmpty) {
@@ -99,18 +104,68 @@ class _ChatsListState extends State<ChatsList> {
             child: CircularProgressIndicator(),
           );
         }
+
+        List<Widget> messageWidgets = [];
+        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+          final document = snapshot.data!.docs[i];
+          final Map<String, dynamic> data =
+              document.data()! as Map<String, dynamic>;
+          final messageDate = (data['timestamp'] as Timestamp).toDate();
+
+          if (currentDate == null || messageDate.day != currentDate!.day) {
+            messageWidgets.add(_buildDateWidget(messageDate));
+            currentDate = messageDate;
+          }
+
+          messageWidgets.add(_buildMessageListItem(document));
+        }
+
         return Align(
           alignment: Alignment.bottomCenter,
-          child: ListView(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: ListView.builder(
+            padding: EdgeInsets.only(bottom: 8),
+            physics: ClampingScrollPhysics(),
             //reverse: true,
             shrinkWrap: true,
-            children: snapshot.data!.docs
-                .map((document) => _buildMessageListItem(document))
-                .toList(),
+            controller: _scrollController,
+            itemCount: messageWidgets.length,
+            itemBuilder: (context, index) {
+              return messageWidgets[index];
+            },
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDateWidget(DateTime date) {
+    return Row(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            DateFormat('dd MMM, yyyy').format(date),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+        ),
+        Expanded(
+          child: SizedBox(
+            height: 10,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      width: 1),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -129,12 +184,32 @@ class _ChatsListState extends State<ChatsList> {
       child: ReceiverMessage(
         message: data['message'].toString(),
         //mainAxisAlignment: mainalignment,
-        url: '', 
+        url: '',
         receiver: data['senderId'] as String,
-         compare: _firebaseAuth.currentUser!.uid, 
-         time: "${DateFormat('HH:mm').format(DateTime.now())}",
+        compare: _firebaseAuth.currentUser!.uid,
+        time: DateFormat('HH:mm')
+            .format((data['timestamp'] as Timestamp).toDate()),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -202,89 +277,134 @@ class _ChatsListState extends State<ChatsList> {
                     // Действие при нажатии на кнопку с телефоном
                   },
                 ),
-                PopupMenuButton<String>(
-                  onSelected: (String choice) {},
-                  itemBuilder: (BuildContext context) {
-                    return {'Настройки', 'Статус'}.map((String choice) {
-                      return choice == "Настройки"
-                          ? PopupMenuItem<String>(
-                              value: choice,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.settings_outlined),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 12),
-                                  ),
-                                  Text(choice),
-                                ],
-                              ),
-                            )
-                          : PopupMenuItem<String>(
-                              value: choice,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.tag_faces_sharp,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 12),
-                                  ),
-                                  Text(choice),
-                                ],
-                              ),
-                            );
-                    }).toList();
+                IconButton(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                  onPressed: () {
+                    // Действие при нажатии на кнопку
                   },
                 ),
+                // PopupMenuButton<String>(
+                //   onSelected: (String choice) {},
+                //   itemBuilder: (BuildContext context) {
+                //     return {'Настройки', 'Статус'}.map((String choice) {
+                //       return choice == "Настройки"
+                //           ? PopupMenuItem<String>(
+                //               value: choice,
+                //               child: Row(
+                //                 children: [
+                //                   const Icon(Icons.settings_outlined),
+                //                   const Padding(
+                //                     padding: EdgeInsets.only(right: 12),
+                //                   ),
+                //                   Text(choice),
+                //                 ],
+                //               ),
+                //             )
+                //           : PopupMenuItem<String>(
+                //               value: choice,
+                //               child: Row(
+                //                 children: [
+                //                   const Icon(
+                //                     Icons.tag_faces_sharp,
+                //                   ),
+                //                   const Padding(
+                //                     padding: EdgeInsets.only(right: 12),
+                //                   ),
+                //                   Text(choice),
+                //                 ],
+                //               ),
+                //             );
+                //     }).toList();
+                //   },
+                // ),
               ],
             ),
           ),
         ],
       ),
-      body: _buildMessageList(),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.zero,
-        child: TextField(
-          scrollPadding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
-          controller: _msgController,
-          decoration: InputDecoration(
-            filled: true, // Включаем заливку цветом
-            fillColor: Theme.of(context).colorScheme.onInverseSurface,
-            hintText: "Введите сообщение...",
-            border: const OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight:
-                      Radius.circular(12)), // Закругленные углы для поля ввода
-            ),
-            prefixIcon: IconButton(
-              icon: Icon(Icons.insert_emoticon), // Иконка смайлика
-              onPressed: () {
-                // Действие при нажатии на кнопку смайлика
-              },
-            ),
-            suffixIcon: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.attach_file), // Иконка скрепки
-                  onPressed: () {
-                    // Действие при нажатии на кнопку скрепки
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    // Действие при нажатии на кнопку отправки
-                    sendMessage();
-                  },
-                ),
-              ],
+      body: Column(
+        children: [
+          Expanded(
+            child: _buildMessageList(),
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              height: 72,
+              width: double.infinity,
+              color: Theme.of(context).colorScheme.onInverseSurface,
+              padding: EdgeInsets.all(6),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          _emojiPicking = !_emojiPicking;
+                        },
+                        icon: Icon(Icons.insert_emoticon),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _msgController,
+                          decoration: InputDecoration(
+                            filled: true, // Включаем заливку цветом
+                            fillColor:
+                                Theme.of(context).colorScheme.onInverseSurface,
+                            hintText: "Введите сообщение...",
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.all(Radius.circular(
+                                  12)), // Закругленные углы для поля ввода
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.attach_file_outlined),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          sendMessage();
+                        },
+                        icon: Icon(Icons.send),
+                      ),
+                    ],
+                  ),
+                  // if (_emojiPicking)
+                  //  Padding(padding: EdgeInsets.only(bottom: 6)),
+                  //   Container(
+                  //     child: EmojiPicker(
+                  //       textEditingController: _msgController,
+                  //       //scrollController: _scrollController,
+                  //       config: Config(
+                  //         height: 256,
+                  //         checkPlatformCompatibility: true,
+                  //         emojiViewConfig: EmojiViewConfig(
+                  //           // Issue: https://github.com/flutter/flutter/issues/28894
+                  //           emojiSizeMax: 28 *
+                  //               (foundation.defaultTargetPlatform ==
+                  //                       TargetPlatform.iOS
+                  //                   ? 1.2
+                  //                   : 1.0),
+                  //         ),
+                  //         swapCategoryAndBottomBar: false,
+                  //         skinToneConfig: const SkinToneConfig(),
+                  //         categoryViewConfig: const CategoryViewConfig(),
+                  //         bottomActionBarConfig: const BottomActionBarConfig(),
+                  //         searchViewConfig: const SearchViewConfig(),
+                  //       ),
+                  //     ),
+                  //   ),
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
