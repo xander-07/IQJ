@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
 import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+//import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatsList extends StatefulWidget {
   const ChatsList({super.key});
@@ -55,7 +59,26 @@ class _ChatsListState extends State<ChatsList> {
   String uid = "";
   bool vol = false;
   bool pin = false;
-  bool _emojiPicking = true;
+  bool _emojiPicking = false;
+  File? imageFile;
+
+  selectFile() async {
+    XFile? file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 1800,
+      maxWidth: 1800,
+    );
+
+    if (file != null) {
+      setState(() {
+        imageFile = File(file.path);
+      });
+    }
+  }
+
+  Future uploadImage() async {
+    
+  }
 
   @override
   void didChangeDependencies() {
@@ -87,6 +110,12 @@ class _ChatsListState extends State<ChatsList> {
       );
       _msgController.clear();
     }
+  }
+
+  void emojiPickerSet() {
+    setState(() {
+      _emojiPicking = !_emojiPicking;
+    });
   }
 
   Widget _buildMessageList() {
@@ -333,9 +362,15 @@ class _ChatsListState extends State<ChatsList> {
           Align(
             alignment: Alignment.bottomLeft,
             child: Container(
-              height: 72,
+              //height: 72,
               width: double.infinity,
-              color: Theme.of(context).colorScheme.onInverseSurface,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+                border: Border.all(width: 0, color: Colors.transparent),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12)),
+              ),
               padding: EdgeInsets.all(6),
               child: Column(
                 children: [
@@ -343,7 +378,8 @@ class _ChatsListState extends State<ChatsList> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          _emojiPicking = !_emojiPicking;
+                          //emojiPickerSet();
+                          //FocusManager.instance.primaryFocus?.unfocus();
                         },
                         icon: Icon(Icons.insert_emoticon),
                       ),
@@ -358,13 +394,15 @@ class _ChatsListState extends State<ChatsList> {
                             border: const OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.all(Radius.circular(
-                                  12)), // Закругленные углы для поля ввода
+                                  12,),),
                             ),
                           ),
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          selectFile();
+                        },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
                       IconButton(
@@ -375,31 +413,28 @@ class _ChatsListState extends State<ChatsList> {
                       ),
                     ],
                   ),
-                  // if (_emojiPicking)
-                  //  Padding(padding: EdgeInsets.only(bottom: 6)),
-                  //   Container(
-                  //     child: EmojiPicker(
-                  //       textEditingController: _msgController,
-                  //       //scrollController: _scrollController,
-                  //       config: Config(
-                  //         height: 256,
-                  //         checkPlatformCompatibility: true,
-                  //         emojiViewConfig: EmojiViewConfig(
-                  //           // Issue: https://github.com/flutter/flutter/issues/28894
-                  //           emojiSizeMax: 28 *
-                  //               (foundation.defaultTargetPlatform ==
-                  //                       TargetPlatform.iOS
-                  //                   ? 1.2
-                  //                   : 1.0),
-                  //         ),
-                  //         swapCategoryAndBottomBar: false,
-                  //         skinToneConfig: const SkinToneConfig(),
-                  //         categoryViewConfig: const CategoryViewConfig(),
-                  //         bottomActionBarConfig: const BottomActionBarConfig(),
-                  //         searchViewConfig: const SearchViewConfig(),
+                  // if (_emojiPicking) Padding(padding: EdgeInsets.only(bottom: 6)),
+                  // if (_emojiPicking) EmojiPicker(
+                  //     textEditingController: _msgController,
+                  //     //scrollController: _scrollController,
+                  //     config: Config(
+                  //       //height: 256,
+                  //       checkPlatformCompatibility: true,
+                  //       emojiViewConfig: EmojiViewConfig(
+                  //         emojiSizeMax: 28 *
+                  //             (foundation.defaultTargetPlatform ==
+                  //                     TargetPlatform.iOS
+                  //                 ? 1.2
+                  //                 : 1.0),
                   //       ),
+                  //       swapCategoryAndBottomBar: false,
+                  //       skinToneConfig: const SkinToneConfig(),
+                  //       categoryViewConfig: const CategoryViewConfig(),
+                  //       bottomActionBarConfig: const BottomActionBarConfig(),
+                  //       searchViewConfig: const SearchViewConfig(),
                   //     ),
                   //   ),
+                  
                 ],
               ),
             ),
