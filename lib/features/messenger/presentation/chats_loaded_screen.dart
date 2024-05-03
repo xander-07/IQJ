@@ -260,8 +260,8 @@ class _ChatsListState extends State<ChatsList> {
                       children: [
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.35,
-                          child: Flexible(
-                            child: Text(
+                          child: 
+                             Text(
                               user_name ?? "",
                               style: TextStyle(
                                 color: Theme.of(context)
@@ -272,7 +272,7 @@ class _ChatsListState extends State<ChatsList> {
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                          
                         ),
                         vol ? Icon(Icons.volume_off) : Container(),
                         pin ? Icon(Icons.push_pin_outlined) : Container(),
