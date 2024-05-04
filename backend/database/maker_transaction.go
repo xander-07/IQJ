@@ -49,23 +49,23 @@ func (tm *transactionMaker) makeSelect(db *sql.DB, query string, key ...interfac
 //	if err != nil {
 //	    // Обработка ошибки
 //	}
-func (tm *transactionMaker) makeInsert(db *sql.DB, query string, values ...interface{}) error {
+func (tm *transactionMaker) makeInsert(db *sql.DB, query string, values ...interface{}) (*sql.Row, error) {
 	tx, err := db.Begin()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(query, values...)
-	if err != nil {
-		return fmt.Errorf("problem with inserting! %v\ncaused by: %v", err, query)
+	row := tx.QueryRow(query, values...)
+	if row == nil {
+		return nil, nil
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return row, nil
 }
 
 // makeUpdate выполняет UPDATE SQL-запрос в рамках транзакции к базе данных.
