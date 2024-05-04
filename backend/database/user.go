@@ -35,24 +35,26 @@ type UserTable struct {
 // Прим:
 // user := &User{Email: "example@example.com", Password: "example"}
 // err := ...Add(user) // err == nil если все хорошо
-func (ut *UserTable) Add(u *User) error {
+func (ut *UserTable) Add(u *User) (*User, error) {
 
 	// Проверяем были ли переданы данные в u
 	if u.isDefault() {
-		return errors.New("User.Add: wrong data! provided *User is empty")
+		return nil, errors.New("User.Add: wrong data! provided *User is empty")
 	}
 
 	// Используем базовую функцию для создания и исполнения insert запроса
-	err := ut.tm.makeInsert(ut.db,
-		"INSERT INTO users (email,password) VALUES ($1, $2)",
+	row, err := ut.tm.makeInsert(ut.db,
+		"INSERT INTO users (email,password) VALUES ($1, $2) RETURNING user_id",
 		&u.Email, &u.Password,
 	)
 
 	if err != nil {
-		return fmt.Errorf("User.Add: %v", err)
+		return nil, fmt.Errorf("User.Add: %v", err)
 	}
 
-	return nil
+	row.Scan(&u.Id)
+
+	return u, nil
 }
 
 // GetById возвращает данные пользователя из базы данных по указанному идентификатору.
