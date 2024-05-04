@@ -206,19 +206,37 @@ func (sgt *StudentGroupTable) Add(group *StudentGroup) error {
 // Прим:
 // group := &StudentGroup{Id: 1, Grade: 2, Institute: "Институт", Name: "Группа 2", Students: []int{4, 5, 6}}
 // err := ...Update(group) // err == nil если все хорошо
-func (sgt *StudentGroupTable) Update(group *StudentGroup) error {
-	if group.isDefault() {
-		return errors.New("studentGroupTable.Update: wrong data! provided *StudentGroup is empty")
+func (sgt *StudentGroupTable) Update(sg *StudentGroup) error {
+	if sg.isDefault() {
+		return errors.New("StudentGroup.Update: wrong data! provided *StudentGroup is empty")
 	}
 
-	_, err := sgt.db.Exec("UPDATE students_groups SET grade = $1, institute = $2, student_group_name = $3, student_group_students_ids = $4 WHERE students_group_id = $5",
-		group.Grade, group.Institute, group.Name, pq.Array(&group.Students), group.Id)
+	//_, err := sgt.db.Exec("UPDATE students_groups SET grade = $1, institute = $2, student_group_name = $3, student_group_students_ids = $4 WHERE students_group_id = $5",
+	//	group.Grade, group.Institute, group.Name, pq.Array(&group.Students), group.Id)
+	err := sgt.qm.makeUpdate(sgt.db,
+		"UPDATE students_groups SET grade = $1, institute = $2, student_group_name = $3, student_group_students_ids = $4 WHERE students_group_id = $5",
+		sg.Grade, sg.Institute, sg.Name, pq.Array(sg.Students), sg.Id,
+	)
+
 	if err != nil {
-		return fmt.Errorf("studentGroupTable.Update: %v", err)
+		return fmt.Errorf("StudentGroup.Update: %v", err)
 	}
 
 	return nil
 }
+
+// TODO: доделать (или нет?)
+// func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) (*[]Class, error) {
+// 	if sg.isDefault() {
+// 		return nil, errors.New("StudentGroup.GetClasses: provided *StudentGroup is empty!")
+// 	}
+
+// 	err := sgt.qm.makeSelect(sgt.db,
+// 		"",
+// 	)
+
+// 	return nil, nil
+// }
 
 // Delete удаляет группу студентов из базы данных по указанному идентификатору.
 // Принимает указатель на структуру StudentGroup с заполненным полем Id.
