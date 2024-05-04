@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS news (
     news_text TEXT NOT NULL,
     image_links TEXT[],
     tags VARCHAR(255)[],
+    is_for_students BOOL NOT NULL,
     publication_time TIMESTAMP
 );
 
