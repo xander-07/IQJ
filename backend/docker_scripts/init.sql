@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS users_data (
     user_data_id INT PRIMARY KEY REFERENCES users(user_id),
     user_name VARCHAR(255) NOT NULL,
-    biography TEXT NOT NULL,
-    useful_data TEXT NOT NULL,
-    role VARCHAR(50) NOT NULL
+    biography TEXT,
+    useful_data TEXT,
+    role VARCHAR(50)
 );
 
 -- Создание таблицы студентов (students)
