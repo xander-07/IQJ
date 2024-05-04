@@ -42,7 +42,7 @@ func (udt *UserDataTable) Add(ud *UserData) error {
 	}
 
 	// Используем базовую функцию для создания и исполнения insert запроса
-	err := udt.tm.makeInsert(udt.db,
+	_, err := udt.tm.makeInsert(udt.db,
 		"INSERT INTO users_data (user_data_id,user_name,biography,useful_data,role) VALUES ($1, $2, $3, $4, $5)",
 		&ud.Id, &ud.Name, &ud.Bio, &ud.UsefulData, &ud.Role,
 	)
@@ -152,6 +152,36 @@ func (udt *UserDataTable) GetRoleById(ud *UserData) (*UserData, error) {
 	}
 
 	return ud, nil
+}
+
+func (udt *UserDataTable) Update(userData *UserData) error {
+	if userData.Id <= 0 {
+		return errors.New("UserData.Update: userData.Id must be a positive integer")
+	}
+
+	err := udt.tm.makeUpdate(udt.db,
+		"UPDATE users_data SET user_name = $1, biography = $2, useful_data = $3, role = $4 WHERE user_data_id = $5",
+		userData.Name, userData.Bio, userData.UsefulData, userData.Role, userData.Id)
+	if err != nil {
+		return fmt.Errorf("UserData.Update: %v", err)
+	}
+
+	return nil
+}
+
+func (udt *UserDataTable) UpdateRole(userData *UserData) error {
+	if userData.Id <= 0 {
+		return errors.New("UserData.UpdateRole: id must be a positive integer")
+	}
+
+	err := udt.tm.makeUpdate(udt.db,
+		"UPDATE users_data SET role = $1 WHERE user_data_id = $2",
+		userData.Role, userData.Id)
+	if err != nil {
+		return fmt.Errorf("UserData.UpdateRole: %v", err)
+	}
+
+	return nil
 }
 
 // Delete удаляет данные пользователя из базы данных по указанному идентификатору.
