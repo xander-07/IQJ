@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS news (
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    user_is_deleted BOOL NOT NULL
 );
 
 -- Создание таблицы данных пользователей (users_data)
@@ -26,20 +27,23 @@ CREATE TABLE IF NOT EXISTS users_data (
     user_name VARCHAR(255) NOT NULL,
     biography TEXT,
     useful_data TEXT,
-    role VARCHAR(50)
+    role VARCHAR(50),
+    user_data_is_deleted BOOL NOT NULL
 );
 
 -- Создание таблицы студентов (students)
 CREATE TABLE IF NOT EXISTS students (
     student_id INT PRIMARY KEY REFERENCES users(user_id),
     student_group_id INT NOT NULL,
-    student_teachers_ids INT[]
+    student_teachers_ids INT[],
+    student_is_deleted BOOL NOT NULL
 );
 
 -- Создание таблицы преподавателей (teachers)
 CREATE TABLE IF NOT EXISTS teachers (
     teacher_id INT PRIMARY KEY REFERENCES users(user_id),
-    teachers_students_groups_ids INT[]
+    teachers_students_groups_ids INT[],
+    teacher_is_deleted BOOL NOT NULL
 );
 
 -- Создание таблицы студенческих групп (student_groups)
@@ -86,7 +90,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 CREATE TABLE IF NOT EXISTS chat_attachments (
     attachment_id SERIAL PRIMARY KEY,
-    attachment_link TEXT NOT NULL
+    attachment_link TEXT NOT NULL,
+
 );
 
 CREATE TABLE IF NOT EXISTS dialogues (
