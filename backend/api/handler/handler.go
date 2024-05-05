@@ -46,7 +46,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authGroup.PUT("/ad", h.HandleUpdateAdvertisements)
 
 		// Группа функций для работы с Firebase
-		firebaseGroup := r.Group("/firebase")
+		firebaseGroup := authGroup.Group("/firebase")
 		{
 			firebaseGroup.GET("/list_user", h.HandleListUsers)
 		}
