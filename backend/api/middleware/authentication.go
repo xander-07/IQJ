@@ -50,8 +50,8 @@ func WithJWTAuth(c *gin.Context) {
 func GenerateJWT(id int) (string, error) {
 	claims := &tokenclaims{
 		jwt.MapClaims{
-			"ExpiresAt": time.Now().Add(24 * time.Hour).Unix(), // Через сколько токен станет недействительный
-			"IssuedAr":  time.Now().Unix(),                     // Время, когда был создан токен
+			"ExpiresAt": time.Now().Add(4344 * time.Hour).Unix(), // Через сколько токен станет недействительный
+			"IssuedAr":  time.Now().Unix(),                       // Время, когда был создан токен
 		},
 		id,
 	}
