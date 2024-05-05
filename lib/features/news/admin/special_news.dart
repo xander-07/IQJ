@@ -76,13 +76,14 @@ class _SpecialNews extends State<SpecialNews> {
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 8),
             child: Text(
-              'Предпросмотр',
+              'Предпросмотр новости',
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.onBackground,
                 fontWeight: FontWeight.w700,
+
               ),
             ),
           ),
@@ -93,7 +94,9 @@ class _SpecialNews extends State<SpecialNews> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).brightness == Brightness.light
+                ? const Color(0xFFFFECB4)
+                : const Color(0xFF594512),
             ),
             child: Wrap(
               children: [
@@ -114,8 +117,8 @@ class _SpecialNews extends State<SpecialNews> {
                                   child: SvgPicture.asset(
                                     'assets/icons/schedule/warning.svg',
                                     semanticsLabel: 'warning',
-                                    height: 24,
-                                    width: 24,
+                                    height: 14,
+                                    width: 16,
                                     allowDrawingOutsideViewBox: true,
                                     // color: const Color.fromARGB(255, 239, 172, 0),
                                   ),
@@ -128,16 +131,23 @@ class _SpecialNews extends State<SpecialNews> {
                                       fontFamily: 'Inter',
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal,
+                                      
                                       color: Color.fromARGB(255, 255, 166, 0),
                                     ),
                                   ),
                                 ),
-                                IconButton(
+                               IconButton(
                                   onPressed: () {
                                     setState(() {});
                                   },
-                                  icon: SvgPicture.asset(
-                                    'assets/icons/news/close.svg',
+                                  icon: Padding(
+                                    padding: const EdgeInsets.only(left: 21.0), 
+                                    child:
+                                     SvgPicture.asset(
+                                      width: 16,
+                                      height: 16,
+                                      'assets/icons/news/close.svg',
+                                    ),
                                   ),
                                 ),
                               ],
@@ -153,16 +163,16 @@ class _SpecialNews extends State<SpecialNews> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 12, right: 12, top: 12),
-            child: Divider(
+            child: const Divider(
               thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Color.fromRGBO(209, 209, 209, 0.12),
             ),
           ),
           // Блок редактора новости
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 12),
             child: Text(
-              'Редактор',
+              'Текст новости',
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontFamily: 'Inter',
@@ -206,9 +216,9 @@ class _SpecialNews extends State<SpecialNews> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 12, right: 12),
-            child: Divider(
+            child: const Divider(
               thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Color.fromRGBO(209, 209, 209, 0.12),
             ),
           ),
           // Блок настройки срока показа новости
@@ -231,130 +241,173 @@ class _SpecialNews extends State<SpecialNews> {
               Container(
                 width: 30,
                 alignment: Alignment.bottomLeft,
-                margin: const EdgeInsets.only(left: 12, top: 6),
+                margin: const EdgeInsets.only(left: 8, top: 6, right: 8),
                 child: Text(
-                  "С:",
+                  "С",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFF191919)
+                      : const Color(0xFFE8E8E8),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
               Flexible(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 10, left: 12, right: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    controller: fromDatePickerController,
-                    decoration: InputDecoration(
-                      hintText: "дд.мм.гггг",
-                      hintFadeDuration: const Duration(milliseconds: 100),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
-                      hintStyle: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16.0,
-                        height: 2.5,
-                        color: Color.fromRGBO(128, 128, 128, 0.6),
-                      ),
-                      suffixIcon: SizedBox(
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.date_range,
-                          ),
-                          onPressed: () {
-                            _selectFromDate(context);
-                          },
+                  margin: const EdgeInsets.only(right: 12),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 40,
+                        left: 10,
+                        right: 0,
+                        child: Container(
+                          height: 1,
+                          color: const Color(0xFF2C2D2F),
                         ),
                       ),
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        DateFormat outputFormat =
-                            DateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
-                        formattedFromDate = outputFormat.format(DateFormat('dd.MM.yyyy').parse(text));
-                        _publishFromTime = text;
-                      });
-                    },
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TextField(
+                              controller: fromDatePickerController,
+                              decoration: InputDecoration(
+                                hintText: "дд.мм.гггг",
+                                hintFadeDuration: const Duration(milliseconds: 100),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,vertical: 10),
+                                hintStyle: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16.0,
+                                  height: 2.5,
+                                  color: Theme.of(context).brightness == Brightness.light
+                                    ? const Color(0xFF191919)
+                                    : const Color(0xFFE8E8E8),
+                                ),
+                              ),
+                              onChanged: (text) {
+                                setState(() {
+                                  DateFormat outputFormat =
+                                      DateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                                  formattedFromDate = outputFormat.format(DateFormat('dd.MM.yyyy').parse(text));
+                                  _publishFromTime = text;
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5.0, bottom: 13), 
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.date_range,
+                              ),
+                              onPressed: () {
+                                _selectFromDate(context);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
                 width: 30,
                 alignment: Alignment.bottomLeft,
-                margin: const EdgeInsets.only(left: 12, top: 6),
+                margin: const EdgeInsets.only(left: 8, top: 6, right: 8),
                 child: Text(
-                  "По:",
+                  "По",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFF191919)
+                      : const Color(0xFFE8E8E8),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
               Flexible(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 10, left: 12, right: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    controller: toDatePickerController,
-                    decoration: InputDecoration(
-                      hintText: "дд.мм.гггг",
-                      hintFadeDuration: const Duration(milliseconds: 100),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
-                      hintStyle: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16.0,
-                        height: 2.5,
-                        color: Color.fromRGBO(128, 128, 128, 0.6),
-                      ),
-                      suffixIcon: SizedBox(
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.date_range,
-                          ),
-                          onPressed: () {
-                            _selectToDate(context);
-                          },
+                  margin: const EdgeInsets.only(right: 12),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 40, 
+                        left: 10,
+                        right: 0,
+                        child: Container(
+                          height: 1,
+                          color: const Color(0xFF2C2D2F),
                         ),
                       ),
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        DateFormat outputFormat =
-                            DateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
-                        formattedUntilDate = outputFormat.format(DateFormat('dd.MM.yyyy').parse(text));
-                        _publishUntilTime = text;
-                      });
-                    },
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TextField(
+                              controller: toDatePickerController,
+                              decoration: InputDecoration(
+                                hintText: "дд.мм.гггг",
+                                hintFadeDuration: const Duration(milliseconds: 100),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                hintStyle: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16.0,
+                                  height: 2.5,
+                                  color: Theme.of(context).brightness == Brightness.light
+                                    ? const Color(0xFF191919)
+                                    : const Color(0xFFE8E8E8),
+                                ),
+                              ),
+                              onChanged: (text) {
+                                setState(() {
+                                  DateFormat outputFormat =
+                                      DateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                                  formattedUntilDate = outputFormat.format(DateFormat('dd.MM.yyyy').parse(text));
+                                  _publishUntilTime = text;
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5.0, bottom: 13), 
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.date_range,
+                              ),
+                              onPressed: () {
+                                _selectToDate(context);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
+
+
+
+
           // Три кнопки быстрой установки срока показа новости
           Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 0),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,7 +418,9 @@ class _SpecialNews extends State<SpecialNews> {
                   decoration: BoxDecoration(
                     //borderRadius: BorderRadius.circular(50),
                     borderRadius: BorderRadius.circular(24.0),
-                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFFB3B3B3)
+                      : const Color(0xFF454648),
                   ),
                   child: TextButton(
                     onPressed: () {
@@ -377,13 +432,13 @@ class _SpecialNews extends State<SpecialNews> {
                       toDatePickerController.text =
                           DateFormat('dd.MM.yyyy').format(to);
                     },
-                    child: Text(
+                    child: const Text(
                       "1 день",
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Color(0xFFFFFFFF),
                       ),
                     ),
                   ),
@@ -395,7 +450,9 @@ class _SpecialNews extends State<SpecialNews> {
                   decoration: BoxDecoration(
                     //borderRadius: BorderRadius.circular(50),
                     borderRadius: BorderRadius.circular(24.0),
-                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFFB3B3B3)
+                      : const Color(0xFF454648),
                   ),
                   child: TextButton(
                     onPressed: () {
@@ -407,13 +464,13 @@ class _SpecialNews extends State<SpecialNews> {
                       toDatePickerController.text =
                           DateFormat('dd.MM.yyyy').format(to);
                     },
-                    child: Text(
+                    child: const Text(
                       "3 дня",
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color:  Color(0xFFFFFFFF),
                       ),
                     ),
                   ),
@@ -422,9 +479,10 @@ class _SpecialNews extends State<SpecialNews> {
                   margin: const EdgeInsets.only(right: 5),
                   height: 35,
                   decoration: BoxDecoration(
-                    //borderRadius: BorderRadius.circular(50),
                     borderRadius: BorderRadius.circular(24.0),
-                    color: Theme.of(context).colorScheme.onInverseSurface,
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFFB3B3B3)
+                      : const Color(0xFF454648),
                   ),
                   child: TextButton(
                     onPressed: () {
@@ -436,13 +494,13 @@ class _SpecialNews extends State<SpecialNews> {
                       toDatePickerController.text =
                           DateFormat('dd.MM.yyyy').format(to);
                     },
-                    child: Text(
+                    child: const Text(
                       "Неделя",
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Color(0xFFFFFFFF),
                       ),
                     ),
                   ),
@@ -450,11 +508,17 @@ class _SpecialNews extends State<SpecialNews> {
               ],
             ),
           ),
+          
           const Padding(
-            padding: EdgeInsets.only(left: 10, top: 25),
+            padding: EdgeInsets.only(left: 10, top: 42, bottom: 25),
             child: Text(
               "Эта новость будет показана всем преподавателям.",
               textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Color(0xFF7D7D7D),
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+              ),
             ),
           ),
           special_news_add_button(

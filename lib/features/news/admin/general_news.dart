@@ -203,7 +203,7 @@ class _GeneralNews extends State<GeneralNews> {
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 12),
             child: Text(
-              'Редактор',
+              'Текст новости',
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontFamily: 'Inter',

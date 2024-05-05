@@ -54,7 +54,7 @@ Widget two_button_add_news(BuildContext context) {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 6), 
+            const SizedBox(height: 8), 
             SizedBox(
               height: 65,
               width: 325,
@@ -118,6 +118,9 @@ Widget two_button_add_news(BuildContext context) {
                 ),
               ),
             ),
+            SizedBox(
+              height: 6,
+            )
           ],
         ),
       ),
