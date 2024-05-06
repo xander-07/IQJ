@@ -73,8 +73,8 @@ class _AppState extends State<App> {
         'account': (context) => const AccountScreen(),
         'registration': (context) => const RegScreen(),
         'successreg': (context) => const SuccessReg(),
-        'messenger': (context) => const MessengerScreen(),
-        'chatslist': (context) => const ChatsList(),
+        'messenger': (context) => const MessengerScreen(), // главна страница сообщений
+        'chatslist': (context) => const ChatsList(), // это страница диолга
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),

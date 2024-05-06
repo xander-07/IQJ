@@ -374,6 +374,15 @@ class _ChatsListState extends State<ChatsList> {
               padding: EdgeInsets.all(6),
               child: Column(
                 children: [
+                  (imageFile != null && imageFile!.existsSync())?Container(
+                      //height: 100,
+                      width: MediaQuery.of(context).size.width,
+                      color: Theme.of(context).backgroundColor,
+                      child: Image.file(
+                        imageFile!,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ):Container(),
                   Row(
                     children: [
                       IconButton(
