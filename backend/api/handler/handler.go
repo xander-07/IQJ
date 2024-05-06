@@ -20,6 +20,8 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
 
+	InitCache()
+
 	// Добавляет заголовки CORS к ответам сервера.
 	// Необходимо для того, чтобы клиентские приложения,
 	// работающие на других доменах, могли взаимодействовать с API.
