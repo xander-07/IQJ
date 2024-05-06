@@ -3,6 +3,7 @@ package scraper
 import (
 	"fmt"
 	"iqj/database"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
@@ -80,9 +81,9 @@ func scraper2(newsblarr []NewsBlock) {
 		mas = append(mas, "https://www.mirea.ru"+e.ChildAttr("img", "src"))
 	})
 
-	var tags []string
+	var tags string
 	c.OnHTML("li[class=\"uk-display-inline-block\"]", func(e *colly.HTMLElement) {
-		tags = append(tags, e.Text)
+		tags = e.Text
 	})
 
 	for i := range newsblarr {
@@ -92,8 +93,14 @@ func scraper2(newsblarr []NewsBlock) {
 		news.Content = text
 		news.ImageLinks = mas
 		mas = nil
-		news.Tags = tags
-		tags = nil
+		tagsArr := strings.Split(tags, ", ")
+		news.Tags = tagsArr
+		if strings.Contains(tags, "студентам") {
+			news.IsForStudents = true
+		} else {
+			news.IsForStudents = false
+		}
+		tagsArr = nil
 		news.PublicationTime = newsblarr[i].PublicationTime
 		err := database.Database.News.Add(&news)
 		if err != nil {
