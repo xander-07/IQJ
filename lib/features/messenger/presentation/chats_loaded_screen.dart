@@ -8,9 +8,11 @@ import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
 import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
+import 'package:iqj/features/messenger/presentation/screens/file_chat.dart/file_chat.dart';
 import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
 //import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+//import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatsList extends StatefulWidget {
@@ -241,6 +243,30 @@ class _ChatsListState extends State<ChatsList> {
     }
   }
 
+
+   Widget getFileWidget(File file) {
+    String extension = file.path.split('.').last.toLowerCase();
+    if (extension == 'jpg' || extension == 'jpeg' || extension == 'png' || extension == 'gif') {
+      return Image.file(
+        file,
+        fit: BoxFit.contain,
+      );
+    } else if (extension == 'mp3' || extension == 'wav' || extension == 'aac') {
+      return AudioWidget(file: file);
+    // } else if (extension == 'pdf') {
+    //   return PDFImage(
+    //     file: File(file.path),
+    //     width: 200, // задайте желаемую ширину изображения
+    //     height: 200, // задайте желаемую высоту изображения
+    //     fitPolicy: FitPolicy.WIDTH_AND_HEIGHT, // опционально, чтобы сохранить соотношение сторон и заполнить всю область изображения
+    //   )
+    } else if (extension == 'mp4' || extension == 'mkv' || extension == 'avi') {
+      return VideoWidget(file: file);
+    } else {
+      return Text('Неподдерживаемый тип файла');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -378,10 +404,11 @@ class _ChatsListState extends State<ChatsList> {
                       //height: 100,
                       width: MediaQuery.of(context).size.width,
                       color: Theme.of(context).backgroundColor,
-                      child: Image.file(
-                        imageFile!,
-                        fit: BoxFit.fitWidth,
-                      ),
+                      // child: Image.file(
+                      //   imageFile!,
+                      //   fit: BoxFit.fitWidth,
+                      // ),
+                      child: getFileWidget(imageFile!),
                     ):Container(),
                   Row(
                     children: [
