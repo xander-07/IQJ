@@ -112,6 +112,9 @@ class _ChatsListState extends State<ChatsList> {
       );
       _msgController.clear();
     }
+    if (imageFile != null && imageFile!.existsSync()){
+      await _chatService.sendMessFile(uid, imageFile!);
+    }
   }
 
   void emojiPickerSet() {
