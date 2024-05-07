@@ -295,7 +295,7 @@ class _ChatsListState extends State<ChatsList> {
             onPressed: () { 
                 Navigator.of(context).pushNamed(
               'page_person',
-              //arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': volume,'pin': push_pin, 'uid':widget.uid},
+              arguments: {'name': user_name,'url': image_url, 'uid': uid},
                 );
              },
             child: Row(
