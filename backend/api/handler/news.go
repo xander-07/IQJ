@@ -179,3 +179,47 @@ func (h *Handler) HandleGetAllNews(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, allnews)
 }
+
+// Функция для обновления новости по её id.
+// Использование с PUT: /api/news
+func (h *Handler) HandleUpdateNews(c *gin.Context) {
+	userIdToConv, ok := c.Get("userId")
+	if !ok {
+		c.String(http.StatusUnauthorized, "User ID not found")
+		fmt.Println("HandleUpdateNews:", ok)
+		return
+	}
+	userId := userIdToConv.(int)
+
+	user, err := database.Database.UserData.GetRoleById(
+		&database.UserData{
+			Id: userId,
+		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleUpdateNews:", err)
+		return
+	}
+
+	if user.Role == "moderator" {
+		var news database.News
+
+		err := c.BindJSON(&news)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+			fmt.Println("HandleUpdateNews:", err)
+			return
+		}
+
+		ok := database.Database.News.Update(&news)
+		if ok != nil {
+			c.JSON(http.StatusInternalServerError, ok.Error())
+			fmt.Println("HandleUpdateNews:", ok)
+			return
+		}
+
+		c.JSON(http.StatusOK, news)
+	} else {
+		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
+	}
+}

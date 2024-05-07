@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -27,6 +28,25 @@ func main() {
 	})
 	r.GET("/api/health", HealthCheckHandler())
 	// r.Run("127.0.0.1:5050")
+}
+
+type Mess struct {
+	ID      string
+	Message string
+}
+
+func CreateMessHandler(client *firestore.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var mess Mess.Todo
+		if err := c.BindJSON(&mess); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadReauest, gin.H{"error": err.Error()})
+			return
+		}
+		now := time.Now()
+
+		ref := client.Collection()
+	}
+
 }
 
 func HealthCheckHandler() func(c *gin.Context) {

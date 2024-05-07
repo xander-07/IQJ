@@ -277,48 +277,70 @@ class _ChatsListState extends State<ChatsList> {
         backgroundColor: Theme.of(context).colorScheme.background,
         title: Container(
           width: MediaQuery.of(context).size.width,
-          child: Row(
-            children: [
-              _buildThumbnailImage(image_url ?? ""),
-              //const Padding(padding: EdgeInsets.only(right: 12)),
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.35,
-                          child: 
-                             Text(
-                              user_name ?? "",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 20,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          
-                        ),
-                        vol ? Icon(Icons.volume_off) : Container(),
-                        pin ? Icon(Icons.push_pin_outlined) : Container(),
-                      ],
-                    ),
-                    Text(
-                      "печатает...",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
+          child: ElevatedButton(
+            style: ButtonStyle(
+              padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+              surfaceTintColor:
+                  const MaterialStatePropertyAll(Colors.transparent),
+              backgroundColor: MaterialStatePropertyAll(
+                Theme.of(context).colorScheme.background,
+              ),
+              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+              shape: MaterialStatePropertyAll(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            ],
+            ),
+            onPressed: () { 
+                Navigator.of(context).pushNamed(
+              'page_person',
+              arguments: {'name': user_name,'url': image_url, 'uid': uid},
+                );
+             },
+            child: Row(
+              children: [
+                _buildThumbnailImage(image_url ?? ""),
+                //const Padding(padding: EdgeInsets.only(right: 12)),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            child: 
+                               Text(
+                                user_name ?? "",
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 20,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            
+                          ),
+                          vol ? Icon(Icons.volume_off) : Container(),
+                          pin ? Icon(Icons.push_pin_outlined) : Container(),
+                        ],
+                      ),
+                      Text(
+                        "печатает...",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [

@@ -25,6 +25,7 @@ require (
 	cloud.google.com/go/iam v1.1.7 // indirect
 	cloud.google.com/go/longrunning v0.5.5 // indirect
 	cloud.google.com/go/storage v1.40.0 // indirect
+	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/MicahParks/keyfunc v1.9.0 // indirect
 	github.com/PuerkitoBio/goquery v1.9.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect

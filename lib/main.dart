@@ -6,6 +6,7 @@ import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
 import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
 import 'package:iqj/features/services/presentation/screens/about_screen.dart';
@@ -18,18 +19,47 @@ import 'package:iqj/features/registration/presentation/reg_screen.dart';
 import 'package:iqj/features/registration/presentation/successful_reg_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:rxdart/rxdart.dart';
 
-void main() async {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(
     ChangeNotifierProvider(
-        create: (context) => AuthService(), 
-        child: const App(),),
+      create: (context) => AuthService(),
+      child: const App(),
+    ),
   );
+
+  // Код для работы пуш-уведомлений для чата (android)
+  final messaging = FirebaseMessaging.instance;
+  final settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  String? token = await messaging.getToken();
+  //print("RegToken HERERERERRERE: " + token!);
+  final _messageStreamController = BehaviorSubject<RemoteMessage>();
+   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+   _messageStreamController.sink.add(message);
+ });
+
 }
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+ await Firebase.initializeApp();
+}
+
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -51,7 +81,7 @@ class _AppState extends State<App> {
     final prefs = await SharedPreferences.getInstance();
     setState(
       () {
-         firstLaunch = prefs.getBool('firstLaunch') ?? true;
+        firstLaunch = prefs.getBool('firstLaunch') ?? true;
       },
     );
   }
@@ -73,15 +103,15 @@ class _AppState extends State<App> {
         'account': (context) => const AccountScreen(),
         'registration': (context) => const RegScreen(),
         'successreg': (context) => const SuccessReg(),
-        'messenger': (context) => const MessengerScreen(), // главна страница сообщений
+        'messenger': (context) =>
+            const MessengerScreen(), // главна страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
+        'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),
       },
-      onUnknownRoute: (settings) {
-        
-      },
+      onUnknownRoute: (settings) {},
     );
   }
 }

@@ -116,7 +116,7 @@ func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
 func (at *AdvertisementTable) Update(a *Advertisement) error {
 
 	if a.isDefault() {
-		return errors.New("Advertisement.Add: wrong data! provided *Advertisement is empty")
+		return errors.New("Advertisement.Update: wrong data! provided *Advertisement is empty")
 	}
 
 	err := at.qm.makeUpdate(at.db,
