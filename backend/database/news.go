@@ -202,3 +202,35 @@ func (nt *NewsTable) Delete(n *News) error {
 
 	return nil
 }
+
+// Update обновляет новость из базы данных по указанному идентификатору.
+// Принимает указатель на News с заполненным полем Id.
+// Возвращает nil при успешном обновлении.
+//
+// Прим:
+// n := &News{Header: "Новость", Content: "Содержание", ImageLinks: []string{"http://example.com/image1.jpg"}, Tags: []string{"tag1", "tag2"}, IfForStudents: true, PublicationTime: "01.01.2024", Id: 25}
+// err := ...Update(n) // err == nil если все хорошо
+func (nt *NewsTable) Update(n *News) error {
+
+	if n.isDefault() {
+		return errors.New("News.Update: wrong data! provided *News is empty")
+	}
+
+	err := nt.qm.makeUpdate(nt.db,
+		`UPDATE news
+		SET header = $1,
+			news_text = $2,
+			image_links = $3,
+			tags = $4,
+			is_for_students = $5,
+			publication_time = $6
+			WHERE news_id = $7`,
+		n.Id, n.Header, n.Content, n.ImageLinks, n.Tags, n.IsForStudents, n.PublicationTime,
+	)
+
+	if err != nil {
+		return fmt.Errorf("News.Update: %v", err)
+	}
+
+	return nil
+}
