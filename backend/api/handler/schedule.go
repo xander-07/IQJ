@@ -2,10 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/patrickmn/go-cache"
-	"iqj/api/excelparser"
+	cache2 "iqj/pkg/cache"
+	"iqj/pkg/excel_parser"
 	"net/http"
-	"time"
 )
 
 // Получает criterion (group, tutor, classroom) и value из запроса, вызывает функцию Parse,
@@ -16,27 +15,23 @@ import (
 // при "GET /lessons?criterion=classroom&value=ауд. А-61 (МП-1)" вернет расписание на неделю аудитории ауд. А-61 (МП-1)
 // При неверном критерии или значении отправит null
 
-var Cache2 *cache.Cache
-
-func InitCache() {
-	Cache2 = cache.New(168*time.Hour, 336*time.Hour)
-}
+var cache = cache2.NewLFUCache(100)
 
 func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
-	item, found := Cache2.Get(value)
-	if found {
-		c.JSON(http.StatusOK, item.([]excelparser.Lesson))
-		return
+
+	item := cache.Get(value)
+	if item != nil {
+		c.JSON(http.StatusOK, item)
 	} else {
-		lessons, err := excelparser.Parse2(criterion, value)
+		lessons, err := excel_parser.Parse2(criterion, value)
 		if err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		}
 
-		var filteredLessons []excelparser.Lesson
+		var filteredLessons []excel_parser.Lesson
 		for _, lesson := range lessons {
 			switch criterion {
 			case "group":
@@ -61,7 +56,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 			}
 		}
 
-		Cache2.Set(value, filteredLessons, cache.DefaultExpiration)
+		cache.Set(value, filteredLessons)
 
 		c.JSON(http.StatusOK, filteredLessons)
 	}

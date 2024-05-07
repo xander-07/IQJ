@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"iqj/api/middleware"
+	middleware2 "iqj/pkg/middleware"
 	"iqj/service"
 	"net/http"
 )
@@ -20,12 +20,10 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
 
-	InitCache()
-
 	// Добавляет заголовки CORS к ответам сервера.
 	// Необходимо для того, чтобы клиентские приложения,
 	// работающие на других доменах, могли взаимодействовать с API.
-	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware2.CORSMiddleware())
 
 	// Вызов хэндлеров исходя из запроса.
 	r.GET("/", h.Hello)
@@ -41,7 +39,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	// Группа функций, которая доступна только после аутентификации
 	authGroup := r.Group("/api")
-	authGroup.Use(middleware.WithJWTAuth)
+	authGroup.Use(middleware2.WithJWTAuth)
 	{
 		authGroup.POST("/news", h.HandleAddNews)
 		authGroup.POST("/ad", h.HandlePostAdvertisement)
