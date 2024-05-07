@@ -100,7 +100,173 @@ class _Page_person extends State<Page_person> {
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
-                        ),) // Отображение названия user_name
+                        ),
+             ),
+             SizedBox(height: 10), // Отступ перед кнопками
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Равномерное распределение по оси X
+            children: [
+              Column(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.person_add),
+                    color: Colors.orange, // Оранжевый цвет
+                    onPressed: () {
+                      // Действия для кнопки с логотипом человечка с плюсом
+                    },
+                  ),
+                  Text("Добавить",
+                  style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ), // Текст ниже первой кнопки
+                ],
+              ),
+              Column(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.notifications),
+                    color: Colors.orange, // Оранжевый цвет
+                    onPressed: () {
+                      // Действия для кнопки с логотипом колокольчика
+                    },
+                  ),
+                  Text("Уведомления",
+                  style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ), // Текст ниже второй кнопки
+                ],
+              ),
+              Column(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.search),
+                    color: Colors.orange, // Оранжевый цвет
+                    onPressed: () {
+                      // Действия для кнопки с логотипом лупы
+                    },
+                  ),
+                  Text("  Поиск",
+                  style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ), // Текст ниже третьей кнопки
+                ],
+              ),
+            ],
+          ), 
+          SizedBox(height: 15),
+          Container(
+            height: 2.0,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
+          SizedBox(height: 15),
+          DefaultTabController(
+            length: 5,
+            child: TabBar( 
+              isScrollable: true,
+              indicatorPadding: EdgeInsets.only(top: 10,bottom: 10),
+              tabs: [
+                Tab(
+                  child: Container(
+                    decoration: BoxDecoration( 
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Text(
+                      "Участники",
+                      style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 10,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Container(
+                    decoration: BoxDecoration( 
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Text(
+                      "Медиа",
+                      style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 10,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Container(
+                    decoration: BoxDecoration( 
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Text(
+                      "Файлы",
+                      style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 10,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Container(
+                    decoration: BoxDecoration( 
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Text(
+                      "Ссылки",
+                      style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 10,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Container(
+                    decoration: BoxDecoration( 
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Text(
+                      "Голосовые",
+                      style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontSize: 10,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          )
           ],
         ),
       ),
