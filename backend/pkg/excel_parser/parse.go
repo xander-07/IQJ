@@ -1,4 +1,4 @@
-package excelparser
+package excel_parser
 
 import (
 	"fmt"

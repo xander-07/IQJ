@@ -1,4 +1,4 @@
-package scraper
+package news_parser
 
 import (
 	"fmt"

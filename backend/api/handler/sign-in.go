@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"iqj/api/middleware"
 	"iqj/database"
+	"iqj/pkg/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
