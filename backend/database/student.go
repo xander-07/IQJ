@@ -110,11 +110,10 @@ func (st *StudentTable) GetClasses(s *Student) (*[]Class, error) {
 
 	// Используем базовую функцию для формирования и исполнения select запроса
 	classes, err := st.qm.makeSelect(st.db,
-		`SELECT s.*
-			FROM schedule s
-			JOIN student_groups sg ON s.group_id = ANY(sg.students)
-			WHERE $1 = ANY(sg.students);
-			`, s.Id)
+		`SELECT *
+		FROM classes
+		WHERE $1 = ANY(class_group_ids);`,
+		s.Id)
 
 	// Проверяем ошибку select'а
 	if err != nil {
@@ -139,22 +138,22 @@ func (st *StudentTable) GetClasses(s *Student) (*[]Class, error) {
 //
 // Прим:
 // s := &Student{Id: 1, Week: 1, Weekday: 3}
-// classes, err := ...GetClassesByCurrentDay(s, 1, 3) // Получить классы на 3-м дне недели первой недели
-func (st *StudentTable) GetClassesByCurrentDay(s *Student, wc, wd int) (*[]Class, error) {
+// classes, err := ...GetClassesByDay(s, 1, 3) // Получить классы на 3-м дне недели первой недели
+func (st *StudentTable) GetClassesByDay(s *Student, wc, wd int) (*[]Class, error) {
 
 	// Проверяем переданы ли данные в функцию
 	if s.isDefault() {
-		return nil, errors.New("Student.GetClassesByWeekday: wrong data! provided *Student is empty")
+		return nil, errors.New("Student.GetClassesByDay: wrong data! provided *Student is empty")
 	}
 	// Проверяем передан ли id
 	if s.Id == 0 {
-		return nil, errors.New("Student.GetClassesByWeekday: wrong data! provided *Student.Id is empty")
+		return nil, errors.New("Student.GetClassesByDay: wrong data! provided *Student.Id is empty")
 	}
 
 	// Используем базовую функцию для формирования и исполнения select запроса
 	classes, err := st.qm.makeSelect(st.db,
 		`SELECT s.*
-			FROM schedule s
+			FROM classes s
 			JOIN student_groups sg ON s.group_id = ANY(sg.students)
 			JOIN students st ON sg.id = st.student_group
 			WHERE st.id = $1 AND s.weekday = $2 AND s.Week = $3`,
@@ -162,7 +161,7 @@ func (st *StudentTable) GetClassesByCurrentDay(s *Student, wc, wd int) (*[]Class
 
 	// Проверяем ошибку select'а
 	if err != nil {
-		return nil, fmt.Errorf("Student.GetClassesByWeekday: %v", err)
+		return nil, fmt.Errorf("Student.GetClassesByDay: %v", err)
 	}
 
 	var resultClasses []Class
