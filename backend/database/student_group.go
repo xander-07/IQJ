@@ -225,18 +225,37 @@ func (sgt *StudentGroupTable) Update(sg *StudentGroup) error {
 	return nil
 }
 
-// TODO: доделать (или нет?)
-// func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) (*[]Class, error) {
-// 	if sg.isDefault() {
-// 		return nil, errors.New("StudentGroup.GetClasses: provided *StudentGroup is empty!")
-// 	}
+func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) ([]Class, error) {
+	if sg.isDefault() {
+		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
+	}
 
-// 	err := sgt.qm.makeSelect(sgt.db,
-// 		"",
-// 	)
+	rows, err := sgt.qm.makeSelect(sgt.db,
+		`SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location
+		FROM classes
+		WHERE $1 = ANY(class_group_ids);`, sg.Id)
+	if err != nil {
+		return nil, fmt.Errorf("StudentGroup.GetClasses: %v", err)
+	}
+	defer rows.Close()
 
-// 	return nil, nil
-// }
+	var resultClasses []Class
+
+	for rows.Next() {
+		var resultClass Class
+		err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		if err != nil {
+			return nil, fmt.Errorf("StudentGroup.GetClasses: error scanning row: %v", err)
+		}
+		resultClasses = append(resultClasses, resultClass)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("StudentGroup.GetClasses: error after scanning rows: %v", err)
+	}
+
+	return resultClasses, nil
+}
 
 // Delete удаляет группу студентов из базы данных по указанному идентификатору.
 // Принимает указатель на структуру StudentGroup с заполненным полем Id.
