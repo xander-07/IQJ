@@ -30,7 +30,7 @@ func (tm *transactionMaker) makeSelect(db *sql.DB, query string, key ...interfac
 		return nil, err
 	}
 
-	rows, err := tx.Query(query, key)
+	rows, err := tx.Query(query, key...)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("problem with selecting! %v\ncaused by: %v", err, query)
