@@ -1,5 +1,6 @@
 package firebase
 
+/*
 import (
 	"time"
 
@@ -47,3 +48,4 @@ func giveMessfirebase(mess Message) (*Message, error) {
 
 	return &mess, nil
 }
+*/

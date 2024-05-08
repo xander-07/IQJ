@@ -1,5 +1,6 @@
 package firebase
 
+/*
 import (
 	"context"
 	"fmt"
@@ -135,3 +136,4 @@ func createClient() (*firestore.Client, error) {
 // 	log.Printf("result is %v", result)
 
 // }
+*/

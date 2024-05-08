@@ -1,5 +1,6 @@
 package firebase
 
+/*
 import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
@@ -27,3 +28,4 @@ func InitFirebase() (*auth.Client, error) {
 
 	return client, nil
 }
+*/

@@ -1,5 +1,6 @@
 package firebase
 
+/*
 import (
 	"net/http"
 
@@ -11,3 +12,4 @@ func HealthCheckHandler() func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": true})
 	}
 }
+*/

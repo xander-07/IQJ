@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	middleware2 "iqj/pkg/middleware"
 	"iqj/service"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -45,11 +46,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authGroup.POST("/ad", h.HandlePostAdvertisement)
 		authGroup.PUT("/ad", h.HandleUpdateAdvertisements)
 
-		// Группа функций для работы с Firebase
-		firebaseGroup := authGroup.Group("/firebase")
-		{
-			firebaseGroup.GET("/list_user", h.HandleListUsers)
-		}
+		// // Группа функций для работы с Firebase
+		// firebaseGroup := authGroup.Group("/firebase")
+		// {
+		// 	firebaseGroup.GET("/list_user", h.HandleListUsers)
+		// }
 	}
 
 	return r

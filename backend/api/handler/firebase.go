@@ -1,5 +1,6 @@
 package handler
 
+/*
 import (
 	"context"
 	"fmt"
@@ -53,3 +54,4 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, userList)
 }
+*/
