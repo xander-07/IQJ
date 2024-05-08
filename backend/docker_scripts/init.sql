@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS news (
 -- Создание таблицы пользователей (users)
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    user_is_deleted BOOL NOT NULL
+    user_is_deleted BOOL NOT NULL DEFAULT FALSE
 );
 
 -- Создание таблицы данных пользователей (users_data)
