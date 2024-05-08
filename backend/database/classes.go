@@ -168,24 +168,42 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 	return &resultClasses, nil
 }
 
+// GetByLocation возвращает список классов по указанному местоположению.
+// Принимает указатель на объект ClassTable (ct) и указатель на объект Class (c), содержащий местоположение класса (c.Location).
+// Возвращает указатель на срез объектов Class и ошибку при её возникновении.
+//
+// Прим:
+// classes, err := ct.GetByLocation(&Class{Location: "A101"})
+//
+//	if err != nil {
+//	    // Обработка ошибки
+//	}
+//
+//	for _, class := range *classes {
+//	    // Обработка классов
+//	}
 func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
+	// Проверяем, что переданный объект класса не пустой
 	if c.isDefault() {
 		return nil, errors.New("Class.GetByLocation: wrong data! provided *Class is empty")
 	}
 
+	// Выполняем SQL-запрос для выборки классов по местоположению
 	rows, err := ct.qm.makeSelect(ct.db,
 		`SELECT class_id, сlass_group_ids, class_teacher_id, class_teacher_name, count, class_name, class_type
 		FROM classes
 		WHERE class_location = $1;`, c.Location)
 	if err != nil {
-		return nil, fmt.Errorf("Class.GetById: %v", err)
+		return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 	}
 
 	var resultClasses []Class
 	var resultClass Class
 
+	// Обработка результатов выборки
 	for rows.Next() {
 		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		// Добавляем информацию о преподавателе, неделе и дне недели из переданного объекта класса
 		resultClass.Teacher, resultClass.Week, resultClass.Weekday = c.Teacher, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -193,11 +211,23 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	return &resultClasses, nil
 }
 
+// Delete удаляет класс из базы данных по указанному идентификатору класса.
+// Принимает указатель на объект ClassTable (ct) и указатель на объект Class (c), содержащий идентификатор класса (c.Id).
+// Возвращает ошибку при её возникновении.
+//
+// Прим:
+// err := ct.Delete(&Class{Id: 123})
+//
+//	if err != nil {
+//	    // Обработка ошибки
+//	}
 func (ct *ClassTable) Delete(c *Class) error {
+	// Проверяем, что переданный объект класса не пустой
 	if c.isDefault() {
 		return errors.New("Class.Delete: wrong data! provided *Class is empty")
 	}
 
+	// Выполняем SQL-запрос для удаления класса по его идентификатору
 	err := ct.qm.makeDelete(ct.db,
 		"DELETE FROM classes WHERE class_id = $1",
 		c.Id)
