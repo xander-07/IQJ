@@ -2,9 +2,9 @@ package main
 
 import (
 	"iqj/api/handler"
-	"iqj/api/scraper"
 	"iqj/config"
 	"iqj/database"
+	"iqj/pkg/news_parser"
 	"iqj/service"
 	"log"
 )
@@ -18,7 +18,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	// Запускает парсер новостей
-	go scraper.ScrapTick()
+	go news_parser.ScrapTick()
 
 	// Запускает сервер на порту и "слушает" запросы.
 	if err := handlers.InitRoutes().RunTLS(":8443", config.SertificatePath, config.KeyPath); err != nil {

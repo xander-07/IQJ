@@ -1,13 +1,11 @@
-package main
+package firebase
 
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"time"
-
-	"github.com/gin-gonic/gin"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/option"
@@ -35,25 +33,25 @@ type Mess struct {
 	Message string
 }
 
-func CreateMessHandler(client *firestore.Client) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		var mess Mess.Todo
-		if err := c.BindJSON(&mess); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadReauest, gin.H{"error": err.Error()})
-			return
-		}
-		now := time.Now()
+//func CreateMessHandler(client *firestore.Client) func(c *gin.Context) {
+//	return func(c *gin.Context) {
+//		var mess Mess.Todo
+//		if err := c.BindJSON(&mess); err != nil {
+//			c.AbortWithStatusJSON(http.StatusBadReauest, gin.H{"error": err.Error()})
+//			return
+//		}
+//		now := time.Now()
+//
+//		ref := client.Collection()
+//	}
+//
+//}
 
-		ref := client.Collection()
-	}
-
-}
-
-func HealthCheckHandler() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"ok": true})
-	}
-}
+//func HealthCheckHandler() func(c *gin.Context) {
+//	return func(c *gin.Context) {
+//		c.JSON(http.StatusOK, gin.H{"ok": true})
+//	}
+//}
 
 func createClient() (*firestore.Client, error) {
 	ctx := context.Background()

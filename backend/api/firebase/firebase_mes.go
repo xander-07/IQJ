@@ -45,5 +45,5 @@ func giveMessfirebase(mess Message) (*Message, error) {
 		return nil, err
 	}
 
-	return mess, nil
+	return &mess, nil
 }
