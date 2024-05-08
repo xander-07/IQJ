@@ -52,6 +52,7 @@ dependencies:
   video_player: ^2.8.6
   audioplayers: ^6.0.0
   firebase_messaging: ^14.9.1
+  file_picker: ^8.0.3
   # emoji_picker_flutter: ^2.0.0 Это ломает сборку)))
 
 dev_dependencies:

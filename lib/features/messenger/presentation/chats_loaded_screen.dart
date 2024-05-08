@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -64,7 +65,7 @@ class _ChatsListState extends State<ChatsList> {
   bool _emojiPicking = false;
   File? imageFile;
 
-  selectFile() async {
+  selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxHeight: 1800,
@@ -78,9 +79,20 @@ class _ChatsListState extends State<ChatsList> {
     }
   }
 
-  Future uploadImage() async {
-    
+  selectFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        File imageFile = File(result.files.single.path!);
+      });
+      
+    } else {
+      // User canceled the picker
+    }
   }
+
+  Future uploadImage() async {}
 
   @override
   void didChangeDependencies() {
@@ -112,7 +124,7 @@ class _ChatsListState extends State<ChatsList> {
       );
       _msgController.clear();
     }
-    if (imageFile != null && imageFile!.existsSync()){
+    if (imageFile != null && imageFile!.existsSync()) {
       await _chatService.sendMessFile(uid, imageFile!);
     }
   }
@@ -246,24 +258,29 @@ class _ChatsListState extends State<ChatsList> {
     }
   }
 
-
-   Widget getFileWidget(File file) {
+  Widget getFileWidget(File file) {
     String extension = file.path.split('.').last.toLowerCase();
-    if (extension == 'jpg' || extension == 'jpeg' || extension == 'png' || extension == 'gif') {
+    if (extension == 'jpg' ||
+        extension == 'jpeg' ||
+        extension == 'png' ||
+        extension == 'gif') {
+      print('image');
       return Image.file(
         file,
         fit: BoxFit.contain,
       );
     } else if (extension == 'mp3' || extension == 'wav' || extension == 'aac') {
+      print('audio');
       return AudioWidget(file: file);
-    // } else if (extension == 'pdf') {
-    //   return PDFImage(
-    //     file: File(file.path),
-    //     width: 200, // задайте желаемую ширину изображения
-    //     height: 200, // задайте желаемую высоту изображения
-    //     fitPolicy: FitPolicy.WIDTH_AND_HEIGHT, // опционально, чтобы сохранить соотношение сторон и заполнить всю область изображения
-    //   )
+      // } else if (extension == 'pdf') {
+      //   return PDFImage(
+      //     file: File(file.path),
+      //     width: 200, // задайте желаемую ширину изображения
+      //     height: 200, // задайте желаемую высоту изображения
+      //     fitPolicy: FitPolicy.WIDTH_AND_HEIGHT, // опционально, чтобы сохранить соотношение сторон и заполнить всю область изображения
+      //   )
     } else if (extension == 'mp4' || extension == 'mkv' || extension == 'avi') {
+      print('video');
       return VideoWidget(file: file);
     } else {
       return Text('Неподдерживаемый тип файла');
@@ -292,12 +309,12 @@ class _ChatsListState extends State<ChatsList> {
                 ),
               ),
             ),
-            onPressed: () { 
-                Navigator.of(context).pushNamed(
-              'page_person',
-              arguments: {'name': user_name,'url': image_url, 'uid': uid},
-                );
-             },
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                'page_person',
+                arguments: {'name': user_name, 'url': image_url, 'uid': uid},
+              );
+            },
             child: Row(
               children: [
                 _buildThumbnailImage(image_url ?? ""),
@@ -310,19 +327,17 @@ class _ChatsListState extends State<ChatsList> {
                         children: [
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.35,
-                            child: 
-                               Text(
-                                user_name ?? "",
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                  fontSize: 20,
-                                ),
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              user_name ?? "",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 20,
                               ),
-                            
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           vol ? Icon(Icons.volume_off) : Container(),
                           pin ? Icon(Icons.push_pin_outlined) : Container(),
@@ -425,16 +440,18 @@ class _ChatsListState extends State<ChatsList> {
               padding: EdgeInsets.all(6),
               child: Column(
                 children: [
-                  (imageFile != null && imageFile!.existsSync())?Container(
-                      //height: 100,
-                      width: MediaQuery.of(context).size.width,
-                      color: Theme.of(context).backgroundColor,
-                      // child: Image.file(
-                      //   imageFile!,
-                      //   fit: BoxFit.fitWidth,
-                      // ),
-                      child: getFileWidget(imageFile!),
-                    ):Container(),
+                  (imageFile != null && imageFile!.existsSync())
+                      ? Container(
+                          //height: 100,
+                          width: MediaQuery.of(context).size.width,
+                          color: Theme.of(context).backgroundColor,
+                          // child: Image.file(
+                          //   imageFile!,
+                          //   fit: BoxFit.fitWidth,
+                          // ),
+                          child: getFileWidget(imageFile!),
+                        )
+                      : Container(),
                   Row(
                     children: [
                       IconButton(
@@ -454,21 +471,39 @@ class _ChatsListState extends State<ChatsList> {
                             hintText: "Введите сообщение...",
                             border: const OutlineInputBorder(
                               borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.all(Radius.circular(
-                                  12,),),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                  12,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                       IconButton(
                         onPressed: () {
-                          selectFile();
+                          selectFileImage();
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString(); 
+                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg'); 
+                          //        var uploadTask = storageRef.putFile(_image!); 
+                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL(); 
+  
+                          //        firestore.collection("Driver Details").add({ 
+                          //          "Name": nameController.text, 
+                          //          "Age": ageController.text, 
+                          //          "Driving Licence": dlController.text, 
+                          //          "Address.": adController.text, 
+                          //          "Phone No.": phnController.text, 
+                          //          // Add image reference to document 
+                          //          "Image": downloadUrl.toString()  
+                          //        }); 
                           sendMessage();
+
                         },
                         icon: Icon(Icons.send),
                       ),
@@ -495,7 +530,6 @@ class _ChatsListState extends State<ChatsList> {
                   //       searchViewConfig: const SearchViewConfig(),
                   //     ),
                   //   ),
-                  
                 ],
               ),
             ),
