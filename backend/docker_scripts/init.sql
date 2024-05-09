@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS users_data (
     biography TEXT,
     useful_data TEXT,
     role VARCHAR(50),
-    user_data_is_deleted BOOL NOT NULL
+    user_data_is_deleted BOOL NOT NULL DEFAULT FALSE
 );
 
 -- Создание таблицы студентов (students)
