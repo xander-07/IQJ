@@ -36,8 +36,6 @@ type UserTable struct {
 // user := &User{Email: "example@example.com", Password: "example"}
 // err := ...Add(user) // err == nil если все хорошо
 func (ut *UserTable) Add(u *User) (*User, error) {
-
-	// Проверяем были ли переданы данные в u
 	if u.isDefault() {
 		return nil, errors.New("User.Add: wrong data! provided *User is empty")
 	}
@@ -52,7 +50,10 @@ func (ut *UserTable) Add(u *User) (*User, error) {
 		return nil, fmt.Errorf("User.Add: %v", err)
 	}
 
-	row.Scan(&u.Id)
+	// Получаем идентификатор пользователя из результата вставки
+	if err := row.Scan(&u.Id); err != nil {
+		return nil, fmt.Errorf("User.Add: error scanning user_id: %v", err)
+	}
 
 	return u, nil
 }
