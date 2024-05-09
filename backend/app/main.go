@@ -2,7 +2,6 @@ package main
 
 import (
 	"iqj/api/handler"
-	"iqj/config"
 	"iqj/database"
 	"iqj/pkg/news_parser"
 	"iqj/service"
@@ -21,7 +20,10 @@ func main() {
 	go news_parser.ScrapTick()
 
 	// Запускает сервер на порту и "слушает" запросы.
-	if err := handlers.InitRoutes().RunTLS(":8443", config.SertificatePath, config.KeyPath); err != nil {
+	// if err := handlers.InitRoutes().RunTLS(":5050", config.SertificatePath, config.KeyPath); err != nil {
+	// 	log.Fatal(err)
+	// }
+	if err := handlers.InitRoutes().Run(":5050"); err != nil {
 		log.Fatal(err)
 	}
 }

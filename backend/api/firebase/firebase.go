@@ -1,13 +1,13 @@
 package firebase
 
-/*
 import (
+	"fmt"
+	"iqj/config"
+
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
-	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
-	"iqj/config"
 )
 
 // Инициализация firebase
@@ -28,4 +28,3 @@ func InitFirebase() (*auth.Client, error) {
 
 	return client, nil
 }
-*/
