@@ -30,8 +30,7 @@ func (c *Class) isDefault() bool {
 
 // Структура для взаимодействия с таблицой Classes
 type ClassTable struct {
-	db *sql.DB    // Указатель на подключение к бд
-	qm queryMaker // Исполнитель ОБЫЧНЫХ sql запросов (см. query_maker.go)
+	db *sql.DB // Указатель на подключение к бд
 }
 
 // Add добавляет данные в базу данных.
@@ -47,21 +46,19 @@ func (ct *ClassTable) Add(c *Class) error {
 		return errors.New("Class.Add: wrong data! provided *Class is empty")
 	}
 
-	// Используем queryMaker для исполнения запроса
-	err := ct.qm.makeInsert(ct.db,
-		`INSERT INTO Classes (class_group_ids, class_group_names class_teacher_id, cllass_teacher_name, count, weekday, week, class_name, class_type, class_location)
+	_, err := ct.db.Exec(`INSERT INTO Classes (class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location)
 		SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 		WHERE NOT EXISTS (
-    	SELECT 1 FROM classes
-     	WHERE class_name = $8
-    	AND weekday = $6
-        AND week = $7
-        AND class_type = $9
-        AND count = $5
-        AND class_group_id = $1
-        AND class_teacher_id = $3
-)`,
-		pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
+			SELECT 1 FROM classes
+			WHERE class_name = $8
+			AND weekday = $6
+			AND week = $7
+			AND class_type = $9
+			AND count = $5
+			AND class_group_id = $1
+			AND class_teacher_id = $3
+		)`,
+		pq.Array(c.Groups), pq.Array(c.GroupsNames), c.Teacher, c.TeacherName, c.Count, c.Weekday, c.Week, c.Name, c.Type, c.Location)
 
 	if err != nil {
 		return fmt.Errorf("Class.Add: %v", err)
@@ -83,24 +80,20 @@ func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	// Используем queryMaker для создания и исполнения select запроса
-	row, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_group_ids, class_group_names, class_teacher_id,	class_teacher_name, count, weekday, week, class_name, class_type, сlass_location
-FROM classes
-WHERE class_id = $1;
-`,
+	row := ct.db.QueryRow(`SELECT class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location
+		FROM classes
+		WHERE class_id = $1`,
 		c.Id)
+
+	err := row.Scan(pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("Class.GetById: %v", err)
 	}
 
-	if !row.Next() {
-		return nil, nil
-	}
-	row.Scan(pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
-
 	return c, nil
-
 }
 
 // GetForWeekByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
@@ -115,20 +108,22 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetForWeekByTeacher: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
 		FROM classes
-		WHERE class_teacher_id = $1 AND week = $2;`,
+		WHERE class_teacher_id = $1 AND week = $2`,
 		c.Id, c.Week)
 	if err != nil {
 		return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
 	}
+	defer rows.Close()
 
 	var resultClasses []Class
-	var resultClass Class
-
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		var resultClass Class
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		if err != nil {
+			return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
+		}
 		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -136,7 +131,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 	return &resultClasses, nil
 }
 
-// GetForWeekByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
+// GetForDayByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
 // Принимает указатель на Class с непустыми полями Id,Week,Weekday\n
 // Возвращает слайс заполненных *Class, nil при успешном получении.
 //
@@ -148,20 +143,22 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, сlass_group_ids, class_group_names, count, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, count, class_name, class_type, class_location
 		FROM classes
-		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3;`,
+		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3`,
 		c.Id, c.Week, c.Weekday)
 	if err != nil {
 		return nil, fmt.Errorf("Class.GetById: %v", err)
 	}
+	defer rows.Close()
 
 	var resultClasses []Class
-	var resultClass Class
-
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		var resultClass Class
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		if err != nil {
+			return nil, fmt.Errorf("Class.GetById: %v", err)
+		}
 		resultClass.Teacher, resultClass.TeacherName, resultClass.Week, resultClass.Weekday = c.Teacher, c.TeacherName, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -190,22 +187,22 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	}
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
-	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, сlass_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
 		FROM classes
-		WHERE class_location = $1;`, c.Location)
+		WHERE class_location = $1`, c.Location)
 	if err != nil {
 		return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 	}
+	defer rows.Close()
 
 	var resultClasses []Class
-	var resultClass Class
-
-	// Обработка результатов выборки
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
-		// Добавляем информацию о преподавателе, неделе и дне недели из переданного объекта класса
-		resultClass.Teacher, resultClass.Week, resultClass.Weekday = c.Teacher, c.Week, c.Weekday
+		var resultClass Class
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
+		if err != nil {
+			return nil, fmt.Errorf("Class.GetByLocation: %v", err)
+		}
+		resultClass.Location = c.Location
 		resultClasses = append(resultClasses, resultClass)
 	}
 
@@ -229,13 +226,20 @@ func (ct *ClassTable) Delete(c *Class) error {
 	}
 
 	// Выполняем SQL-запрос для удаления класса по его идентификатору
-	err := ct.qm.makeDelete(ct.db,
-		"DELETE FROM classes WHERE class_id = $1",
-		c.Id)
-
+	_, err := ct.db.Exec("DELETE FROM classes WHERE class_id = $1", c.Id)
 	if err != nil {
 		return fmt.Errorf("Class.Delete: %v", err)
 	}
 
 	return nil
+}
+
+// Функция создания новой таблицы учебных пар
+func newClassesTable(db *sql.DB, query string) (*ClassTable, error) {
+	_, err := db.Exec(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create classes table: %v", err)
+	}
+
+	return &ClassTable{db: db}, nil
 }
