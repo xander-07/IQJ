@@ -11,7 +11,7 @@ import (
 
 // User представляет сущность пользователя в системе.
 type User struct {
-	Id       int    `json:"id"`       // Уникальный идентификатор пользователя
+	Id       int64  `json:"id"`       // Уникальный идентификатор пользователя
 	Email    string `json:"email"`    // Электронная почта пользователя
 	Password string `json:"password"` // Хешированный пароль пользователя
 }
@@ -28,6 +28,12 @@ type UserTable struct {
 	tm transactionMaker // Создатель транзакций
 }
 
+// ВНИМАНИЕ!
+//
+//	Данная функция устарела и скоро будет удалена, используйте User.AddNew!
+//
+// ВНИМАНИЕ!
+//
 // Add добавляет пользователя в базу данных.
 // Принимает указатель на User с заполненными полями.
 // Возвращает nil при успешном добавлении.
@@ -36,8 +42,6 @@ type UserTable struct {
 // user := &User{Email: "example@example.com", Password: "example"}
 // err := ...Add(user) // err == nil если все хорошо
 func (ut *UserTable) Add(u *User) (*User, error) {
-
-	// Проверяем были ли переданы данные в u
 	if u.isDefault() {
 		return nil, errors.New("User.Add: wrong data! provided *User is empty")
 	}
@@ -45,14 +49,49 @@ func (ut *UserTable) Add(u *User) (*User, error) {
 	// Используем базовую функцию для создания и исполнения insert запроса
 	row, err := ut.tm.makeInsert(ut.db,
 		"INSERT INTO users (email,password) VALUES ($1, $2) RETURNING user_id",
-		&u.Email, &u.Password,
+		u.Email, u.Password,
 	)
 
 	if err != nil {
 		return nil, fmt.Errorf("User.Add: %v", err)
 	}
 
-	row.Scan(&u.Id)
+	// Получаем идентификатор пользователя из результата вставки
+	if err := row.Scan(&u.Id); err != nil {
+		return nil, fmt.Errorf("User.Add: error scanning user_id: %v", err)
+	}
+
+	return u, nil
+}
+
+func (ut *UserTable) AddNew(u *User) (*User, error) {
+	if u.isDefault() {
+		return nil, errors.New("User.Add: wrong data! provided *User is empty")
+	}
+
+	// Начинаем транзакцию
+	tx, err := ut.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	// Выполняем запрос INSERT внутри транзакции
+	var userId int
+	err = tx.QueryRow(
+		"INSERT INTO users (email, password) VALUES ($1, $2) RETURNING user_id",
+		u.Email, u.Password,
+	).Scan(&userId)
+	if err != nil {
+		return nil, fmt.Errorf("User.Add: error executing INSERT query: %v", err)
+	}
+
+	// Коммитим транзакцию
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("User.Add: error committing transaction: %v", err)
+	}
+
+	u.Id = int64(userId)
 
 	return u, nil
 }
@@ -130,7 +169,7 @@ func (ut *UserTable) Check(u *User) (*User, error) {
 		return nil, errors.New("Users.Check: incorrect password!")
 	}
 	// Если все хорошо, возвращаем пользователя с id
-	u.Id = id
+	u.Id = int64(id)
 	return u, nil
 }
 

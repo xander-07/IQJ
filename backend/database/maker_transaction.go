@@ -57,9 +57,6 @@ func (tm *transactionMaker) makeInsert(db *sql.DB, query string, values ...inter
 	defer tx.Rollback()
 
 	row := tx.QueryRow(query, values...)
-	if row == nil {
-		return nil, nil
-	}
 
 	if err := tx.Commit(); err != nil {
 		return nil, err

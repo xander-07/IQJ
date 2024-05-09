@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class Page_person extends StatefulWidget {
   const Page_person({super.key});
@@ -27,39 +28,32 @@ class _Page_person extends State<Page_person> {
     super.didChangeDependencies();
   }
 
-  Widget _buildThumbnailImage(String image_url,double size) {
-    try {
-      return Container(
-        padding: EdgeInsets.only(right: 12),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: Image.network(
-              image_url,
-              fit: BoxFit.fill,
-              height: 200,
-              errorBuilder: (
-                BuildContext context,
-                Object exception,
-                StackTrace? stackTrace,
-              ) {
-                return CircleAvatar(
-                  radius: 6,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: const Text('A'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-    } catch (e) {
-      return Container();
-    }
+  bool flag1 = true;
+  bool flag2 = false;
+  bool flag3 = false;
+  bool flag4 = false;
+  bool flag5 = false;
+
+  void change_flag1() {
+    setState(() {
+      flag1 = true;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+    });
   }
+
+  void change_flag2() {
+    setState(() {
+      flag1 = false;
+      flag2 = true;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -164,171 +158,11 @@ class _Page_person extends State<Page_person> {
                     // ),
                     child: Column( 
                       children: [ 
-                        ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(Icons.attach_file_outlined),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Закрепить в списке чатов",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 18,
-                                      ),
-                              ),
-                            ],
-                          )
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(Icons.edit),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Закрепленное сообщение",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 18,
-                                      ),
-                              ),
-                            ],
-                          )
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(Icons.refresh),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Очистить историю",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 18,
-                                      ),
-                              ),
-                            ],
-                          )
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(Icons.close),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Выйти из чата",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 18,
-                                      ),
-                              ),
-                            ],
-                          )
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(Icons.delete),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Выйти из чата и очистить историю",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 16,
-                                      ),
-                              ),
-                            ],
-                          )
-                        ),
+                        create_button_for_change_state(Icons.attach_file_outlined, "Закрепить в списке чатов", context),
+                        create_button_for_change_state(Icons.edit, "Закрепленное сообщение", context),
+                        create_button_for_change_state(Icons.refresh, "Очистить историю", context),
+                        create_button_for_change_state(Icons.close, "Выйти из чата", context),
+                        create_button_for_change_state(Icons.delete, "Выйти из чата и очистить историю", context),
                       ],
                     ),
                     
@@ -438,6 +272,7 @@ class _Page_person extends State<Page_person> {
             Container(
               alignment: Alignment.center,
               child: DefaultTabController(
+
                   length: 5,
                   child: TabBar(
                     isScrollable: true,
@@ -446,38 +281,48 @@ class _Page_person extends State<Page_person> {
                     tabAlignment: TabAlignment.start,
                     tabs: [
                       Tab(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            "Участники",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 10,
+                        child: GestureDetector(
+                          onTap: (){
+                            change_flag1();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              "Участники",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 10,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
                       Tab(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            "Медиа",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 10,
+                        child: GestureDetector(
+                          onTap: (){
+                            change_flag2();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              "Медиа",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 10,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
@@ -538,9 +383,143 @@ class _Page_person extends State<Page_person> {
                     ],
                   )),
             ),
+            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
+            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
+            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
           ],
         ),
       ),
     );
   }
+}
+
+Widget _buildThumbnailImage(String image_url,double size) {
+    try {
+      return Container(
+        padding: EdgeInsets.only(right: 12),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: Image.network(
+              image_url,
+              fit: BoxFit.fill,
+              height: 200,
+              errorBuilder: (
+                BuildContext context,
+                Object exception,
+                StackTrace? stackTrace,
+              ) {
+                return CircleAvatar(
+                  radius: 6,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  child: const Text('A'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      return Container();
+    }
+  }
+
+
+
+Widget create_button_for_change_state(IconData icon,String text, BuildContext context){
+  return ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(icon),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Закрепить в списке чатов",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 18,
+                                      ),
+                              ),
+                            ],
+                          )
+                        );
+}
+
+Widget participants(BuildContext context,String name, String time,String role,String image_url){
+  return ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              _buildThumbnailImage(image_url, 33),
+                              SizedBox(width: 20,),
+                              Column(
+                                children: [
+                                  Text( 
+                                    name,
+                                    style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                            fontSize: 10,
+                                          ),
+                                  ),
+                                  Text( 
+                                    time,
+                                    style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onSecondary,
+                                            fontSize: 10,
+                                          ),
+                                  ),
+                                  
+                                ],
+                              ),
+                              Expanded(
+                                child: Text( 
+                                  role,
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        );
 }
