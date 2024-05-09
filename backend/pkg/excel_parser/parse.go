@@ -1,4 +1,4 @@
-package excel_parser
+package excelparser
 
 import (
 	"fmt"
@@ -6,50 +6,43 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
 	"sync"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
-func Parse2(criterion, value string) ([]Lesson, error) {
+func Parse2() error {
+	id := 0
+	institutes := []string{"/III", "/IIT", "/IKTST", "/IPTIP", "/IRI", "/ITKHT", "/ITU"}
+	directory := config.DirToParse
 	var wg sync.WaitGroup
 
-	institutes := []string{"/III", "/IIT", "/IKTST", "/IPTIP", "/IRI", "/ITKHT", "/ITU"}
-	directory := config.DirToParse //ПРОПИСАТЬ ПОЛНЫЙ ПУТЬ, ЕСЛИ НЕ РАБОТАЕТ
-
-	ch := make(chan []Lesson)
+	ch := make(chan int)
 
 	for i := range institutes {
 		path := directory + institutes[i]
 		wg.Add(1)
-		go Parse(criterion, value, path, &wg, ch)
+		go Parse(path, &wg, ch, id)
 	}
-
-	var result []Lesson
 
 	go func() {
 		wg.Wait()
 		close(ch)
 	}()
 
-	for i := range ch {
-		result = append(result, i...)
-	}
-
-	return result, nil
+	return nil
 }
 
 // Парсинг всех Excel файлов директории
-func Parse(criterion, value, path string, wg *sync.WaitGroup, ch chan []Lesson) ([]Lesson, error) {
+func Parse(path string, wg *sync.WaitGroup, ch chan int, id int) (int, error) {
 	defer wg.Done()
 
-	var tables []Lesson
 	files, err := os.ReadDir(path)
 	if err != nil {
-		return tables, err
+		return id, err
 	}
 
-	id := 0
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".xlsx") {
 			filePath := filepath.Join(path, file.Name())
@@ -61,19 +54,15 @@ func Parse(criterion, value, path string, wg *sync.WaitGroup, ch chan []Lesson) 
 			}
 
 			table := xlFile.GetRows("Расписание занятий по неделям")
-			var newTable []Lesson
-			newTable, id, err = find(criterion, value, table, id)
+			id, err = find(table, id)
 			if err != nil {
 				fmt.Println("Ошибка при парсинге:", err)
-				return nil, err
-			}
-			for _, lesson := range newTable {
-				tables = append(tables, lesson)
+				return id, err
 			}
 		}
 	}
 
-	ch <- tables
+	ch <- id
 
-	return tables, nil
+	return id, nil
 }
