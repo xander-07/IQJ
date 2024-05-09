@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"iqj/api/excelparser"
 	"iqj/database"
+	"iqj/pkg/excel_parser"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +20,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	err := excelparser.Parse2()
+	err := excel_parser.Parse()
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
@@ -31,12 +31,17 @@ func (h *Handler) Lessons(c *gin.Context) {
 
 	switch criterion {
 	case "group":
-		/*group := database.Database.Class.getIdByName(value)
-		lesson.Groups = append(lesson.Groups, group)
-		filteredLessons, err = database.Database.Class.GetByGroup(lesson)
+		group := &database.StudentGroup{}
+		group.Name = value
+		group, err := database.Database.StudentGroup.GetIdByName(group)
 		if err != nil {
 			c.String(http.StatusBadRequest, err.Error())
-		}*/
+		}
+		filteredLessons1, err := database.Database.StudentGroup.GetClasses(group)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+		}
+		filteredLessons = &filteredLessons1
 
 	case "tutor":
 		lesson.TeacherName = value
