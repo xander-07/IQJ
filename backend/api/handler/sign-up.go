@@ -60,7 +60,7 @@ func (h *Handler) HandleSignUp(c *gin.Context) {
 
 	user.Password = string(hashedPassword)
 	var userDb *database.User
-	if userDb, err = database.Database.User.Add(&user); err != nil {
+	if userDb, err = database.Database.User.AddNew(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleSignUp:", err)
 		return

@@ -53,7 +53,7 @@ func (h *Handler) HandleSignIn(c *gin.Context) {
 	// Если все хорошо сделаем JWT токен
 
 	// Получаем токен для пользователя
-	token, err := middleware.GenerateJWT(user.Id)
+	token, err := middleware.GenerateJWT(int(user.Id))
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleSignIn:", err)
@@ -107,7 +107,7 @@ func (h *Handler) HandleWebSignIn(c *gin.Context) {
 	// Если все хорошо сделаем JWT токен
 
 	// Получаем токен для пользователя
-	token, err := middleware.GenerateJWT(user.Id)
+	token, err := middleware.GenerateJWT(int(user.Id))
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleWebSignIn:", err)

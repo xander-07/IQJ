@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"iqj/database"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Структура получаемого из тела запроса JSON
@@ -36,7 +37,7 @@ func (h *Handler) HandleUpdateUserRole(c *gin.Context) {
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
 		&database.UserData{
-			Id: userId,
+			Id: int64(userId),
 		})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
