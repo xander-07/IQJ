@@ -10,21 +10,22 @@ import (
 
 // Структура учебной пары
 type Class struct {
-	Id          int    `json:"class_id"`                  // Id пары
-	Groups      []int  `json:"class_group_ids,omitempty"` // Список Id групп, для которых пара
-	Teacher     int    `json:"class_teacher_id"`          // Id преподавателя, который ведет пару
-	TeacherName string `json:"class_teacher_name"`        // фио преподавателя
-	Count       int    `json:"class_count"`               // Какая пара по счету за день
-	Weekday     int    `json:"class_weekday"`             // Номер дня недели
-	Week        int    `json:"class_week"`                // Номер учебной неделяя
-	Name        string `json:"class_name"`                // Название пары
-	Type        string `json:"class_type"`                // Тип пары
-	Location    string `json:"class_location"`            // Местонахождение
+	Id          int      `json:"class_id"`                   // Id пары
+	Groups      []int    `json:"class_group_ids,omitempty"`  // Список Id групп, для которых пара
+	GroupsNames []string `json:"class_group_names"`          // список названий групп, т.к. не все группы есть в таблице учебных групп
+	Teacher     int      `json:"class_teacher_id,omitempty"` // Id преподавателя, который ведет пару
+	TeacherName string   `json:"class_teacher_name"`         // фио преподавателя
+	Count       int      `json:"class_count"`                // Какая пара по счету за день
+	Weekday     int      `json:"class_weekday"`              // Номер дня недели
+	Week        int      `json:"class_week"`                 // Номер учебной неделяя
+	Name        string   `json:"class_name"`                 // Название пары
+	Type        string   `json:"class_type"`                 // Тип пары
+	Location    string   `json:"class_location,omitempty"`   // Местонахождение
 }
 
 // Проверяет переданы ли в структуру какие-либо данные
 func (c *Class) isDefault() bool {
-	return c.Id == 0 && c.Groups == nil && c.Teacher == 0 && c.Count == 0 && c.Weekday == 0 && c.Week == 0 && c.Name == "" && c.Type == "" && c.Location == ""
+	return c.Id == 0 && c.Groups == nil && c.GroupsNames == nil && c.Teacher == 0 && c.Count == 0 && c.Weekday == 0 && c.Week == 0 && c.Name == "" && c.Type == "" && c.Location == ""
 }
 
 // Структура для взаимодействия с таблицой Classes
@@ -48,19 +49,19 @@ func (ct *ClassTable) Add(c *Class) error {
 
 	// Используем queryMaker для исполнения запроса
 	err := ct.qm.makeInsert(ct.db,
-		`INSERT INTO Classes (class_group_ids, class_teacher_id, cllass_teacher_name, count, weekday, week, class_name, class_type, class_location)
-		SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9
+		`INSERT INTO Classes (class_group_ids, class_group_names class_teacher_id, cllass_teacher_name, count, weekday, week, class_name, class_type, class_location)
+		SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 		WHERE NOT EXISTS (
     	SELECT 1 FROM classes
-     	WHERE class_name = $7
-    	AND weekday = $5
-        AND week = $6
-        AND class_type = $8
-        AND count = $4
+     	WHERE class_name = $8
+    	AND weekday = $6
+        AND week = $7
+        AND class_type = $9
+        AND count = $5
         AND class_group_id = $1
-        AND class_teacher_id = $2
+        AND class_teacher_id = $3
 )`,
-		pq.Array(&c.Groups), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
+		pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
 
 	if err != nil {
 		return fmt.Errorf("Class.Add: %v", err)
@@ -84,7 +85,7 @@ func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 
 	// Используем queryMaker для создания и исполнения select запроса
 	row, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_group_ids, class_teacher_id,	class_teacher_name, count, weekday, week, class_name, class_type, сlass_location
+		`SELECT class_group_ids, class_group_names, class_teacher_id,	class_teacher_name, count, weekday, week, class_name, class_type, сlass_location
 FROM classes
 WHERE class_id = $1;
 `,
@@ -96,7 +97,7 @@ WHERE class_id = $1;
 	if !row.Next() {
 		return nil, nil
 	}
-	row.Scan(pq.Array(&c.Groups), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
+	row.Scan(pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
 
 	return c, nil
 
@@ -115,7 +116,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 	}
 
 	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, class_group_ids, class_teacher_name, count, weekday, class_name, class_type, class_location
+		`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2;`,
 		c.Id, c.Week)
@@ -127,7 +128,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 	var resultClass Class
 
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -148,7 +149,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 	}
 
 	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, сlass_group_ids, count, class_name, class_type, class_location
+		`SELECT class_id, сlass_group_ids, class_group_names, count, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3;`,
 		c.Id, c.Week, c.Weekday)
@@ -160,7 +161,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 	var resultClass Class
 
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		resultClass.Teacher, resultClass.TeacherName, resultClass.Week, resultClass.Weekday = c.Teacher, c.TeacherName, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -190,7 +191,7 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
 	rows, err := ct.qm.makeSelect(ct.db,
-		`SELECT class_id, сlass_group_ids, class_teacher_id, class_teacher_name, count, class_name, class_type
+		`SELECT class_id, сlass_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
 		FROM classes
 		WHERE class_location = $1;`, c.Location)
 	if err != nil {
@@ -202,7 +203,7 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 
 	// Обработка результатов выборки
 	for rows.Next() {
-		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		// Добавляем информацию о преподавателе, неделе и дне недели из переданного объекта класса
 		resultClass.Teacher, resultClass.Week, resultClass.Weekday = c.Teacher, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
