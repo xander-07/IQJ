@@ -130,7 +130,7 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 // blocks, err := ...GetLatestBlocks(10, 0) // Получить 10 последних новостных блоков
 func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	rows, err := nt.qm.makeSelect(nt.db,
-		"SELECT news_id, header, link, image_links, publication_time FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2",
+		"SELECT news_id, header, link, image_links, tags, publication_time FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2",
 		count, offset,
 	)
 
@@ -142,7 +142,7 @@ func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	var resultNews News
 
 	for rows.Next() {
-		rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), &resultNews.PublicationTime)
+		rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
 		resultNewsArr = append(resultNewsArr, resultNews)
 	}
 
