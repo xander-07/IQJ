@@ -36,13 +36,11 @@ func (nt *NewsTable) Add(n *News) error {
 	if n.isDefault() {
 		return errors.New("News.Add: wrong data! provided *News is empty")
 	}
-
 	formattedDate, err := time.Parse("02.01.2006", n.PublicationTime)
 	if err != nil {
 		return err
 	}
 	n.PublicationTime = formattedDate.Format("2006-01-02 15:04:05")
-
 	// Подготовим запрос на добавление новости
 	insertQuery := `
 		INSERT INTO news (header, link, news_text, image_links, tags, is_for_students, publication_time)
@@ -51,13 +49,12 @@ func (nt *NewsTable) Add(n *News) error {
 			SELECT 1 FROM news WHERE header = $1 AND publication_time = $7
 		)
 	`
-
 	// Выполним запрос
-	_, err = nt.db.Exec(insertQuery, n.Header, n.Link, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.PublicationTime)
+	_, err = nt.db.Exec(insertQuery,
+		n.Header, n.Link, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.PublicationTime)
 	if err != nil {
 		return fmt.Errorf("News.Add: %v", err)
 	}
-
 	return nil
 }
 
