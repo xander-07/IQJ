@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"iqj/api/excelparser"
-	"iqj/models"
+	"iqj/database"
+	cache2 "iqj/pkg/cache"
+	"iqj/pkg/excel_parser"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,40 +17,59 @@ import (
 // при "GET /lessons?criterion=classroom&value=ауд. А-61 (МП-1)" вернет расписание на неделю аудитории ауд. А-61 (МП-1)
 // При неверном критерии или значении отправит null
 
-func Lessons(c *gin.Context) {
+var cache = cache2.NewLFUCache(100)
+
+func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	lessons, err := excelparser.Parse2(criterion, value)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
+	lesson := &database.Class{}
+	filteredLessons := &[]database.Class{}
 
-	var filteredLessons []models.Lesson
-	for _, lesson := range lessons {
+	item := cache.Get(value)
+	if item != nil {
+		c.JSON(http.StatusOK, item)
+	} else {
+		err := excel_parser.Parse()
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+			return
+		}
+
 		switch criterion {
 		case "group":
-			for _, group := range lesson.GroupID {
-				if group == 0 { //ЗАМЕНИТЬ НА  group == value
-					filteredLessons = append(filteredLessons, lesson)
-				}
+			group := &database.StudentGroup{}
+			group.Name = value
+			group, err := database.Database.StudentGroup.GetIdByName(group)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
 			}
+			filteredLessons1, err := database.Database.StudentGroup.GetClasses(group)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+			}
+			filteredLessons = &filteredLessons1
 
 		case "tutor":
-			if lesson.TeacherID == 0 { //ЗАМЕНИТЬ НА lesson.TeacherID == value
-				filteredLessons = append(filteredLessons, lesson)
+			lesson.TeacherName = value
+			filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
 			}
 
 		case "classroom":
-			if lesson.Location == value {
-				filteredLessons = append(filteredLessons, lesson)
+			lesson.Location = value
+			filteredLessons, err = database.Database.Class.GetByLocation(lesson)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
 			}
 		default:
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		}
 	}
+
+	cache.Set(value, filteredLessons)
 
 	c.JSON(http.StatusOK, filteredLessons)
 }

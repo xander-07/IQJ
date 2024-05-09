@@ -32,7 +32,7 @@ class FileMes {
   final String senderId;
   final String senderEmail;
   final String receiverId;
-  final File message;
+  final String message;
   final Timestamp timestamp;
 
 
