@@ -60,6 +60,26 @@ func (sgt *StudentGroupTable) GetByID(sg *StudentGroup) (*StudentGroup, error) {
 	return sg, nil
 }
 
+func (sgt *StudentGroupTable) GetIdByName(sg *StudentGroup) (*StudentGroup, error) {
+	if sg.isDefault() {
+		return nil, errors.New("StudentGroup.GetByName: wrong data! provided *StudentGroup is empty!")
+	}
+
+	rows, err := sgt.qm.makeSelect(sgt.db,
+		"SELECT students_group_id FROM student_groups WHERE student_group_name = $1",
+		sg.Name)
+
+	if err != nil {
+		return nil, fmt.Errorf("StudentGroup.GetByName: %v", err)
+	}
+
+	if rows.Next() {
+		rows.Scan(&sg.Id)
+	}
+
+	return sg, nil
+}
+
 // GetStudent возвращает группу студентов из базы данных по указанному идентификатору студента.
 // Принимает указатель на StudentGroup с заполненным полем Id.
 // Возвращает заполненную структуру StudentGroup и nil при успешном запросе.

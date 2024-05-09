@@ -52,10 +52,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authGroup.PUT("/update_role", h.HandleUpdateUserRole)
 
 		// // Группа функций для работы с Firebase
-		firebaseGroup := authGroup.Group("/firebase")
-		{
-			firebaseGroup.GET("/list_user", h.HandleListUsers)
-		}
+		//firebaseGroup := authGroup.Group("/firebase")
+		//{
+		//firebaseGroup.GET("/list_user", h.HandleListUsers)
+		//}
 	}
 
 	return r

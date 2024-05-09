@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 )
 
@@ -58,9 +57,6 @@ func (tm *transactionMaker) makeInsert(db *sql.DB, query string, values ...inter
 	defer tx.Rollback()
 
 	row := tx.QueryRow(query, values...)
-	if row == nil {
-		return nil, errors.New("no row returned after insertion")
-	}
 
 	if err := tx.Commit(); err != nil {
 		return nil, err
