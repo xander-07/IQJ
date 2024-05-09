@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"iqj/api/excelparser"
-	"iqj/models"
+	"iqj/database"
+	"iqj/pkg/excel_parser"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,39 +16,49 @@ import (
 // при "GET /lessons?criterion=classroom&value=ауд. А-61 (МП-1)" вернет расписание на неделю аудитории ауд. А-61 (МП-1)
 // При неверном критерии или значении отправит null
 
-func Lessons(c *gin.Context) {
+func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	lessons, err := excelparser.Parse2(criterion, value)
+	err := excel_parser.Parse()
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var filteredLessons []models.Lesson
-	for _, lesson := range lessons {
-		switch criterion {
-		case "group":
-			for _, group := range lesson.GroupID {
-				if group == 0 { //ЗАМЕНИТЬ НА  group == value
-					filteredLessons = append(filteredLessons, lesson)
-				}
-			}
+	lesson := &database.Class{}
+	filteredLessons := &[]database.Class{}
 
-		case "tutor":
-			if lesson.TeacherID == 0 { //ЗАМЕНИТЬ НА lesson.TeacherID == value
-				filteredLessons = append(filteredLessons, lesson)
-			}
-
-		case "classroom":
-			if lesson.Location == value {
-				filteredLessons = append(filteredLessons, lesson)
-			}
-		default:
+	switch criterion {
+	case "group":
+		group := &database.StudentGroup{}
+		group.Name = value
+		group, err := database.Database.StudentGroup.GetIdByName(group)
+		if err != nil {
 			c.String(http.StatusBadRequest, err.Error())
-			return
 		}
+		filteredLessons1, err := database.Database.StudentGroup.GetClasses(group)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+		}
+		filteredLessons = &filteredLessons1
+
+	case "tutor":
+		lesson.TeacherName = value
+		filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+		}
+
+	case "classroom":
+		lesson.Location = value
+		filteredLessons, err = database.Database.Class.GetByLocation(lesson)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+		}
+	default:
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, filteredLessons)
