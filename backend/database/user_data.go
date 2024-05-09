@@ -44,7 +44,7 @@ func (udt *UserDataTable) Add(ud *UserData) error {
 	// Используем базовую функцию для создания и исполнения insert запроса
 	_, err := udt.tm.makeInsert(udt.db,
 		"INSERT INTO users_data (user_data_id,user_name,biography,useful_data,role) VALUES ($1, $2, $3, $4, $5)",
-		&ud.Id, &ud.Name, &ud.Bio, &ud.UsefulData, &ud.Role,
+		ud.Id, ud.Name, ud.Bio, ud.UsefulData, ud.Role,
 	)
 
 	if err != nil {
