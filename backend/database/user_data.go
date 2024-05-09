@@ -176,7 +176,7 @@ func (udt *UserDataTable) UpdateRole(userData *UserData) error {
 
 	err := udt.tm.makeUpdate(udt.db,
 		"UPDATE users_data SET role = $1 WHERE user_data_id = $2",
-		userData.Role, userData.Id)
+		userData.Id, userData.Role)
 	if err != nil {
 		return fmt.Errorf("UserData.UpdateRole: %v", err)
 	}
