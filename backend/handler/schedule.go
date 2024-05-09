@@ -2,6 +2,7 @@ package handler
 
 import (
 	"iqj/database"
+	cache2 "iqj/pkg/cache"
 	"iqj/pkg/excel_parser"
 	"net/http"
 
@@ -16,50 +17,59 @@ import (
 // при "GET /lessons?criterion=classroom&value=ауд. А-61 (МП-1)" вернет расписание на неделю аудитории ауд. А-61 (МП-1)
 // При неверном критерии или значении отправит null
 
+var cache = cache2.NewLFUCache(100)
+
 func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	err := excel_parser.Parse()
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
 	lesson := &database.Class{}
 	filteredLessons := &[]database.Class{}
 
-	switch criterion {
-	case "group":
-		group := &database.StudentGroup{}
-		group.Name = value
-		group, err := database.Database.StudentGroup.GetIdByName(group)
+	item := cache.Get(value)
+	if item != nil {
+		c.JSON(http.StatusOK, item)
+	} else {
+		err := excel_parser.Parse()
 		if err != nil {
 			c.String(http.StatusBadRequest, err.Error())
-		}
-		filteredLessons1, err := database.Database.StudentGroup.GetClasses(group)
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
-		}
-		filteredLessons = &filteredLessons1
-
-	case "tutor":
-		lesson.TeacherName = value
-		filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
+			return
 		}
 
-	case "classroom":
-		lesson.Location = value
-		filteredLessons, err = database.Database.Class.GetByLocation(lesson)
-		if err != nil {
+		switch criterion {
+		case "group":
+			group := &database.StudentGroup{}
+			group.Name = value
+			group, err := database.Database.StudentGroup.GetIdByName(group)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+			}
+			filteredLessons1, err := database.Database.StudentGroup.GetClasses(group)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+			}
+			filteredLessons = &filteredLessons1
+
+		case "tutor":
+			lesson.TeacherName = value
+			filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+			}
+
+		case "classroom":
+			lesson.Location = value
+			filteredLessons, err = database.Database.Class.GetByLocation(lesson)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+			}
+		default:
 			c.String(http.StatusBadRequest, err.Error())
+			return
 		}
-	default:
-		c.String(http.StatusBadRequest, err.Error())
-		return
 	}
+
+	cache.Set(value, filteredLessons)
 
 	c.JSON(http.StatusOK, filteredLessons)
 }

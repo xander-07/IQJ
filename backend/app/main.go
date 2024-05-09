@@ -2,6 +2,7 @@ package main
 
 import (
 	"iqj/api/handler"
+	"iqj/config"
 	"iqj/database"
 	"iqj/pkg/news_parser"
 	"iqj/service"
