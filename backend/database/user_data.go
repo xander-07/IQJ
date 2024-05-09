@@ -8,7 +8,7 @@ import (
 
 // UserData представляет сущность данных о пользователе в системе.
 type UserData struct {
-	Id         int    `json:"id"`          // Уникальный идентификатор данных пользователя
+	Id         int64  `json:"id"`          // Уникальный идентификатор данных пользователя
 	Name       string `json:"name"`        // Имя пользователя
 	Bio        string `json:"bio"`         // Биография пользователя
 	UsefulData string `json:"useful_data"` // Дополнительные данные пользователя
