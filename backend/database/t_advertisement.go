@@ -22,8 +22,7 @@ func (a *Advertisement) isDefault() bool {
 
 // AdvertisementTable предоставляет методы для работы с таблицей Advertisements
 type AdvertisementTable struct {
-	db *sql.DB    // Указатель на подключение к базе данных
-	qm queryMaker // Исполнитель ОБЫЧНЫХ sql запросов (см. query_maker.go)
+	db *sql.DB // Указатель на подключение к базе данных
 }
 
 // Add добавляет данные в базу данных.
@@ -51,14 +50,13 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 	}
 	a.ExpirationDate = formattedExpirationDate.Format("2006-01-02 15:04:05")
 
-	// Используем queryMaker для создания и исполнения insert запроса
-	err = at.qm.makeInsert(at.db,
+	// Выполнение SQL-запроса напрямую к базе данных
+	_, err = at.db.Exec(
 		`INSERT INTO advertisements (content, creation_date, expiration_date)
 		SELECT $1, $2, $3
 		WHERE NOT EXISTS (
 			SELECT 1 FROM advertisements WHERE content = $1 AND creation_date = $2
-		)
-		`,
+		)`,
 		a.Content, a.CreationDate, a.ExpirationDate,
 	)
 
@@ -75,7 +73,7 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 // Прим:\n
 // ads, err := ...Get() // err == nil если все хорошо
 func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
-	rows, err := at.qm.makeSelect(at.db,
+	rows, err := at.db.Query(
 		"SELECT advertiesment_id, content, creation_date, expiration_date FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
 		time.Now(),
 	)
@@ -84,18 +82,22 @@ func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 		return nil, fmt.Errorf("Advertisement.Get: %v", err)
 	}
 
+	defer rows.Close()
+
 	var resultAdvertisementArr []Advertisement
 	var resultAdvertisement Advertisement
 
 	for rows.Next() {
-		rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate)
+		if err := rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate); err != nil {
+			return nil, err
+		}
 		resultAdvertisementArr = append(resultAdvertisementArr, resultAdvertisement)
 	}
 	return &resultAdvertisementArr, nil
 }
 
 func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
-	rows, err := at.qm.makeSelect(at.db,
+	rows, err := at.db.Query(
 		"SELECT * FROM advertisements",
 	)
 
@@ -103,11 +105,15 @@ func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
 		return nil, fmt.Errorf("Advertisement.GetAll: %v", err)
 	}
 
+	defer rows.Close()
+
 	var resultAdvertisementArr []Advertisement
 	var resultAdvertisement Advertisement
 
 	for rows.Next() {
-		rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate)
+		if err := rows.Scan(&resultAdvertisement.Id, &resultAdvertisement.Content, &resultAdvertisement.CreationDate, &resultAdvertisement.ExpirationDate); err != nil {
+			return nil, err
+		}
 		resultAdvertisementArr = append(resultAdvertisementArr, resultAdvertisement)
 	}
 	return &resultAdvertisementArr, nil
@@ -119,13 +125,13 @@ func (at *AdvertisementTable) Update(a *Advertisement) error {
 		return errors.New("Advertisement.Update: wrong data! provided *Advertisement is empty")
 	}
 
-	err := at.qm.makeUpdate(at.db,
+	_, err := at.db.Exec(
 		`UPDATE advertisements
 		SET content = $1,
 			creation_date = $2,
 			expiration_date= $3
 			WHERE advertiesment_id = $4`,
-		a.Id, a.Content, a.CreationDate, a.ExpirationDate,
+		a.Content, a.CreationDate, a.ExpirationDate, a.Id,
 	)
 
 	if err != nil {
@@ -148,8 +154,7 @@ func (at *AdvertisementTable) Delete(a *Advertisement) error {
 		return errors.New("Advertisement.Delete: wrong data! provided advertisementID is empty")
 	}
 
-	// Используем queryMaker для удаления объявления
-	err := at.qm.makeDelete(at.db,
+	_, err := at.db.Exec(
 		"DELETE FROM advertisements WHERE advertiesmentId = $1",
 		a.Id,
 	)
@@ -159,4 +164,13 @@ func (at *AdvertisementTable) Delete(a *Advertisement) error {
 
 	// Возвращаем nil, так как ошибок не случилось
 	return nil
+}
+
+func newAdvertisementTable(db *sql.DB, query string) (*AdvertisementTable, error) {
+	_, err := db.Exec(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create advertisements table: %v", err)
+	}
+
+	return &AdvertisementTable{db: db}, nil
 }
