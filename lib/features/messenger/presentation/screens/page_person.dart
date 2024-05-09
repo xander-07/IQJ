@@ -11,6 +11,8 @@ class _Page_person extends State<Page_person> {
   String? image_url = "";
   String uid = "";
 
+  TextEditingController ChangeController = TextEditingController();
+
   @override
   void didChangeDependencies() {
     final args = ModalRoute.of(context)?.settings.arguments;
@@ -25,13 +27,13 @@ class _Page_person extends State<Page_person> {
     super.didChangeDependencies();
   }
 
-  Widget _buildThumbnailImage(String image_url) {
+  Widget _buildThumbnailImage(String image_url,double size) {
     try {
       return Container(
         padding: EdgeInsets.only(right: 12),
         child: SizedBox(
-          width: 117,
-          height: 117,
+          width: size,
+          height: size,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(32),
             child: Image.network(
@@ -68,9 +70,83 @@ class _Page_person extends State<Page_person> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              // Действия для кнопки с логотипом шестеренки (настройки)
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    color: Theme.of(context).colorScheme.background,
+                    height: 160,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              icon: Icon(Icons.close),
+                            ),
+                            Text(
+                              "Настройки чата",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                fontSize: 25,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            _buildThumbnailImage(image_url ?? "", 70),
+                            Column(
+                              children: [
+                                Text(
+                                  "Название чата",
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                // TextField(
+                                //   controller: ChangeController,
+                                //   decoration: InputDecoration(
+                                //     hintText: user_name ?? "Заметки",
+                                //     hintStyle: TextStyle(
+                                //       fontFamily: 'Inter',
+                                //       fontWeight: FontWeight.w400,
+                                //       fontSize: 16.0,
+                                //       height: 5,
+                                //     ),
+                                //     border: InputBorder.none,
+                                //     contentPadding: const EdgeInsets.symmetric(
+                                //       horizontal: 12,
+                                //       vertical: 16,
+                                //     ),
+                                //     suffixIcon: SizedBox(
+                                //       child: IconButton(
+                                //         icon: const Icon(
+                                //           Icons.search,
+                                //         ),
+                                //         onPressed: () {
+                                //           // Действие при нажатии кнопки поиска
+                                //         },
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
             },
           ),
+
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
@@ -86,7 +162,7 @@ class _Page_person extends State<Page_person> {
               .start, // Элементы начинаются с верхней части экрана
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildThumbnailImage(image_url ?? ""),
+            _buildThumbnailImage(image_url ?? "",117),
             SizedBox(height: 10), // Отступ между картинкой и названием
             Text(
               user_name ?? "",
