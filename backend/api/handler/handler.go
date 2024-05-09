@@ -28,8 +28,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	// Вызов хэндлеров исходя из запроса.
 	r.GET("/", h.Hello)
+
 	r.POST("/sign-up", h.HandleSignUp)
 	r.POST("/sign-in", h.HandleSignIn)
+	r.POST("/web_sign-in", h.HandleWebSignIn)
 
 	r.GET("/news", h.HandleGetNews)
 	r.GET("/news_id", h.HandleGetNewsById)
@@ -43,14 +45,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	authGroup.Use(middleware2.WithJWTAuth)
 	{
 		authGroup.POST("/news", h.HandleAddNews)
+
 		authGroup.POST("/ad", h.HandlePostAdvertisement)
 		authGroup.PUT("/ad", h.HandleUpdateAdvertisements)
 
+		authGroup.PUT("/update_role", h.HandleUpdateUserRole)
+
 		// // Группа функций для работы с Firebase
-		// firebaseGroup := authGroup.Group("/firebase")
-		// {
-		// 	firebaseGroup.GET("/list_user", h.HandleListUsers)
-		// }
+		firebaseGroup := authGroup.Group("/firebase")
+		{
+			firebaseGroup.GET("/list_user", h.HandleListUsers)
+		}
 	}
 
 	return r

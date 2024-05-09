@@ -1,14 +1,14 @@
 package handler
 
-/*
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/api/iterator"
 	"iqj/api/firebase"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"google.golang.org/api/iterator"
 )
 
 type UserInfo struct {
@@ -54,4 +54,3 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, userList)
 }
-*/
