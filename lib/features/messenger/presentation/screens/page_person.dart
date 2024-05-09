@@ -76,6 +76,9 @@ class _Page_person extends State<Page_person> {
                   return Container(
                     color: Theme.of(context).colorScheme.background,
                     height: 160,
+                    // decoration: BoxDecoration( 
+                    //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
+                    // ),
                     child: Column(
                       children: [
                         Row(
@@ -150,7 +153,188 @@ class _Page_person extends State<Page_person> {
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
-              // Действия для кнопки с логотипом трех вертикальных точек
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    color: Theme.of(context).colorScheme.background,
+                    height: 260,
+                    // decoration: BoxDecoration( 
+                    //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
+                    // ),
+                    child: Column( 
+                      children: [ 
+                        ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(Icons.attach_file_outlined),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Закрепить в списке чатов",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 18,
+                                      ),
+                              ),
+                            ],
+                          )
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(Icons.edit),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Закрепленное сообщение",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 18,
+                                      ),
+                              ),
+                            ],
+                          )
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(Icons.refresh),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Очистить историю",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 18,
+                                      ),
+                              ),
+                            ],
+                          )
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(Icons.close),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Выйти из чата",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 18,
+                                      ),
+                              ),
+                            ],
+                          )
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              Icon(Icons.delete),
+                              SizedBox(width: 20,),
+                              Text( 
+                                "Выйти из чата и очистить историю",
+                                style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 16,
+                                      ),
+                              ),
+                            ],
+                          )
+                        ),
+                      ],
+                    ),
+                    
+                  );
+                }
+              );
             },
           ),
         ],
