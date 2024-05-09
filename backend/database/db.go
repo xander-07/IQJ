@@ -96,36 +96,12 @@ func (st *DatabaseRepository) connectDatabase(connectionString string) error {
 
 // раздаем указатели на подключение декораторам
 func (st *DatabaseRepository) connectTables(db *sql.DB) {
-	st.User = &UserTable{
-		db: db,
-		tm: transactionMaker{},
-	}
-	st.UserData = &UserDataTable{
-		db: db,
-		tm: transactionMaker{},
-	}
-	st.News = &NewsTable{
-		db: db,
-		qm: queryMaker{},
-	}
-	st.Student = &StudentTable{
-		db: db,
-		qm: queryMaker{},
-	}
-	st.StudentGroup = &StudentGroupTable{
-		db: db,
-		qm: queryMaker{},
-	}
-	st.Class = &ClassTable{
-		db: db,
-		qm: queryMaker{},
-	}
-	st.Advertisement = &AdvertisementTable{
-		db: db,
-		qm: queryMaker{},
-	}
-	st.Teacher = &TeacherTable{
-		db: db,
-		qm: queryMaker{},
-	}
+	newAdvertisementTable(db, createTableAdvertisements)
+	newClassesTable(db, createTableClasses)
+	newNewsTable(db, createTableNews)
+	newStudentTable(db, createTableStudents)
+	newStudentGroupTable(db, createTableStudentGroups)
+	newTeacherTable(db, createTableTeachers)
+	newUserTable(db, createTableUsers)
+	newUserDataTable(db, createTableUsersData)
 }
