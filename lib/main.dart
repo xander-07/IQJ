@@ -5,6 +5,7 @@ import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
@@ -37,6 +38,9 @@ Future<void> main() async {
   );
 
   // Код для работы пуш-уведомлений для чата (android)
+  // ВАЖНО: Может выдавать ошибки при сборке на Windows.
+  // Их можно пропустить, приложение будет работать корректно.
+  // На Windows не будет пуш-уведомлений.
   final messaging = FirebaseMessaging.instance;
   final settings = await messaging.requestPermission(
     alert: true,
@@ -104,12 +108,13 @@ class _AppState extends State<App> {
         'registration': (context) => const RegScreen(),
         'successreg': (context) => const SuccessReg(),
         'messenger': (context) =>
-            const MessengerScreen(), // главна страница сообщений
+            const MessengerScreen(), // главная страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
         'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),
+        'creategroup' :(context) => const CreateGroupScreen(),
       },
       onUnknownRoute: (settings) {},
     );

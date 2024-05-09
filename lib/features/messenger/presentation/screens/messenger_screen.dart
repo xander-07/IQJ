@@ -54,6 +54,22 @@ class _MessengerBloc extends State<MessengerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Container(
+        width: 50.0, // Задаем ширину
+        height: 50.0, // Задаем высоту
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary, // Цвет кнопки
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed('creategroup');
+          },
+          icon: const Icon(Icons.edit),
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         toolbarHeight: 72,
         scrolledUnderElevation: 0,
