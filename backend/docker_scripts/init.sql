@@ -58,7 +58,8 @@ CREATE TABLE IF NOT EXISTS student_groups (
 -- Создание таблицы расписания (schedule)
 CREATE TABLE IF NOT EXISTS classes (
     class_id SERIAL PRIMARY KEY,
-    class_group_ids INT[] NOT NULL,
+    class_group_ids INT[],
+    class_group_names VARCHAR(11)[] NOT NULL, -- возможно будет заменено на использование jsonb
     class_teacher_id INT,
     class_teacher_name VARCHAR(255),
     count INT NOT NULL,
