@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -51,6 +52,36 @@ class _Page_person extends State<Page_person> {
       flag3 = false;
       flag4 = false;
       flag5 = false;
+    });
+  }
+
+  void change_flag3() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = true;
+      flag4 = false;
+      flag5 = false;
+    });
+  }
+
+  void change_flag4() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = true;
+      flag5 = false;
+    });
+  }
+
+  void change_flag5() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = true;
     });
   }
 
@@ -282,8 +313,8 @@ class _Page_person extends State<Page_person> {
                     tabs: [
                       Tab(
                         child: GestureDetector(
-                          onTap: (){
-                            change_flag1();
+                          onTap: () => {
+                            change_flag1(),
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -305,8 +336,8 @@ class _Page_person extends State<Page_person> {
                       ),
                       Tab(
                         child: GestureDetector(
-                          onTap: (){
-                            change_flag2();
+                          onTap: () => {
+                            change_flag2(),
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -327,56 +358,71 @@ class _Page_person extends State<Page_person> {
                         ),
                       ),
                       Tab(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            "Файлы",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 10,
+                        child: GestureDetector(
+                          onTap: () => {
+                            change_flag3(),
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              "Файлы",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 10,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
                       Tab(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            "Ссылки",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 10,
+                        child: GestureDetector(
+                          onTap: () => {
+                            change_flag4(),
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              "Ссылки",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 10,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
                       Tab(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            "Голосовые",
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 10,
+                        child: GestureDetector(
+                          onTap: () => {
+                            change_flag5(),
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
+                            child: Text(
+                              "Голосовые",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 10,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
@@ -386,6 +432,16 @@ class _Page_person extends State<Page_person> {
             if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
             if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
             if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
+            Wrap(
+              children: [
+                flag2? _buildSquer(image_url??"",105) : Container(),
+                flag2? _buildSquer(image_url??"",105) : Container(),
+                flag2? _buildSquer(image_url??"",105) : Container(),
+                flag2? _buildSquer(image_url??"",105) : Container(),
+                flag2? _buildSquer(image_url??"",105) : Container(),
+                flag2? _buildSquer(image_url??"",105) : Container(),
+            ],
+            ),
           ],
         ),
       ),
@@ -522,4 +578,37 @@ Widget participants(BuildContext context,String name, String time,String role,St
                             ],
                           )
                         );
+}
+
+Widget _buildSquer(String image_url, double size) {
+  try {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12), // Используем радиус 12 для получения квадратных углов
+          child: Image.network(
+            image_url,
+            fit: BoxFit.fill,
+            errorBuilder: (
+              BuildContext context,
+              Object exception,
+              StackTrace? stackTrace,
+            ) {
+              return Container(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer, // Вместо CircleAvatar используем обычный контейнер с цветом фона
+                child: const Text('A'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  } catch (e) {
+    return Container();
+  }
 }
