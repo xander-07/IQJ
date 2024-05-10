@@ -126,7 +126,7 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	// Подготовим запрос на получение последних новостных блоков
 	selectQuery := `
-		SELECT news_id, header, link, image_links, publication_time
+		SELECT news_id, header, link, image_links, tags, publication_time
 		FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2
 	`
 
@@ -142,7 +142,7 @@ func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	// Пройдемся по всем строкам и заполним структуру News
 	for rows.Next() {
 		var resultNews News
-		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), &resultNews.PublicationTime)
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
 		if err != nil {
 			return nil, fmt.Errorf("News.GetLatest: %v", err)
 		}
