@@ -55,23 +55,31 @@ func (h *Handler) Lessons(c *gin.Context) {
 			filteredLessons = &filteredLessons1
 			//По преподавателю
 		case "tutor":
+			//TODO: Раскомментировать, когда будет готов запрос
 			//Заданное value присваивается полю ФИО препода пары
-			lesson.TeacherName = value
-			//Получаем список пар по преподу
-			filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
+			//lesson.TeacherName = value
+			//Получаем список пар по преподу		
+			/*filteredLessons, err = database.Database.Class.GetForWeekByTeacher(lesson)
 			if err != nil {
 				c.String(http.StatusBadRequest, err.Error())
-			}
+			}*/
+			return
 
 			//По аудитории
 		case "classroom":
-			//Заданное value присваивается полю вудитории пары
+			filteredLessons2 := []database.Class{}
+			//Заданное value присваивается полю аудитории пары
 			lesson.Location = value
 			//Получаем список пар по аудитории
-			filteredLessons, err = database.Database.Class.GetByLocation(lesson)
+			classes, err := database.Database.Class.GetByLocation(lesson)
 			if err != nil {
 				c.String(http.StatusBadRequest, err.Error())
 			}
+			//Проходим по полученным парам и закидываем в список
+			for _, class := range *classes {
+				filteredLessons2 = append(filteredLessons2, class)
+			}
+			filteredLessons = &filteredLessons2
 			//При неверном критерии вернет BadRequest
 		default:
 			c.String(http.StatusBadRequest, err.Error())
