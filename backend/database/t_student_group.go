@@ -175,7 +175,7 @@ func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) ([]Class, error) {
 		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
 	}
 
-	rows, err := sgt.db.Query("SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location FROM classes WHERE $1 = ANY(class_group_ids)", sg.Id)
+	rows, err := sgt.db.Query("SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location, class_group_names FROM classes WHERE $1 = ANY(class_group_ids)", sg.Id)
 	if err != nil {
 		return nil, fmt.Errorf("StudentGroup.GetClasses: %v", err)
 	}
@@ -184,7 +184,7 @@ func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) ([]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		if err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location); err != nil {
+		if err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location, pq.Array(&resultClass.GroupsNames)); err != nil {
 			return nil, fmt.Errorf("StudentGroup.GetClasses: error scanning row: %v", err)
 		}
 		resultClasses = append(resultClasses, resultClass)
