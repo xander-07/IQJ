@@ -36,7 +36,7 @@ func Parse() error {
 				}
 
 				table := xlFile.GetRows("Расписание занятий по неделям") //Получение листа Excel
-				id, err = find(table, id) //Получение нового ID и добавление одного файла в БД
+				id, err = find(table, id)                                //Получение нового ID и добавление одного файла в БД
 				if err != nil {
 					fmt.Println("Ошибка при парсинге:", err)
 					return err

@@ -4,6 +4,7 @@ import (
 	"iqj/api/handler"
 	"iqj/config"
 	"iqj/database"
+	"iqj/pkg/excel_parser"
 	"iqj/pkg/news_parser"
 	"iqj/service"
 	"log"
@@ -19,6 +20,7 @@ func main() {
 
 	// Запускает парсер новостей
 	go news_parser.ScrapTick()
+	go excel_parser.Parse()
 
 	// Запускает сервер на порту и "слушает" запросы.
 	if err := handlers.InitRoutes().RunTLS(":8443", config.SertificatePath, config.KeyPath); err != nil {
