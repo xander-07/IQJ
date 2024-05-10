@@ -77,14 +77,14 @@ CREATE TABLE IF NOT EXISTS student_groups (
     count INT NOT NULL,
     weekday INT NOT NULL,
     week INT NOT NULL,
-    class_name VARCHAR(255),
-    class_type VARCHAR(30),
-    class_location VARCHAR(40)
+    class_name TEXT,
+    class_type TEXT,
+    class_location TEXT
 );
 
-CREATE INDEX idx_class_id ON classes (class_id);
-CREATE INDEX idx_class_teacher_id ON classes (class_teacher_id);
-CREATE INDEX idx_class_student_group_ids ON classes USING GIN (class_group_ids);
+CREATE INDEX IF NOT EXISTS idx_class_id  ON classes (class_id);
+CREATE INDEX IF NOT EXISTS idx_class_teacher_id ON classes (class_teacher_id);
+CREATE INDEX IF NOT EXISTS idx_class_student_group_ids ON classes USING GIN (class_group_ids);
 
 `
 
