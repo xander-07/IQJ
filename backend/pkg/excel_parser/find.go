@@ -9,13 +9,18 @@ import (
 func find(table [][]string, id int) (int, error) {
 	//Индексы с названием дня недели (под индексом 3 - понедельник, 17 - вторник и т.д.)
 	weekdayIndex := []int{3, 17, 31, 45, 59, 73, 87}
+	//Срез ID групп
 	var groupids []int
+	//Срез названий групп
 	var groups []string
-	var teacherid int
+	//Итераторы ID
+	var groupid, teacherid int
 
 	//Проход по всем строкам таблицы от 3 (начало расписания) до 88 (конец таблицы)
 	for i := 3; i < 88; i++ {
-		group := &database.StudentGroup{}
+		//group - одна группа типа StudentGroup //ВРЕМЕННО НЕ РАБОТАЕТ
+		//group := &database.StudentGroup{}
+		//row - одна пара типа Class
 		var row database.Class
 		//При нахождении строки между индексами weekdayIndex полю Weekday присваивается соответствующий индекс
 		for k := 0; k < len(weekdayIndex); k++ {
@@ -25,6 +30,7 @@ func find(table [][]string, id int) (int, error) {
 			}
 		}
 		//Итераторы прохода по таблице
+		//так как некоторые пары стоят через 5 столбцов друг от друга, а некоторые через 10
 		iter := 10
 		count_iter := 0
 		//Проход по столбцам таблицы от 5 (название пары) до конца строки
@@ -53,13 +59,14 @@ func find(table [][]string, id int) (int, error) {
 			row.Name = table[i][j]
 			row.Type = table[i][j+1]
 			row.Location = table[i][j+3]
-			//Поиск ID группы из БД
-			group.Name = table[1][j]
-			group, err := database.Database.StudentGroup.GetIdByName(group)
+			//Поиск ID группы из БД //ВРЕМЕННО НЕ РАБОТАЕТ
+			/*group.Name = table[1][j]
+			group, err := database.Database.StudentGroup.GetIdByName(group)*/
 			if err != nil {
 				return id, err
 			}
-			groupids = append(groupids, group.Id)
+			//Добавление группы и её ID в списки
+			groupids = append(groupids, groupid)
 			groups = append(groups, table[1][j])
 			var teacher_iter int
 			//Изменение итератора по учителю в соответствии с положением пары в группе
@@ -75,13 +82,14 @@ func find(table [][]string, id int) (int, error) {
 			//Пока у групп совпадают пары и учители
 			//мы закидываем в список группы с совпадающими парами
 			for m+2+iter < len(table[i]) && table[i][m+2] == table[i][m+2+teacher_iter] && table[i][m] == table[i][m+teacher_iter] {
-				//Поиск ID группы из БД
-				group.Name = table[1][m+teacher_iter]
-				group, err := database.Database.StudentGroup.GetIdByName(group)
+				//Поиск ID группы из БД //ВРЕМЕННО НЕ РАБОТАЕТ
+				/*group.Name = table[1][m+teacher_iter]
+				group, err := database.Database.StudentGroup.GetIdByName(group)*/
 				if err != nil {
 					return id, err
 				}
-				groupids = append(groupids, group.Id)
+				//Добавление группы и её ID в списки
+				groupids = append(groupids, groupid)
 				groups = append(groups, table[1][m+teacher_iter])
 				m += teacher_iter
 				//Изменение итератора
@@ -102,9 +110,11 @@ func find(table [][]string, id int) (int, error) {
 			if err != nil {
 				return id, err
 			}
+			//Обновление итераторов
 			id++
 			teacherid++
-			//Изменение итераторов
+			groupid++
+			
 			if iter == 5 {
 				iter = 10
 				count_iter = 0
