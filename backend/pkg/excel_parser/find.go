@@ -61,7 +61,7 @@ func find(table [][]string, id int) (int, error) {
 			row.Location = table[i][j+3]
 			//Поиск ID группы из БД
 			group.Name = table[1][j]
-			group, err := database.Database.StudentGroup.GetIdByName(group)
+			_, err := database.Database.StudentGroup.GetIdByName(group) // TODO: сделать группу вместо заглушки
 			if err != nil {
 				group.Id = 0
 			}
