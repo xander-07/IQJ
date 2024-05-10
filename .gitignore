@@ -170,3 +170,4 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 
+backend/pkg/brunoCollection

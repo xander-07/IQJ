@@ -35,12 +35,6 @@ type Entity interface {
 	isDefault() bool
 }
 
-type Interactor interface {
-	makeDelete(*sql.DB, string, ...interface{}) error
-	makeInsert(*sql.DB, string, ...interface{}) error
-	makeSelect(*sql.DB, string, ...interface{}) (*sql.Rows, error)
-}
-
 // NewDatabaseInstance() создает новое подключение к базе данных, не возвращает ошибку,
 // если подключение создать не удалось, чтобы не захламлять main(), вызывает панику
 // при ошибке.
@@ -96,12 +90,12 @@ func (st *DatabaseRepository) connectDatabase(connectionString string) error {
 
 // раздаем указатели на подключение декораторам
 func (st *DatabaseRepository) connectTables(db *sql.DB) {
-	newAdvertisementTable(db, createTableAdvertisements)
-	newClassesTable(db, createTableClasses)
-	newNewsTable(db, createTableNews)
-	newStudentTable(db, createTableStudents)
-	newStudentGroupTable(db, createTableStudentGroups)
-	newTeacherTable(db, createTableTeachers)
-	newUserTable(db, createTableUsers)
-	newUserDataTable(db, createTableUsersData)
+	st.Advertisement, _ = newAdvertisementTable(db, createTableAdvertisements)
+	st.Class, _ = newClassesTable(db, createTableClasses)
+	st.News, _ = newNewsTable(db, createTableNews)
+	st.Student, _ = newStudentTable(db, createTableStudents)
+	st.StudentGroup, _ = newStudentGroupTable(db, createTableStudentGroups)
+	st.Teacher, _ = newTeacherTable(db, createTableTeachers)
+	st.User, _ = newUserTable(db, createTableUsers)
+	st.UserData, _ = newUserDataTable(db, createTableUsersData)
 }
