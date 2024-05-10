@@ -18,8 +18,8 @@ func find(table [][]string, id int) (int, error) {
 
 	//Проход по всем строкам таблицы от 3 (начало расписания) до 88 (конец таблицы)
 	for i := 3; i < 88; i++ {
-		//group - одна группа типа StudentGroup //ВРЕМЕННО НЕ РАБОТАЕТ
-		//group := &database.StudentGroup{}
+		//group - одна группа типа StudentGroup
+		group := &database.StudentGroup{}
 		//row - одна пара типа Class
 		var row database.Class
 		//При нахождении строки между индексами weekdayIndex полю Weekday присваивается соответствующий индекс
@@ -59,11 +59,11 @@ func find(table [][]string, id int) (int, error) {
 			row.Name = table[i][j]
 			row.Type = table[i][j+1]
 			row.Location = table[i][j+3]
-			//Поиск ID группы из БД //ВРЕМЕННО НЕ РАБОТАЕТ
-			/*group.Name = table[1][j]
-			group, err := database.Database.StudentGroup.GetIdByName(group)*/
+			//Поиск ID группы из БД
+			group.Name = table[1][j]
+			group, err := database.Database.StudentGroup.GetIdByName(group)
 			if err != nil {
-				return id, err
+				group.Id = 0
 			}
 			//Добавление группы и её ID в списки
 			groupids = append(groupids, groupid)
@@ -82,11 +82,11 @@ func find(table [][]string, id int) (int, error) {
 			//Пока у групп совпадают пары и учители
 			//мы закидываем в список группы с совпадающими парами
 			for m+2+iter < len(table[i]) && table[i][m+2] == table[i][m+2+teacher_iter] && table[i][m] == table[i][m+teacher_iter] {
-				//Поиск ID группы из БД //ВРЕМЕННО НЕ РАБОТАЕТ
-				/*group.Name = table[1][m+teacher_iter]
-				group, err := database.Database.StudentGroup.GetIdByName(group)*/
+				//Поиск ID группы из БД
+				group.Name = table[1][m+teacher_iter]
+				_, err := database.Database.StudentGroup.GetIdByName(group)
 				if err != nil {
-					return id, err
+					group.Id = 0
 				}
 				//Добавление группы и её ID в списки
 				groupids = append(groupids, groupid)
@@ -113,8 +113,7 @@ func find(table [][]string, id int) (int, error) {
 			//Обновление итераторов
 			id++
 			teacherid++
-			groupid++
-			
+			//Изменение итераторов
 			if iter == 5 {
 				iter = 10
 				count_iter = 0
