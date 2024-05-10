@@ -55,8 +55,7 @@ func (ct *ClassTable) Add(c *Class) error {
 			AND week = $7
 			AND class_type = $9
 			AND count = $5
-			AND class_group_id = $1
-			AND class_teacher_id = $3
+			AND class_location = $10
 		)`,
 		pq.Array(c.Groups), pq.Array(c.GroupsNames), c.Teacher, c.TeacherName, c.Count, c.Weekday, c.Week, c.Name, c.Type, c.Location)
 
@@ -240,6 +239,5 @@ func newClassesTable(db *sql.DB, query string) (*ClassTable, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create classes table: %v", err)
 	}
-
 	return &ClassTable{db: db}, nil
 }

@@ -124,7 +124,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 	}
 	userId := userIdToConv.(int)
 	var userDB database.UserData
-	userDB.Id = userId
+	userDB.Id = int64(userId)
 	user, err := database.Database.UserData.GetRoleById(&userDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -193,7 +193,7 @@ func (h *Handler) HandleUpdateNews(c *gin.Context) {
 
 	user, err := database.Database.UserData.GetRoleById(
 		&database.UserData{
-			Id: userId,
+			Id: int64(userId),
 		})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

@@ -45,7 +45,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
 		&database.UserData{
-			Id: userId,
+			Id: int64(userId),
 		})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -99,7 +99,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
 		&database.UserData{
-			Id: userId,
+			Id: int64(userId),
 		})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

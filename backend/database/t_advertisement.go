@@ -171,6 +171,5 @@ func newAdvertisementTable(db *sql.DB, query string) (*AdvertisementTable, error
 	if err != nil {
 		return nil, fmt.Errorf("failed to create advertisements table: %v", err)
 	}
-
 	return &AdvertisementTable{db: db}, nil
 }
