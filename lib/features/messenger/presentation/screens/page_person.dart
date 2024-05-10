@@ -442,6 +442,11 @@ class _Page_person extends State<Page_person> {
                 flag2? _buildSquer(image_url??"",105) : Container(),
             ],
             ),
+            flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
+            flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
+            flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
+            flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
+            flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
           ],
         ),
       ),
@@ -611,4 +616,57 @@ Widget _buildSquer(String image_url, double size) {
   } catch (e) {
     return Container();
   }
+}
+
+Widget _File_in_main_chat(BuildContext context, String image_url,String name,String info){
+  return ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20,),
+                              _buildSquer(image_url, 40),
+                              SizedBox(width: 20,),
+                              Column(
+                                children: [
+                                  Text( 
+                                    name,
+                                    style: TextStyle(
+                                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                                fontSize: 12,
+                                              ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.download,size: 12, color: Theme.of(context).colorScheme.onSecondary,),
+                                      SizedBox(width: 10,),
+                                      Text(
+                                    info,
+                                    style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onSecondary,
+                                            fontSize: 10,
+                                          ),
+                                  )
+                                    ],
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
+                        );
 }
