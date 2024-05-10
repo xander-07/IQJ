@@ -39,8 +39,8 @@ func (udt *UserDataTable) Add(ud *UserData) error {
 	defer tx.Rollback()
 
 	_, err = tx.Exec(
-		"INSERT INTO users_data (user_name, biography, useful_data, role) VALUES ($1, $2, $3, $4)",
-		ud.Name, ud.Bio, ud.UsefulData, ud.Role,
+		"INSERT INTO users_data (user_data_id, user_name, biography, useful_data, role) VALUES ($1, $2, $3, $4, $5)",
+		ud.Id, ud.Name, ud.Bio, ud.UsefulData, ud.Role,
 	)
 	if err != nil {
 		return fmt.Errorf("UserData.Add: %v", err)

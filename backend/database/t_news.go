@@ -70,7 +70,7 @@ func (nt *NewsTable) GetById(n *News) (*News, error) {
 
 	// Подготовим запрос на получение новости по ID
 	selectQuery := `
-		SELECT header, link, news_text, image_links, tags, is_for_student, publication_time
+		SELECT header, link, news_text, image_links, tags, is_for_students, publication_time
 		FROM news WHERE news_id = $1
 	`
 
