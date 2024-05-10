@@ -447,6 +447,7 @@ class _Page_person extends State<Page_person> {
             flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
             flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
             flag3? _File_in_main_chat(context, image_url??"","линейная алгебра и аналитическая геом","1,0 MB, 06.05.24 в 12:25"):Container(),
+            flag4? _Link_for_main_chat(context, image_url??"", "Подготовка к экзамену", "№1. Вычислить неопределённый интеграл", "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4"):Container(),
           ],
         ),
       ),
@@ -668,5 +669,71 @@ Widget _File_in_main_chat(BuildContext context, String image_url,String name,Str
                               )
                             ],
                           )
+                        );
+}
+
+
+Widget _Link_for_main_chat(BuildContext context, String image_url,String name,String info,String link){
+  return ElevatedButton(
+                          onPressed: () =>{
+
+                          }, 
+                          style: ButtonStyle(
+                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                            surfaceTintColor:
+                                const MaterialStatePropertyAll(Colors.transparent),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).colorScheme.background,
+                            ),
+                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              // SizedBox(width: 20,),
+                              _buildSquer(image_url, 40),
+                              // SizedBox(width: 20,),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      name,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      info,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                    // SizedBox(width: 10,),
+                                    Text(
+                                      link,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
                         );
 }
