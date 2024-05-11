@@ -74,7 +74,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 			}
 			//При неверном критерии вернет BadRequest
 		default:
-			c.String(http.StatusBadRequest, err.Error())
+			c.String(http.StatusBadRequest, "bad request")
 			return
 		}
 	}
