@@ -25,7 +25,7 @@ type Class struct {
 
 // Проверяет переданы ли в структуру какие-либо данные
 func (c *Class) isDefault() bool {
-	return c.Id == 0 && c.Groups == nil && c.GroupsNames == nil && c.Teacher == 0 && c.Count == 0 && c.Weekday == 0 && c.Week == 0 && c.Name == "" && c.Type == "" && c.Location == ""
+	return c.Id == 0 && c.Groups == nil && c.GroupsNames == nil && c.TeacherName == "" && c.Teacher == 0 && c.Count == 0 && c.Weekday == 0 && c.Week == 0 && c.Name == "" && c.Type == "" && c.Location == ""
 }
 
 // Структура для взаимодействия с таблицой Classes
@@ -75,7 +75,7 @@ func (ct *ClassTable) Add(c *Class) error {
 // cl, err := ...GetById(a) // err == nil если все хорошо
 func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 	// Проверяем были ли переданы данные в с
-	if c.isDefault() {
+	if c.Id == 0 {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
