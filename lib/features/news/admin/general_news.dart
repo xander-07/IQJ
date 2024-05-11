@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:iqj/features/news/admin/general_news_add_button.dart';
 import 'package:iqj/features/news/presentation/screens/search/body_for_tags/body_tags.dart';
-import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart';
 
 class GeneralNews extends StatefulWidget {
   const GeneralNews({super.key});
@@ -73,7 +71,7 @@ class _GeneralNews extends State<GeneralNews> {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 12),
+            padding: const EdgeInsets.only(left: 12, bottom: 4),
             child: Text(
               'Добавить фото',
               textAlign: TextAlign.left,
@@ -90,11 +88,16 @@ class _GeneralNews extends State<GeneralNews> {
             height: 192,
             //color: Color.fromRGBO(44, 45, 47, 1),
             //color: Colors.blue,
-            margin: const EdgeInsets.only(top: 10, left: 12, right: 12),
+            margin:  const EdgeInsets.only(top: 10, left: 12, right: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onInverseSurface,
+              color:  Theme.of(context).colorScheme.onInverseSurface,
               borderRadius: BorderRadius.circular(12),
-              //border: Border.all(width: 1),
+              // border: Border.all(
+              //   width: 1, 
+              //   color: Theme.of(context).brightness == Brightness.light
+              //     ? const Color(0xFFF6F6F6)
+              //     : const Color(0xFF46463C),
+              // ),
             ),
             child: ElevatedButton(
               onPressed: () {
@@ -105,7 +108,10 @@ class _GeneralNews extends State<GeneralNews> {
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll(
-                  Theme.of(context).colorScheme.onInverseSurface,
+                  Theme.of(context).colorScheme.onInverseSurface
+                  // Theme.of(context).brightness == Brightness.light
+                  // ? Color(0xFFE8E8E8)
+                  // : Color(0xFF2C2D2F),
                 ),
                 shape: MaterialStatePropertyAll(
                   RoundedRectangleBorder(
@@ -117,22 +123,34 @@ class _GeneralNews extends State<GeneralNews> {
                 children: [
                   //icon: SvgPicture.asset('assets/icons/news/bookmark2.svg'),
                   //SvgPicture.asset('assets/icons/news/images_add.svg'), // Иконка или изображение
-                  const Icon(Icons.image, size: 39),
-                  const SizedBox(
-                      width: 8), // Расстояние между изображением и текстом
+                  Container(
+                        height: 39,
+                        width: 39,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/news/add_image.png'),
+                          ),
+                        ),
+                      ),
+                  const SizedBox(width: 9), // Расстояние между изображением и текстом
                   Text(
                     'Загрузить изображение',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground,
+                    style:  TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFF000000).withOpacity(0.6)
+                      : const Color(0xFFFFFFFF).withOpacity(0.6),
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          
           Container(
-            margin: const EdgeInsets.only(top: 6, left: 12, right: 12),
+            margin: const EdgeInsets.only(top: 9, left: 16, right: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -144,10 +162,7 @@ class _GeneralNews extends State<GeneralNews> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 12, right: 12, top: 12),
-            child: Divider(
-              thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-            ),
+            
           ),
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 8),
@@ -195,10 +210,7 @@ class _GeneralNews extends State<GeneralNews> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 12, right: 12),
-            child: Divider(
-              thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-            ),
+            
           ),
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 12),
@@ -245,42 +257,45 @@ class _GeneralNews extends State<GeneralNews> {
               },
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(left: 12, right: 12),
-            child: Divider(
-              thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12, top: 12),
-            child: Text(
-              'Теги',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onBackground,
-                fontWeight: FontWeight.w700,
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              //padding: EdgeInsets.only(top: 40),
+              width: 357,
+              height: 467,
+              //color: Color.fromRGBO(44, 45, 47, 1),
+              //color: Colors.blue,
+              margin: const EdgeInsets.only(top: 10, left: 20, right: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    height: 53,
+                    width: 300,
+                    padding: const EdgeInsets.only(top: 12),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Теги',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 32,
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  BodyTagsWidget(),
+                ],
               ),
             ),
-          ),
-          Container(
-            //padding: EdgeInsets.only(top: 40),
-            width: 328,
-            //color: Color.fromRGBO(44, 45, 47, 1),
-            //color: Colors.blue,
-            margin: const EdgeInsets.only(top: 10, left: 12, right: 12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onInverseSurface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                create_body_tags(context),
-              ],
-            ),
-          ),
+          ],
+        ),
+
           Container(
             margin: const EdgeInsets.only(left: 12, right: 12, top: 12),
             child: Divider(
@@ -294,6 +309,7 @@ class _GeneralNews extends State<GeneralNews> {
               'Дата публикации',
               textAlign: TextAlign.left,
               style: TextStyle(
+                
                 fontFamily: 'Inter',
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -360,14 +376,13 @@ class _GeneralNews extends State<GeneralNews> {
 
 Widget three_but(BuildContext context) {
   return Container(
-    width: 120,
+    width: 99,
     height: 99,
     //color: Color.fromRGBO(44, 45, 47, 1),
-    //color: Colors.blue,
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.onInverseSurface,
       borderRadius: BorderRadius.circular(12),
-      //border: Border.all(width: 1),
+      border: Border.all(width: 1, color: const Color(0xFF46463C)),
     ),
     child: ElevatedButton(
       onPressed: () {
@@ -381,7 +396,7 @@ Widget three_but(BuildContext context) {
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
-      child: const Column(
+      child:  Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           //icon: SvgPicture.asset('assets/icons/news/bookmark2.svg'),
@@ -390,9 +405,26 @@ Widget three_but(BuildContext context) {
           //   width: 32,
           //   height: 32,
           // ), // Иконка или изображение
-          Icon(Icons.image, size: 39),
-          Icon(Icons.add, size: 16),
-          SizedBox(width: 8), // Расстояние между изображением и текстом
+          Container(
+              height: 39,
+              width: 39,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/news/add_image.png'),
+                ),
+              ),
+            ),
+          const SizedBox(height:  12,),
+          Container(
+              height: 16,
+              width: 16,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/news/plus.png'),
+                ),
+              ),
+            ),
+          const SizedBox(width: 8), // Расстояние между изображением и текстом
           // Text('Загрузить изображение',
           //   textAlign: TextAlign.center,
           //   style: TextStyle(
