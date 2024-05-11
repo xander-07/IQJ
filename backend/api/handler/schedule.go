@@ -28,79 +28,90 @@ func (h *Handler) Lessons(c *gin.Context) {
 	filteredLessons := &[]database.Class{}
 
 	//Проверяем, есть ли заданное значение в кэше
-	//item := cache.Get(value)
-	// if item != nil { //Если есть, возвращаем его
-	// 	c.JSON(http.StatusOK, item)
-	// } else {
+	item := cache.Get(value)
+	if item != nil { //Если есть, возвращаем его
+		c.JSON(http.StatusOK, item)
+	} else {
 
-	var err error
+		var err error
 
-	//Switch по заданному критерию
-	switch criterion {
-	//По группе
-	case "group":
+		//Switch по заданному критерию
+		switch criterion {
+		//По группе
+		case "group":
 
-		// ИЗМЕНЕНО: намного быстрее и проще оказалось получать пары по имени,
-		// поэтому теперь мы будем делать только так, функции sg.GetIdByName, sg.GetClassesById будут в скором времени удалены,
-		// внесите изменения в код там, где они используются
+			// ИЗМЕНЕНО: намного быстрее и проще оказалось получать пары по имени,
+			// поэтому теперь мы будем делать только так, функции sg.GetIdByName, sg.GetClassesById будут в скором времени удалены,
+			// внесите изменения в код там, где они используются
 
-		//Создание группы
-		//group := &database.StudentGroup{Name: value}
-		//Поиск ID группы по имени
-		// group, err := database.Database.StudentGroup.GetIdByName(group)
-		// if err != nil {
-		// 	if errors.Is(err, sql.ErrTxDone) {
-		// 		c.String(http.StatusBadRequest, err.Error())
-		// 		return
-		// 	}
-		// }
-		//Получаем список пар по группе из БД
-		// if group != nil {
-		// 	filteredLessons, err = database.Database.StudentGroup.GetClassesById(group)
-		// 	if err != nil {
-		// 		c.String(http.StatusBadRequest, err.Error())
-		// 		return
-		// 	}
-		// } else
-		//{
+			//Создание группы
+			//group := &database.StudentGroup{Name: value}
+			//Поиск ID группы по имени
+			// group, err := database.Database.StudentGroup.GetIdByName(group)
+			// if err != nil {
+			// 	if errors.Is(err, sql.ErrTxDone) {
+			// 		c.String(http.StatusBadRequest, err.Error())
+			// 		return
+			// 	}
+			// }
+			//Получаем список пар по группе из БД
+			// if group != nil {
+			// 	filteredLessons, err = database.Database.StudentGroup.GetClassesById(group)
+			// 	if err != nil {
+			// 		c.String(http.StatusBadRequest, err.Error())
+			// 		return
+			// 	}
+			// } else
+			//{
 
-		newgroup := database.StudentGroup{Name: value}
-		filteredLessons, err = database.Database.StudentGroup.GetClassesByName(&newgroup)
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
+			newgroup := database.StudentGroup{Name: value}
+			filteredLessons, err = database.Database.StudentGroup.GetClassesByName(&newgroup)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+				return
+			}
+
+			//}
+			//По преподавателю
+		case "tutor":
+			tempclass := &database.Class{TeacherName: value}
+			//Получаем список пар по преподу
+			filteredLessons, err = database.Database.Class.GetForTeacher(tempclass)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+				return
+			}
+
+			//По аудитории
+		case "classroom":
+			//Заданное value присваивается полю вудитории пары
+			lesson.Location = value
+			//Получаем список пар по аудитории
+			filteredLessons, err = database.Database.Class.GetByLocation(lesson)
+			if err != nil {
+				c.String(http.StatusBadRequest, err.Error())
+				return
+			}
+			//При неверном критерии вернет BadRequest
+		default:
+			c.String(http.StatusBadRequest, "There is no such criterion")
 			return
 		}
 
-		//}
-		//По преподавателю
-	case "tutor":
-		tempclass := &database.Class{TeacherName: value}
-		//Получаем список пар по преподу
-		filteredLessons, err = database.Database.Class.GetForTeacher(tempclass)
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
-			return
+		if len(*filteredLessons) != 0 {
+			//Добавляем в кэш значение
+			cache.Set(value, filteredLessons)
+			//Возвращаем StatusOK и пары по заданным значениям
+			c.JSON(http.StatusOK, filteredLessons)
+		} else {
+			switch criterion {
+			case "group":
+				c.JSON(http.StatusBadRequest, "There is no such group")
+			case "tutor":
+				c.JSON(http.StatusBadRequest, "There is no such tutor")
+			case "classroom":
+				c.JSON(http.StatusBadRequest, "There is no such classroom")
+			}
 		}
-
-		//По аудитории
-	case "classroom":
-		//Заданное value присваивается полю вудитории пары
-		lesson.Location = value
-		//Получаем список пар по аудитории
-		filteredLessons, err = database.Database.Class.GetByLocation(lesson)
-		if err != nil {
-			c.String(http.StatusBadRequest, err.Error())
-			return
-		}
-		//При неверном критерии вернет BadRequest
-	default:
-		c.String(http.StatusBadRequest, "bad request")
-		return
 	}
-
-	//}
-	//Добавляем в кэш значение
-	//cache.Set(value, filteredLessons)
-	//Возвращаем StatusOK и пары по заданным значениям
-	c.JSON(http.StatusOK, filteredLessons)
 }
