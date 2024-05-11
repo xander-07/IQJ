@@ -79,12 +79,12 @@ func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	row := ct.db.QueryRow(`SELECT class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location
+	row := ct.db.QueryRow(`SELECT class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location
 		FROM classes
 		WHERE class_id = $1`,
 		c.Id)
 
-	err := row.Scan(pq.Array(&c.Groups), pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
+	err := row.Scan(pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -107,7 +107,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetForWeekByTeacher: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id,  class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2`,
 		c.Id, c.Week)
@@ -119,7 +119,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
 		}
@@ -142,7 +142,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, count, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_names, count, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3`,
 		c.Id, c.Week, c.Weekday)
@@ -154,7 +154,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetById: %v", err)
 		}
@@ -186,7 +186,7 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	}
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
-	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
+	rows, err := ct.db.Query(`SELECT class_id, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
 		FROM classes
 		WHERE class_location = $1`, c.Location)
 	if err != nil {
@@ -197,10 +197,21 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.Groups), pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
+		// var tempGroupIds []*sql.NullInt32
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 		}
+		// функция конвертации sql.NullInt32 в []int
+		// resultClass.Groups = make([]int, len(tempGroupIds))
+		// func() {
+		// 	for k, v := range tempGroupIds {
+		// 		resultClass.Groups[k] = int(v.Int32)
+		// 	}
+		// }()
+
+		// конец функции конвертации
+
 		resultClass.Location = c.Location
 		resultClasses = append(resultClasses, resultClass)
 	}
