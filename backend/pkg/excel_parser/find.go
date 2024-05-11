@@ -103,6 +103,24 @@ func find(table [][]string, id int) (int, error) {
 			//Присваивание полей групп и ID групп и обнуление список
 			row.Groups = groupids
 			row.GroupsNames = groups
+
+			// функция проверки на массив нулей, для избежания занесения в бд массива вида [0,0,0] (это вызывает ошибку sql)
+			// теперь еще и учителя меняет с 0 на 123
+			func() {
+				c := 0 // счетчик элементов с нулями
+				for _, v := range row.Groups {
+					if v == 0 {
+						c++
+					}
+				}
+				if c == len(row.Groups) {
+					row.Groups = []int{1, 2, 3, 4}
+				}
+				if row.Teacher == 0 {
+					row.Teacher = 123
+				}
+			}()
+
 			groupids = nil
 			groups = nil
 			//Добавление пары в БД
