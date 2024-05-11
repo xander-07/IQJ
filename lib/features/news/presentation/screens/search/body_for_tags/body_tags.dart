@@ -28,7 +28,7 @@ class _BodyTagsWidgetState extends State<BodyTagsWidget> {
   }
 
   Color getTagColor(int index) {
-    return index < 2 ? Theme.of(context).colorScheme.primary : const Color(0xFF454648);
+    return index < 2 ? Theme.of(context).colorScheme.primary : Theme.of(context).brightness == Brightness.light ?Color(0xFFB3B3B3) :Color(0xFF454648);
   }
 
   Widget getTagSvg(int index) {
@@ -55,18 +55,22 @@ class _BodyTagsWidgetState extends State<BodyTagsWidget> {
                 child: TextField(
                   controller: TagPickerController,
                   maxLines: 1,
-                  decoration: const InputDecoration(
+                  decoration:  InputDecoration(
                     border: InputBorder.none,
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFEFAC00)), // Custom focused border color
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFE8E8E8)), // Custom enabled border color
+                      borderSide: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFF191919)
+                      : const Color(0xFFE8E8E8)
+                      ), 
                     ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     hintText: "Добавить тег...",
-                    hintFadeDuration: Duration(milliseconds: 100),
-                    hintStyle: TextStyle(
+                    hintFadeDuration: const Duration(milliseconds: 100),
+                    hintStyle: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
                       fontSize: 16.0,
@@ -108,15 +112,18 @@ class _BodyTagsWidgetState extends State<BodyTagsWidget> {
                   color: Color(0xFFE8E8E8),
                 ),
               ),
-              Text(
-                'Добавленные',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  'Добавленные',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.left,
                 ),
-                textAlign: TextAlign.left,
-              )
+              ),
             ],
           ),
         ),
@@ -188,21 +195,27 @@ class _BodyTagsWidgetState extends State<BodyTagsWidget> {
                 ),
               ),
               Container(
-                child: const Divider(
+                child: Divider(
                   thickness: 1,
                   height: 24,
-                  color: Color(0xFFE8E8E8),
+                  color: Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFF191919)
+                  : const Color(0xFFE8E8E8)
+                  
                 ),
               ),
-              const SizedBox(height: 8), // Add this line to create a small vertical space
-              const Text(
-                'Популярные',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
+              //const SizedBox(height: 8), 
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  'Популярные',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.left,
                 ),
-                textAlign: TextAlign.left,
               ),
               Wrap(
                 spacing: 2.0,
@@ -251,12 +264,14 @@ class _BodyTagsWidgetState extends State<BodyTagsWidget> {
                       ),
                 ),
               ),
-              const Divider(
+              Divider(
                 thickness: 1,
                 height: 24,
-                color: Color(0xFFE8E8E8),
+                color: Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFF191919)
+                  : const Color(0xFFE8E8E8)
               ),
-              SizedBox(height: 6,),
+              const SizedBox(height: 6,),
               Align(
                 alignment: Alignment.centerRight,
                 child: SizedBox(

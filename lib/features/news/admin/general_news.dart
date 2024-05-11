@@ -84,7 +84,7 @@ class _GeneralNews extends State<GeneralNews> {
             ),
           ),
           Container(
-            width: 350,
+            width: 450,
             height: 192,
             //color: Color.fromRGBO(44, 45, 47, 1),
             //color: Colors.blue,
@@ -262,7 +262,7 @@ class _GeneralNews extends State<GeneralNews> {
           children: [
             Container(
               //padding: EdgeInsets.only(top: 40),
-              width: 357,
+              width: 380,
               height: 467,
               //color: Color.fromRGBO(44, 45, 47, 1),
               //color: Colors.blue,
@@ -275,7 +275,7 @@ class _GeneralNews extends State<GeneralNews> {
                 children: [
                   Container(
                     height: 53,
-                    width: 300,
+                    width: 315,
                     padding: const EdgeInsets.only(top: 12),
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -295,21 +295,12 @@ class _GeneralNews extends State<GeneralNews> {
             ),
           ],
         ),
-
-          Container(
-            margin: const EdgeInsets.only(left: 12, right: 12, top: 12),
-            child: Divider(
-              thickness: 1,
-              color: Theme.of(context).colorScheme.surfaceVariant,
-            ),
-          ),
           Padding(
-            padding: const EdgeInsets.only(left: 12, top: 12),
+            padding: const EdgeInsets.only(left: 16, top: 31),
             child: Text(
               'Дата публикации',
               textAlign: TextAlign.left,
               style: TextStyle(
-                
                 fontFamily: 'Inter',
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -319,43 +310,63 @@ class _GeneralNews extends State<GeneralNews> {
           ),
           Container(
             height: 52,
-            margin:
-                const EdgeInsets.only(top: 10, left: 12, right: 12, bottom: 12),
+            margin: const EdgeInsets.only(top: 10, left: 16, right: 12),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.onInverseSurface,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: TextField(
-              controller: datePickerController,
-              decoration: InputDecoration(
-                hintText: "дд.мм.гггг",
-                hintFadeDuration: const Duration(milliseconds: 100),
-                border: InputBorder.none,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                hintStyle: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16.0,
-                  height: 2.5,
-                  color: Color.fromRGBO(128, 128, 128, 0.6),
-                ),
-                suffixIcon: SizedBox(
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.date_range,
-                    ),
-                    onPressed: () {
-                      _selectDate(context);
-                    },
+            child: Stack(
+              children: [
+                Positioned(
+                  bottom: 12,
+                  left: 12,
+                  right: 40,
+                  child: Container(
+                    height: 1,
+                    color: const Color(0xFF454648),
                   ),
                 ),
-              ),
-              onChanged: (text) {
-                _publicationTime = text;
-              },
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: datePickerController,
+                          decoration: const InputDecoration(
+                            hintText: "дд.мм.гггг",
+                            border: InputBorder.none,
+                            hintFadeDuration: Duration(milliseconds: 100),
+                            hintStyle: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16.0,
+                              height: 1,
+                              color: Color.fromRGBO(128, 128, 128, 0.6),
+                            ),
+                          ),
+                          onChanged: (text) {
+                            _publicationTime = text;
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.date_range,
+                        ),
+                        onPressed: () {
+                          _selectDate(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            
           ),
+          SizedBox(height: 8,),
+
           general_news_add_button(
             context,
             _header,
