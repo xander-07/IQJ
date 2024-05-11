@@ -9,21 +9,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (h *Handler) HandleNews(c *gin.Context) {
+	offsetStr := c.Query("offset")
+	offset, _ := strconv.Atoi(offsetStr)
+
+	countStr := c.Query("count")
+	count, _ := strconv.Atoi(countStr)
+
+	idStr := c.Query("id")
+	id, _ := strconv.Atoi(idStr)
+
+	if (len(offsetStr) != 0 && len(countStr) != 0 && len(idStr) != 0) || (len(idStr) != 0 && len(offsetStr) != 0) || (len(idStr) != 0 && len(countStr) != 0) {
+		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
+	} else if len(idStr) != 0 {
+		h.HandleGetNewsById(c, id)
+	} else if len(offsetStr) == 0 && len(countStr) == 0 && len(idStr) == 0 {
+		h.HandleGetAllNews(c)
+	} else {
+		h.HandleGetNews(c, offset, count)
+	}
+}
+
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
 // Например при GET /news?offset=1&count=5 вернет новости с первой по шестую.
-func (h *Handler) HandleGetNews(c *gin.Context) {
-	// Получаем промежуток пропуска и количество блоков новостей
-	offsetStr := c.Query("offset")
-	countStr := c.Query("count")
-
-	offset, err := strconv.Atoi(offsetStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleGetNews:", err)
-		return
-	}
+func (h *Handler) HandleGetNews(c *gin.Context, offset, count int) {
 	switch {
 	case offset < 0:
 		c.JSON(http.StatusBadRequest, "Offset < 0")
@@ -35,12 +46,6 @@ func (h *Handler) HandleGetNews(c *gin.Context) {
 		return
 	}
 
-	count, err := strconv.Atoi(countStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleGetNews:", err)
-		return
-	}
 	switch {
 	case count < 1:
 		c.JSON(http.StatusBadRequest, "Count < 1")
@@ -52,28 +57,20 @@ func (h *Handler) HandleGetNews(c *gin.Context) {
 		return
 	}
 
-	latestnews, err := database.Database.News.GetLatestBlocks(count, offset)
+	latestNews, err := database.Database.News.GetLatestBlocks(count, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleGetNews:", err)
 		return
 	}
-	c.JSON(http.StatusOK, latestnews)
+	c.JSON(http.StatusOK, latestNews)
 }
 
 // Извлекает id из параметров запроса,
 // вызывает функцию GetNewsByID, которая получает полную новость из бд.
 // Выдает полную новость пользователю в формате JSON.
 // Например при GET /newsid?id=13 вернет новость с id = 13.
-func (h *Handler) HandleGetNewsById(c *gin.Context) {
-	idStr := c.Query("id")
-
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleGetNewsById:", err)
-		return
-	}
+func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 	switch {
 	case id < 0:
 		c.JSON(http.StatusBadRequest, "Id < 0")
@@ -156,28 +153,14 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 // Используется функция GetAllNews, которая получает срез всех новостей в бд
 // Использование с GET: /news?all=1
 func (h *Handler) HandleGetAllNews(c *gin.Context) {
-	allStr := c.Query("all")
 
-	all, err := strconv.Atoi(allStr)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleGetAllNews:", err)
-		return
-	}
-
-	if all != 1 {
-		c.JSON(http.StatusBadRequest, "All != 1")
-		fmt.Println("HandleGetAllNews: all != 1")
-		return
-	}
-
-	allnews, err := database.Database.News.GetAll()
+	allNews, err := database.Database.News.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleGetAllNews:", err)
 		return
 	}
-	c.JSON(http.StatusOK, allnews)
+	c.JSON(http.StatusOK, allNews)
 }
 
 // Функция для обновления новости по её id.

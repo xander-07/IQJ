@@ -8,6 +8,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	DefaultRoute        = "/"
+	NewsRoute           = "/news"
+	AdvertisementsRoute = "/ad"
+	LessonsRoute        = "/lessons"
+	SignInRoute         = "/sign-in"
+	SignUpRoute         = "/sign-up"
+	WebSignInRoute      = "/web_sign-in"
+	UpdateRoleRoute     = "/update_role"
+
+	AuthGroupRoute = "/auth"
+
+	FirebaseGroupRoute = "/firebase"
+	FirebaseUserRoute  = "/user"
+)
+
 type Handler struct {
 	services *service.Service
 }
@@ -27,35 +43,35 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.Use(middleware2.CORSMiddleware())
 
 	// Вызов хэндлеров исходя из запроса.
-	r.GET("/", h.Hello)
+	r.GET(DefaultRoute, h.Hello)
 
-	r.POST("/sign-up", h.HandleSignUp)
-	r.POST("/sign-in", h.HandleSignIn)
-	r.POST("/web_sign-in", h.HandleWebSignIn)
+	r.POST(SignUpRoute, h.HandleSignUp)
+	r.POST(SignInRoute, h.HandleSignIn)
+	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
-	r.GET("/news", h.HandleGetNews)
-	r.GET("/news_id", h.HandleGetNewsById)
+	r.GET(NewsRoute, h.HandleNews)
 
-	r.GET("/ad", h.HandleGetAdvertisement)
+	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
 
-	r.GET("/lessons", h.Lessons)
+	r.GET(LessonsRoute, h.Lessons)
 
 	// Группа функций, которая доступна только после аутентификации
-	authGroup := r.Group("/api")
+	authGroup := r.Group(AuthGroupRoute)
 	authGroup.Use(middleware2.WithJWTAuth)
 	{
-		authGroup.POST("/news", h.HandleAddNews)
+		authGroup.POST(NewsRoute, h.HandleAddNews)
+		authGroup.PUT(NewsRoute, h.HandleUpdateNews)
 
-		authGroup.POST("/ad", h.HandlePostAdvertisement)
-		authGroup.PUT("/ad", h.HandleUpdateAdvertisements)
+		authGroup.POST(AdvertisementsRoute, h.HandlePostAdvertisement)
+		authGroup.PUT(AdvertisementsRoute, h.HandleUpdateAdvertisements)
 
-		authGroup.PUT("/update_role", h.HandleUpdateUserRole)
+		authGroup.PUT(UpdateRoleRoute, h.HandleUpdateUserRole)
 
 		// Группа функций для работы с Firebase
-		firebaseGroup := authGroup.Group("/firebase")
+		firebaseGroup := authGroup.Group(FirebaseGroupRoute)
 		{
-			firebaseGroup.GET("/list_user", h.HandleListUsers)
-			firebaseGroup.PUT("/update_user", h.HandleUpdateFirebaseUser)
+			firebaseGroup.GET(FirebaseUserRoute, h.HandleListUsers)
+			firebaseGroup.PUT(FirebaseUserRoute, h.HandleUpdateFirebaseUser)
 		}
 	}
 
