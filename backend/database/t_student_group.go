@@ -194,7 +194,36 @@ func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) ([]Class, error) {
 		return nil, fmt.Errorf("StudentGroup.GetClasses: error after scanning rows: %v", err)
 	}
 
-	return resultClasses, nil
+	return &resultClasses, nil
+}
+
+// GetClasses возвращает классы для группы студентов из базы данных.
+func (sgt *StudentGroupTable) GetClassesByName(sg *StudentGroup) (*[]Class, error) {
+	if sg.isDefault() {
+		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
+	}
+
+	rows, err := sgt.db.Query("SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location FROM classes WHERE $1 = ANY(class_group_names)", sg.Name)
+	if err != nil {
+		return nil, fmt.Errorf("StudentGroup.GetClasses: %v", err)
+	}
+	defer rows.Close()
+
+	var resultClasses []Class
+	for rows.Next() {
+		var resultClass Class
+		if err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location); err != nil {
+			return nil, fmt.Errorf("StudentGroup.GetClasses: error scanning row: %v", err)
+		}
+		resultClass.Name = sg.Name
+		resultClasses = append(resultClasses, resultClass)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("StudentGroup.GetClasses: error after scanning rows: %v", err)
+	}
+
+	return &resultClasses, nil
 }
 
 // Delete удаляет группу студентов из базы данных по указанному идентификатору.
