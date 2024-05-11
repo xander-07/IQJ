@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"iqj/database"
+	"iqj/internal/database"
 	"net/http"
 	"strconv"
 

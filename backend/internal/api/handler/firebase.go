@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
-	"iqj/api/firebase"
+	"iqj/internal/api/firebase"
 	"net/http"
 	"time"
 

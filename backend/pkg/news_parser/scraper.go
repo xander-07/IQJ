@@ -2,7 +2,7 @@ package news_parser
 
 import (
 	"fmt"
-	"iqj/database"
+	"iqj/internal/database"
 	"strings"
 	"time"
 

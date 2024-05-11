@@ -1,7 +1,7 @@
 package excel_parser
 
 import (
-	"iqj/database"
+	"iqj/internal/database"
 	"strconv"
 )
 
