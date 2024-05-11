@@ -7,9 +7,14 @@ import (
 	"iqj/pkg/excel_parser"
 	"iqj/pkg/news_parser"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// ТОЛЬКО ДЛЯ РЕЛИЗНОЙ ВЕРСИИ (СЕРВЕР)
+	gin.SetMode(gin.ReleaseMode)
+
 	// БД
 	database.NewDatabaseInstance()
 
