@@ -70,9 +70,9 @@ CREATE TABLE IF NOT EXISTS student_groups (
 	createTableClasses = `
 	CREATE TABLE IF NOT EXISTS classes (
     class_id SERIAL PRIMARY KEY,
-    class_group_ids INT[] DEFAULT '{0}',
+    class_group_ids INT[] DEFAULT '{-1}' NOT NULL,
     class_group_names VARCHAR(11)[] DEFAULT '{"default"}' NOT NULL,
-    class_teacher_id INT DEFAULT 0,
+    class_teacher_id INT DEFAULT -1,
     class_teacher_name VARCHAR(255),
     count INT DEFAULT 0 NOT NULL,
     weekday INT DEFAULT 0 NOT NULL,
