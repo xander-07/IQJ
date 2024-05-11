@@ -23,7 +23,7 @@ func (h *Handler) HandleNews(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
 	} else if len(idStr) != 0 {
 		h.HandleGetNewsById(c, id)
-	} else if len(offsetStr) == 0 && len(countStr) == 0 && len(idStr) == 0 {
+	} else if (len(offsetStr) + len(countStr) + len(idStr)) == 0 {
 		h.HandleGetAllNews(c)
 	} else {
 		h.HandleGetNews(c, offset, count)
