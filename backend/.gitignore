@@ -2,3 +2,4 @@
 config
 *.crt
 .DS_Store
+/firebaseopt.json

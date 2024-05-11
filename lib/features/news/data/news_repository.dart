@@ -31,6 +31,7 @@ Future<List<News>> getNews() async {
     //   },
     // ).toList();
     final dynamic decodedData = json.decode(response.body);
+    print(decodedData);
     List<News> newsList = [];
     final List<dynamic> jsonList = decodedData as List;
     // final dynamic hi = jsonList[0];

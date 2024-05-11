@@ -8,7 +8,9 @@ class AuthService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   Future<UserCredential> signInWithEmailandPassword(
-      String email, String password,) async {
+    String email,
+    String password,
+  ) async {
     try {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
@@ -18,13 +20,29 @@ class AuthService extends ChangeNotifier {
         'email': userCredential.user!.email,
       });
 
-
       // Использовать это в методе для регистрации когда он понадобится (написать тоже нужно)
       // _firestore.collection('users').doc(userCredential.user!.uid).set({
       //   'uid': userCredential.user!.uid,
       //   'email': userCredential.user!.email,
       // }), SetOptions(merge: true);
 
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.code);
+    }
+  }
+
+  Future<UserCredential> createUserWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'uid': userCredential.user!.uid,
+        'email': email,
+      });
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);

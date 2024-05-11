@@ -34,7 +34,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -43,7 +43,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -73,7 +73,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -82,7 +82,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -111,7 +111,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),
@@ -120,7 +120,7 @@ final List<Day> schedule = [
         type: 'Практика',
         classroom: 'А-107-1 (В-78)',
         groups: [
-          'ЭФБО-14-88',
+          'ЭФБО-01-23',
         ],
         professor: 'Кто-то',
       ),

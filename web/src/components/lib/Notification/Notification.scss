@@ -1,0 +1,28 @@
+.notification-alert {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff0000; /* Красный цвет */
+  color: #ffffff; /* Белый цвет */
+  padding: 10px 20px; /* Внутренние отступы */
+  margin-top: 10px;
+  border-radius: 50px; /* Закругленные углы */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Тень */
+  z-index: 1000;
+  display: inline-block;
+  text-align: center; /* Выравнивание текста по центру */
+  font-size: 16px; /* Размер шрифта */
+  transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out; /* Плавная анимация */
+  opacity: 0; /* Начальная невидимость */
+}
+
+.notification-alert.show {
+  top: 10px; /* Конечное положение */
+  opacity: 1; /* Видимый */
+}
+
+.notification-alert.hide {
+  top: 0; /* Начальное положение */
+  opacity: 0; /* Невидимый */
+}

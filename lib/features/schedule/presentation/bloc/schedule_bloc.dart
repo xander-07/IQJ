@@ -9,6 +9,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   late List<Day> scheduleList;
 
   ScheduleBloc() : super(ScheduleInitial()) {
+    // MARK: Загрузка расписания
     on<LoadSchedule>((_, emit) async {
       try {
         if (state is! ScheduleLoading) {
@@ -29,6 +30,11 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         emit(ScheduleLoadingFailed(except: e));
       }
     });
+    // MARK: выбор расписания
+    on<SelectSchedule>((event, emit) {
+      if (state is! ScheduleLoaded) add(LoadSchedule());
+    });
+    // MARK: выбор дня
     on<SelectDay>(
       (event, emit) async {
         try {

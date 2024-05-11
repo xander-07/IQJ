@@ -24,22 +24,10 @@ class ScheduleScreen extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () => showModalBottomSheet<void>(
-                backgroundColor: Theme.of(context).colorScheme.background,
-                context: context,
-                builder: (context) => ListView(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => DoNothingAction(),
-                      child: Text(
-                        'Тут будут настройки расписания',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  elevation: 0,
+                  context: context,
+                  builder: (context) => _buildBottomSheet(context)),
               icon: const Icon(Icons.more_vert),
             ),
           ],
@@ -53,4 +41,24 @@ class ScheduleScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// MARK: Панель с настройками
+Container _buildBottomSheet(BuildContext context) {
+  return Container(
+    child: ListView(
+      padding: const EdgeInsets.all(8),
+      children: [
+        Text(
+          'Управление расписанием',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
+        ),
+      ],
+    ),
+  );
 }
