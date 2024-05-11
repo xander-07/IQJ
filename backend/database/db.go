@@ -90,12 +90,40 @@ func (st *DatabaseRepository) connectDatabase(connectionString string) error {
 
 // раздаем указатели на подключение декораторам
 func (st *DatabaseRepository) connectTables(db *sql.DB) {
-	st.Advertisement, _ = newAdvertisementTable(db, createTableAdvertisements)
-	st.Class, _ = newClassesTable(db, createTableClasses)
-	st.News, _ = newNewsTable(db, createTableNews)
-	st.Student, _ = newStudentTable(db, createTableStudents)
-	st.StudentGroup, _ = newStudentGroupTable(db, createTableStudentGroups)
-	st.Teacher, _ = newTeacherTable(db, createTableTeachers)
-	st.User, _ = newUserTable(db, createTableUsers)
-	st.UserData, _ = newUserDataTable(db, createTableUsersData)
+	var err error
+	st.Advertisement, err = newAdvertisementTable(db, createTableAdvertisements)
+	if err != nil {
+		panic(err)
+	}
+	st.Class, err = newClassesTable(db, createTableClasses)
+	if err != nil {
+		panic(err)
+	}
+	st.News, err = newNewsTable(db, createTableNews)
+	if err != nil {
+		panic(err)
+	}
+	st.Student, err = newStudentTable(db, createTableStudents)
+	if err != nil {
+		panic(err)
+	}
+	st.StudentGroup, err = newStudentGroupTable(db, createTableStudentGroups)
+	if err != nil {
+		panic(err)
+	}
+	if err != nil {
+		panic(err)
+	}
+	st.Teacher, err = newTeacherTable(db, createTableTeachers)
+	if err != nil {
+		panic(err)
+	}
+	st.User, err = newUserTable(db, createTableUsers)
+	if err != nil {
+		panic(err)
+	}
+	st.UserData, err = newUserDataTable(db, createTableUsersData)
+	if err != nil {
+		panic(err)
+	}
 }
