@@ -95,6 +95,8 @@ func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 	return c, nil
 }
 
+//	СКОРО БУДЕТ УДАЛЕНО, ИСПОЛЬЗУЙТЕ GetForTeacher вместо этого, за доп. функционалом обращаться в канал бд
+//
 // GetForWeekByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
 // Принимает указатель на Class с непустыми полями Id,Week\n
 // Возвращает слайс заполненных *Class, nil при успешном получении.
@@ -122,6 +124,34 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
+		}
+		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
+		resultClasses = append(resultClasses, resultClass)
+	}
+
+	return &resultClasses, nil
+}
+
+func (ct *ClassTable) GetForTeacher(c *Class) (*[]Class, error) {
+	if c.isDefault() {
+		return nil, errors.New("Class.GetForTeacher: wrong data! provided *Class is empty")
+	}
+
+	rows, err := ct.db.Query(`SELECT class_id,  class_group_names, count ,week, weekday, class_name, class_type, class_location
+		FROM classes
+		WHERE class_teacher_name = $1`,
+		c.TeacherName)
+	if err != nil {
+		return nil, fmt.Errorf("Class.GetForTeacher: %v", err)
+	}
+	defer rows.Close()
+
+	var resultClasses []Class
+	for rows.Next() {
+		var resultClass Class
+		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		if err != nil {
+			return nil, fmt.Errorf("Class.GetForTeacher: %v", err)
 		}
 		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
 		resultClasses = append(resultClasses, resultClass)
@@ -181,7 +211,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 //	}
 func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	// Проверяем, что переданный объект класса не пустой
-	if c.isDefault() {
+	if c.Location == "" {
 		return nil, errors.New("Class.GetByLocation: wrong data! provided *Class is empty")
 	}
 
