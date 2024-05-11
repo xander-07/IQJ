@@ -111,9 +111,6 @@ func (st *DatabaseRepository) connectTables(db *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
-	if err != nil {
-		panic(err)
-	}
 	st.Teacher, err = newTeacherTable(db, createTableTeachers)
 	if err != nil {
 		panic(err)
