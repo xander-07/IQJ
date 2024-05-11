@@ -170,7 +170,10 @@ func (sgt *StudentGroupTable) Update(sg *StudentGroup) error {
 }
 
 // GetClasses возвращает классы для группы студентов из базы данных.
-func (sgt *StudentGroupTable) GetClasses(sg *StudentGroup) ([]Class, error) {
+func (sgt *StudentGroupTable) GetClassesById(sg *StudentGroup) (*[]Class, error) {
+	if sg == nil {
+		return nil, sql.ErrConnDone // сделал эту ошибку чисто чтобы понимать, что это изза nil ptr, позже исправлю вместе со всеми ошибками
+	}
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
 	}
