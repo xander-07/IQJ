@@ -32,7 +32,7 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 	client, err := firebase.InitFirebase()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
 		return
 	}
 	iter := client.Users(context.Background(), "")
@@ -45,7 +45,7 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			fmt.Println("HandleListUsers: error listing users: %s\n", err)
+			fmt.Printf("HandleListUsers: error listing users: %s\n", err)
 		}
 		userInfo.UID = user.UID
 		userInfo.Email = user.Email
@@ -82,7 +82,7 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 	client, err := firebase.InitFirebase()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
 		return
 	}
 	var userUpdate UserInfo
@@ -104,7 +104,7 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 	u, err := client.UpdateUser(context.Background(), uid, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
 	}
 	fmt.Println(u)
 }

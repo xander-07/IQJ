@@ -70,7 +70,6 @@ func (h *Handler) HandleSignUp(c *gin.Context) {
 	userData.Id = userDb.Id
 	userData.Name = fullUser.Name
 	userData.Role = "student"
-	fmt.Println(userData)
 	if err = database.Database.UserData.Add(&userData); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleSignUp:", err)
