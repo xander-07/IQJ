@@ -94,17 +94,24 @@ func (h *Handler) Lessons(c *gin.Context) {
 			}
 			//При неверном критерии вернет BadRequest
 		default:
-			c.String(http.StatusBadRequest, "bad request")
+			c.String(http.StatusBadRequest, "There is no such criterion")
 			return
 		}
 
-		if filteredLessons != nil {
+		if len(*filteredLessons) != 0 {
 			//Добавляем в кэш значение
 			cache.Set(value, filteredLessons)
 			//Возвращаем StatusOK и пары по заданным значениям
 			c.JSON(http.StatusOK, filteredLessons)
 		} else {
-			c.JSON(http.StatusBadRequest, "")
+			switch criterion {
+			case "group":
+				c.JSON(http.StatusBadRequest, "There is no such group")
+			case "tutor":
+				c.JSON(http.StatusBadRequest, "There is no such tutor")
+			case "classroom":
+				c.JSON(http.StatusBadRequest, "There is no such classroom")
+			}
 		}
 	}
 }
