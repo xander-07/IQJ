@@ -294,6 +294,7 @@ class _MessengerBloc extends State<MessengerScreen> {
     );
   }
 
+
   Widget _buildUserList(){
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -315,9 +316,48 @@ class _MessengerBloc extends State<MessengerScreen> {
       },
       );
   }
+
+  Widget _buildGroupList(){
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('chatrooms').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError){
+          return const Text('err');
+        }
+        if (snapshot.connectionState == ConnectionState.waiting){
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return Column(
+          children: 
+            snapshot.data!.docs
+            .map<Widget>((doc) => _buildUserListItem(doc))
+            .toList(),
+        );
+      },
+      );
+  }
   
 
   Widget _buildUserListItem(DocumentSnapshot document){
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    if (_auth.currentUser!.email != data['email']){
+      // return ListTile(
+      //   title: Text(data['email'].toString()),
+      //   onTap: (){
+      //     Navigator.of(context).pushNamed(
+      //       'chatslist',
+      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
+      //     );
+      //   },
+      // );
+      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
+    }
+    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
+  }
+
+  Widget _buildGroupItem(DocumentSnapshot document){
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     if (_auth.currentUser!.email != data['email']){
       // return ListTile(

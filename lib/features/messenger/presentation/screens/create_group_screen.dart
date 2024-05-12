@@ -20,6 +20,8 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ChatService _chatService = ChatService();
   TextEditingController SearchPickerController = TextEditingController();
+  TextEditingController groupNameController = TextEditingController();
+  String groupName = '';
   Map<String, dynamic> userMap = {};
 
   void updateSelectionState(String uid, bool isSelected) {
@@ -71,8 +73,9 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
         child: IconButton(
           onPressed: () {
             createGroup();
-            Navigator.of(context).pushNamed('chatslist',
-            arguments: {'name': 'I hate this ','url':'no.','volume': false,'pin': false, 'uid':'just bugger off'},);
+            //Navigator.of(context).pushNamed('chatslist',
+            //arguments: {'name': groupName, 'url':'no.', 'volume': false, 'pin': false, 'uid':_auth.currentUser?.uid},);
+            Navigator.of(context).pop();
           },
           icon: const Icon(Icons.arrow_forward_rounded),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -91,6 +94,45 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
       body: Container(
         child: Column(
           children: [
+            Padding(padding: EdgeInsets.only(bottom: 12),),
+            SizedBox(
+              width: 500,
+              height: 50,
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextField(
+                  controller: groupNameController,
+                  decoration: InputDecoration(
+                    hintText: "Введите название группы...",
+                    hintFadeDuration: const Duration(milliseconds: 100),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                    hintStyle: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16.0,
+                      //height: 5,
+                      color: Color.fromRGBO(128, 128, 128, 0.6),
+                    ),
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      groupName = text;
+                    });
+                  },
+                ),
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(bottom: 12),),
             SizedBox(
               width: 500,
               height: 50,

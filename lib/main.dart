@@ -29,7 +29,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthService(),
@@ -41,28 +41,28 @@ Future<void> main() async {
   // ВАЖНО: Может выдавать ошибки при сборке на Windows.
   // Их можно пропустить, приложение будет работать корректно.
   // На Windows не будет пуш-уведомлений.
-  final messaging = FirebaseMessaging.instance;
-  final settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  String? token = await messaging.getToken();
-  //print("RegToken HERERERERRERE: " + token!);
-  final _messageStreamController = BehaviorSubject<RemoteMessage>();
-   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-   _messageStreamController.sink.add(message);
- });
+//   final messaging = FirebaseMessaging.instance;
+//   final settings = await messaging.requestPermission(
+//     alert: true,
+//     announcement: false,
+//     badge: true,
+//     carPlay: false,
+//     criticalAlert: false,
+//     provisional: false,
+//     sound: true,
+//   );
+//   String? token = await messaging.getToken();
+//   //print("RegToken HERERERERRERE: " + token!);
+//   final _messageStreamController = BehaviorSubject<RemoteMessage>();
+//    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+//    _messageStreamController.sink.add(message);
+//  });
 
 }
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
- await Firebase.initializeApp();
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//  await Firebase.initializeApp();
+// }
 
 
 class App extends StatefulWidget {

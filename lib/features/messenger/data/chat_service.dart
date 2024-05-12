@@ -10,6 +10,7 @@ class ChatService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  ////////////// Личные сообщения ///////////////
   // Send message
   Future<void> sendMessage(String receiverId, String message) async {
     // get info
@@ -34,7 +35,7 @@ class ChatService extends ChangeNotifier {
 
     // add to db
     await _firestore
-        .collection('chatrooms')
+        .collection('direct_messages')
         .doc(chatRoomId)
         .collection('messages')
         .add(newMessage.toMap());
@@ -69,7 +70,7 @@ class ChatService extends ChangeNotifier {
 
     // add to db
     await _firestore
-        .collection('chatrooms')
+        .collection('direct_messages')
         .doc(chatRoomId)
         .collection('messages')
         .add(newFile.toMap());
@@ -82,13 +83,16 @@ class ChatService extends ChangeNotifier {
     print(ids);
     final String chatRoomId = ids.join("_");
     return _firestore
-        .collection('chatrooms')
+        .collection('direct_messages')
         .doc(chatRoomId)
         .collection('messages')
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
 
+
+
+  ////////////// ГРУППОВЫЕ ///////////////
   // Generate random group chat ID
   String generateRandomGroupId() {
     final Random random = Random();
@@ -104,6 +108,7 @@ class ChatService extends ChangeNotifier {
 
     // Generate random chatroom id
     final String groupChatId = generateRandomGroupId();
+    print(groupChatId);
 
     // Add users to the group chat
     final Map<String, bool> users = {};
@@ -111,24 +116,47 @@ class ChatService extends ChangeNotifier {
       users[uid] = true;
     }
 
+    print('creating group');
     // Add users to Firestore
     await _firestore
-        .collection('chatrooms')
+        .collection('groups')
         .doc(groupChatId)
         .collection('users')
-        .doc('users')
-        .set(users);
+        .add(users);
   }
 
   Future<void> addUserToGroupChat(String groupChatId, String userId) async {
+    print('adding user to group');
     // Add user to Firestore
     await _firestore
-        .collection('chatrooms')
+        .collection('groups')
         .doc(groupChatId)
         .collection('users')
         .doc('users')
         .update({
       userId: true,
     });
+  }
+
+  Future<void> sendMessageToGroup(String groupChatId, String message) async {
+    // get info
+    final String currentUserId = _auth.currentUser!.uid;
+    final String currentUserEmail = _auth.currentUser!.email.toString();
+    final Timestamp timestamp = Timestamp.now();
+
+    // create msg
+    final GroupMessage newMessage = GroupMessage(
+      senderId: currentUserId,
+      senderEmail: currentUserEmail,
+      timestamp: timestamp,
+      message: message,
+    );
+
+    // add to db
+    await _firestore
+        .collection('group')
+        .doc(groupChatId)
+        .collection('messages')
+        .add(newMessage.toMap());
   }
 }
