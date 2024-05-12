@@ -44,7 +44,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 	userId := userIdToConv.(int)
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
-		&database.UserData{
+		database.UserData{
 			Id: int64(userId),
 		})
 	if err != nil {
@@ -98,7 +98,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	userId := userIdToConv.(int)
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
-		&database.UserData{
+		database.UserData{
 			Id: int64(userId),
 		})
 	if err != nil {

@@ -36,7 +36,7 @@ func (h *Handler) HandleUpdateUserRole(c *gin.Context) {
 	userId := userIdToConv.(int)
 
 	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
-		&database.UserData{
+		database.UserData{
 			Id: int64(userId),
 		})
 	if err != nil {
@@ -57,7 +57,7 @@ func (h *Handler) HandleUpdateUserRole(c *gin.Context) {
 		userDB.Email = updateUser.Email
 		userDB.Password = updateUser.Password
 		var user2 *database.User
-		if user2, err = database.Database.User.Check(&userDB); err != nil {
+		if user2, err = database.Database.User.Check(userDB); err != nil {
 			c.String(http.StatusUnauthorized, "") // Если пользователя нет или пароль неверный вернем пустую строку и ошибку
 			fmt.Println("HandleUpdateUserRole:", err)
 			return
@@ -67,7 +67,7 @@ func (h *Handler) HandleUpdateUserRole(c *gin.Context) {
 		userData.Id = user2.Id
 		userData.Role = updateUser.Role
 
-		if err = database.Database.UserData.UpdateRole(&userData); err != nil {
+		if err = database.Database.UserData.UpdateRole(userData); err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			fmt.Println("HandleUpdateUserRole:", err)
 			return

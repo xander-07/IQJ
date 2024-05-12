@@ -19,7 +19,7 @@ func find(table [][]string, id int) (int, error) {
 	//Проход по всем строкам таблицы от 3 (начало расписания) до 88 (конец таблицы)
 	for i := 3; i < 88; i++ {
 		//group - одна группа типа StudentGroup
-		group := &database.StudentGroup{}
+		group := database.StudentGroup{}
 		//row - одна пара типа Class
 		var row database.Class
 		//При нахождении строки между индексами weekdayIndex полю Weekday присваивается соответствующий индекс
@@ -124,7 +124,7 @@ func find(table [][]string, id int) (int, error) {
 			groupids = nil
 			groups = nil
 			//Добавление пары в БД
-			err = database.Database.Class.Add(&row)
+			err = database.Database.Class.Add(row)
 			if err != nil {
 				return id, err
 			}

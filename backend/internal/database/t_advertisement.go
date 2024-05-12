@@ -26,11 +26,11 @@ type AdvertisementTable struct {
 }
 
 // Add добавляет данные в базу данных.
-// Принимает указатель на Advertisement с непустым полeм Content\n
+// Принимает Advertisement с непустым полeм Content\n
 // Возвращает nil при успешном добавлении.
 //
 // Прим:\n
-// a := &Advertisement{Content : "123"} // Content != "" !!!!!!\n
+// a := Advertisement{Content : "123"} // Content != "" !!!!!!\n
 // err := ...Add(a) // err == nil если все хорошо
 func (at *AdvertisementTable) Add(a *Advertisement) error {
 	// Проверяем были ли переданы данные в a
@@ -142,7 +142,7 @@ func (at *AdvertisementTable) Update(a *Advertisement) error {
 }
 
 // Delete удаляет данные из базы данных по заданному Id.
-// Принимает указатель на Advertisement с заполненным полем Id,
+// Принимает Advertisement с заполненным полем Id,
 // возвращает nil при успешном удалении.
 //
 // Прим:\n

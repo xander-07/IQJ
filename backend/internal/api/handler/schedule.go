@@ -24,7 +24,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	lesson := &database.Class{}
+	lesson := database.Class{}
 	filteredLessons := &[]database.Class{}
 
 	//Проверяем, есть ли заданное значение в кэше
@@ -45,7 +45,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 			// внесите изменения в код там, где они используются
 
 			newgroup := database.StudentGroup{Name: value}
-			filteredLessons, err = database.Database.StudentGroup.GetClassesByName(&newgroup)
+			filteredLessons, err = database.Database.StudentGroup.GetClassesByName(newgroup)
 			if err != nil {
 				c.String(http.StatusBadRequest, err.Error())
 				return
@@ -54,7 +54,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 			//}
 			//По преподавателю
 		case "tutor":
-			tempclass := &database.Class{TeacherName: value}
+			tempclass := database.Class{TeacherName: value}
 			//Получаем список пар по преподу
 			filteredLessons, err = database.Database.Class.GetForTeacher(tempclass)
 			if err != nil {

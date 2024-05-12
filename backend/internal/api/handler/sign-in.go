@@ -44,7 +44,7 @@ func (h *Handler) HandleSignIn(c *gin.Context) {
 	}
 
 	// Проверяем существует ли такой пользователь и проверяем верный ли пароль
-	user, err := database.Database.User.Check(&signingUser)
+	user, err := database.Database.User.Check(signingUser)
 	if err != nil {
 		c.String(http.StatusUnauthorized, "") // Если пользователя нет или пароль неверный вернем пустую строку и ошибку
 		fmt.Println("HandleSignIn:", err)
@@ -98,7 +98,7 @@ func (h *Handler) HandleWebSignIn(c *gin.Context) {
 	}
 
 	// Проверяем существует ли такой пользователь и проверяем верный ли пароль
-	user, err := database.Database.User.Check(&signingUser)
+	user, err := database.Database.User.Check(signingUser)
 	if err != nil {
 		c.String(http.StatusUnauthorized, "") // Если пользователя нет или пароль неверный вернем пустую строку и ошибку
 		fmt.Println("HandleWebSignIn:", err)
@@ -115,7 +115,7 @@ func (h *Handler) HandleWebSignIn(c *gin.Context) {
 	}
 
 	userData, err := database.Database.UserData.GetRoleById(
-		&database.UserData{
+		database.UserData{
 			Id: user.Id,
 		})
 	if err != nil {
