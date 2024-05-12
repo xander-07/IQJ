@@ -23,21 +23,6 @@ Future<void> admin_button(BuildContext context) async {
                 ),
                 textAlign: TextAlign.center,
               ),
-    titlePadding: const EdgeInsets.only(left: 30, top: 24, right: 24),
-    title: Column(
-      children: [
-        const Row(
-          children: [
-            Flexible(
-              child: Text(
-                " Создать новость",
-                overflow: TextOverflow.clip,
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
             ),
           ],
         ),
@@ -46,8 +31,7 @@ Future<void> admin_button(BuildContext context) async {
           thickness: 1,
           height: 8,
         ),
-        //SizedBox(height: 8),
-        two_button_add_news(context), 
+        two_button_add_news(context),
       ],
     ),
     backgroundColor: Theme.of(context).colorScheme.background,
@@ -63,13 +47,11 @@ Future<void> admin_button(BuildContext context) async {
   );
 }
 
-
-
 Widget two_button_add_news(BuildContext context) {
   return Wrap(
     children: [
       Padding(
-        padding: const EdgeInsets.only(top: 10), 
+        padding: const EdgeInsets.only(top: 10),
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.transparent,
@@ -122,7 +104,8 @@ Widget two_button_add_news(BuildContext context) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const GeneralNews()),
+                            builder: (context) => const GeneralNews(),
+                          ),
                         );
                       },
                       child: const Center(
@@ -149,4 +132,3 @@ Widget two_button_add_news(BuildContext context) {
     ],
   );
 }
-
