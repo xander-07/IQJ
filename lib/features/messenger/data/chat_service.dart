@@ -10,7 +10,7 @@ class ChatService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  ////////////// Личные сообщения ///////////////
+  ////////////// ЛИЧНЫЕ СООБЩЕНИЯ ///////////////
   // Send message
   Future<void> sendMessage(String receiverId, String message) async {
     // get info
@@ -60,7 +60,7 @@ class ChatService extends ChangeNotifier {
         senderEmail: currentUserId,
         receiverId: receiverId,
         message: message, // ???
-        timestamp: timestamp);
+        timestamp: timestamp,);
 
     // make chatroom
     final List<String> ids = [currentUserId, receiverId];
@@ -90,19 +90,18 @@ class ChatService extends ChangeNotifier {
         .snapshots();
   }
 
-
-
-  ////////////// ГРУППОВЫЕ ///////////////
+  ////////////// ГРУППОВЫЕ СООБЩЕНИЯ ///////////////
   // Generate random group chat ID
   String generateRandomGroupId() {
     final Random random = Random();
-    const String chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    return List.generate(10, (index) => chars[random.nextInt(chars.length)])
+    const String chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIKJLMNOPQRSTUVWXYZ0123456789';
+    return List.generate(32, (index) => chars[random.nextInt(chars.length)])
         .join();
   }
 
 // Create group chat with a random ID
   Future<void> createGroupChat(List<String> memberIds) async {
+    print('create group called');
     // Get info
     final String currentUserId = _auth.currentUser!.uid;
 
@@ -154,7 +153,7 @@ class ChatService extends ChangeNotifier {
 
     // add to db
     await _firestore
-        .collection('group')
+        .collection('groups')
         .doc(groupChatId)
         .collection('messages')
         .add(newMessage.toMap());

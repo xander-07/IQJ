@@ -5,6 +5,7 @@ import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
+import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
@@ -110,6 +111,7 @@ class _AppState extends State<App> {
         'messenger': (context) =>
             const MessengerScreen(), // главная страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
+        'groupchat': (context) => const ChatsGroupList(), // это страница диолга
         'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),

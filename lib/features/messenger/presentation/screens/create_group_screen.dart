@@ -32,11 +32,10 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   }
 
   void createGroup() async {
-    if (userMap.isNotEmpty) {
-      List<String> users =
-          userMap.values.map((value) => value.toString()).toList();
-      await _chatService.createGroupChat(users);
-    }
+    List<String> users =
+        userMap.values.map((value) => value.toString()).toList();
+
+    await _chatService.createGroupChat(users);
   }
 
   void onSearch() async {
@@ -73,9 +72,17 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
         child: IconButton(
           onPressed: () {
             createGroup();
-            //Navigator.of(context).pushNamed('chatslist',
-            //arguments: {'name': groupName, 'url':'no.', 'volume': false, 'pin': false, 'uid':_auth.currentUser?.uid},);
-            Navigator.of(context).pop();
+            Navigator.of(context).pushNamed(
+              'chatslist',
+              arguments: {
+                'name': groupName,
+                'url': 'no.',
+                'volume': false,
+                'pin': false,
+                'uid': _auth.currentUser?.uid
+              },
+            );
+            //Navigator.of(context).pop();
           },
           icon: const Icon(Icons.arrow_forward_rounded),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -94,7 +101,9 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
       body: Container(
         child: Column(
           children: [
-            Padding(padding: EdgeInsets.only(bottom: 12),),
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+            ),
             SizedBox(
               width: 500,
               height: 50,
@@ -132,7 +141,9 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
                 ),
               ),
             ),
-            Padding(padding: EdgeInsets.only(bottom: 12),),
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+            ),
             SizedBox(
               width: 500,
               height: 50,
@@ -209,20 +220,11 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   Widget _buildUserListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     if (_auth.currentUser!.email != data['email']) {
-      // return ListTile(
-      //   title: Text(data['email'].toString()),
-      //   onTap: (){
-      //     Navigator.of(context).pushNamed(
-      //       'chatslist',
-      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
-      //     );
-      //   },
-      // );
       return ChatBubbleSelection(
         imageUrl: data['picture'].toString(),
         chatTitle: data['email'].toString(),
         uid: data['uid'].toString(),
-        selected: false,
+        selected: true,
       );
     }
     return Container();
