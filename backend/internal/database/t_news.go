@@ -32,7 +32,7 @@ type NewsTable struct {
 }
 
 // Add добавляет новость в базу данных.
-func (nt *NewsTable) Add(n *News) error {
+func (nt *NewsTable) Add(n News) error {
 	if n.isDefault() {
 		return errors.New("News.Add: wrong data! provided *News is empty")
 	}
@@ -59,7 +59,7 @@ func (nt *NewsTable) Add(n *News) error {
 }
 
 // GetById возвращает новость из базы данных по указанному идентификатору.
-func (nt *NewsTable) GetById(n *News) (*News, error) {
+func (nt *NewsTable) GetById(n News) (*News, error) {
 	if n.isDefault() {
 		return nil, errors.New("News.GetById: wrong data! provided *News is empty")
 	}
@@ -186,7 +186,7 @@ func (nt *NewsTable) GetLatestBlocksForStudents(count, offset int) (*[]News, err
 }
 
 // Delete удаляет новость из базы данных по указанному идентификатору.
-func (nt *NewsTable) Delete(n *News) error {
+func (nt *NewsTable) Delete(n News) error {
 	if n.isDefault() {
 		return errors.New("News.Delete: wrong data! provided *News is empty")
 	}
@@ -210,7 +210,7 @@ func (nt *NewsTable) Delete(n *News) error {
 }
 
 // Update обновляет новость в базе данных по указанному идентификатору.
-func (nt *NewsTable) Update(n *News) error {
+func (nt *NewsTable) Update(n News) error {
 	if n.isDefault() {
 		return errors.New("News.Update: wrong data! provided *News is empty")
 	}

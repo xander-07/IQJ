@@ -102,7 +102,7 @@ func scraper2(newsblarr []NewsBlock) {
 		}
 		tagsArr = nil
 		news.PublicationTime = newsblarr[i].PublicationTime
-		err := database.Database.News.Add(&news)
+		err := database.Database.News.Add(news)
 		if err != nil {
 			fmt.Println(err)
 		}

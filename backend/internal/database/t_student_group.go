@@ -29,7 +29,7 @@ type StudentGroupTable struct {
 }
 
 // GetByID возвращает группу студентов из базы данных по указанному идентификатору.
-func (sgt *StudentGroupTable) GetByID(sg *StudentGroup) (*StudentGroup, error) {
+func (sgt *StudentGroupTable) GetByID(sg StudentGroup) (*StudentGroup, error) {
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetByID: wrong data! provided *StudentGroup is empty!")
 	}
@@ -43,11 +43,11 @@ func (sgt *StudentGroupTable) GetByID(sg *StudentGroup) (*StudentGroup, error) {
 		return nil, fmt.Errorf("studentGroupTable.GetByID: %v", err)
 	}
 
-	return sg, nil
+	return &sg, nil
 }
 
 // GetIdByName возвращает идентификатор группы студентов из базы данных по указанному названию группы.
-func (sgt *StudentGroupTable) GetIdByName(sg *StudentGroup) (*StudentGroup, error) {
+func (sgt *StudentGroupTable) GetIdByName(sg StudentGroup) (*StudentGroup, error) {
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetByName: wrong data! provided *StudentGroup is empty!")
 	}
@@ -57,11 +57,11 @@ func (sgt *StudentGroupTable) GetIdByName(sg *StudentGroup) (*StudentGroup, erro
 		return nil, fmt.Errorf("StudentGroup.GetByName: %v", err)
 	}
 
-	return sg, nil
+	return &sg, nil
 }
 
 // GetStudent возвращает группу студентов из базы данных по указанному идентификатору студента.
-func (sgt *StudentGroupTable) GetStudent(sg *StudentGroup) (*StudentGroup, error) {
+func (sgt *StudentGroupTable) GetStudent(sg StudentGroup) (*StudentGroup, error) {
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetStudent: wrong data! provided *StudentGroup is empty!")
 	}
@@ -75,7 +75,7 @@ func (sgt *StudentGroupTable) GetStudent(sg *StudentGroup) (*StudentGroup, error
 		return nil, fmt.Errorf("studentGroupTable.GetStudent: %v", err)
 	}
 
-	return sg, nil
+	return &sg, nil
 }
 
 // GetGroupsByInstituteAndGrade возвращает группы студентов из базы данных по названию института и курсу.
@@ -100,7 +100,7 @@ func (sgt *StudentGroupTable) GetGroupsByInstituteAndGrade(institute string, gra
 }
 
 // GetGroupsByInstitute возвращает группы студентов из базы данных по названию института.
-func (sgt *StudentGroupTable) GetGroupsByInstitute(sg *StudentGroup) ([]*StudentGroup, error) {
+func (sgt *StudentGroupTable) GetGroupsByInstitute(sg StudentGroup) ([]*StudentGroup, error) {
 	groups := []*StudentGroup{}
 
 	rows, err := sgt.db.Query("SELECT students_group_id, student_group_name, student_group_students_ids FROM students_groups WHERE institute = $1", sg.Institute)
@@ -121,7 +121,7 @@ func (sgt *StudentGroupTable) GetGroupsByInstitute(sg *StudentGroup) ([]*Student
 }
 
 // GetGroupsByGrade возвращает группы студентов из базы данных по номеру курса.
-func (sgt *StudentGroupTable) GetGroupsByGrade(sg *StudentGroup) ([]*StudentGroup, error) {
+func (sgt *StudentGroupTable) GetGroupsByGrade(sg StudentGroup) ([]*StudentGroup, error) {
 	groups := []*StudentGroup{}
 
 	rows, err := sgt.db.Query("SELECT students_group_id, student_group_name, student_group_students_ids FROM students_groups WHERE grade = $1", sg.Grade)
@@ -142,7 +142,7 @@ func (sgt *StudentGroupTable) GetGroupsByGrade(sg *StudentGroup) ([]*StudentGrou
 }
 
 // Add добавляет группу студентов в базу данных.
-func (sgt *StudentGroupTable) Add(group *StudentGroup) error {
+func (sgt *StudentGroupTable) Add(group StudentGroup) error {
 	if group.isDefault() {
 		return errors.New("studentGroupTable.Add: wrong data! provided *StudentGroup is empty")
 	}
@@ -156,7 +156,7 @@ func (sgt *StudentGroupTable) Add(group *StudentGroup) error {
 }
 
 // Update обновляет данные о группе студентов в базе данных.
-func (sgt *StudentGroupTable) Update(sg *StudentGroup) error {
+func (sgt *StudentGroupTable) Update(sg StudentGroup) error {
 	if sg.isDefault() {
 		return errors.New("StudentGroup.Update: wrong data! provided *StudentGroup is empty")
 	}
@@ -170,10 +170,7 @@ func (sgt *StudentGroupTable) Update(sg *StudentGroup) error {
 }
 
 // GetClasses возвращает классы для группы студентов из базы данных.
-func (sgt *StudentGroupTable) GetClassesById(sg *StudentGroup) (*[]Class, error) {
-	if sg == nil {
-		return nil, sql.ErrConnDone // сделал эту ошибку чисто чтобы понимать, что это изза nil ptr, позже исправлю вместе со всеми ошибками
-	}
+func (sgt *StudentGroupTable) GetClassesById(sg StudentGroup) (*[]Class, error) {
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
 	}
@@ -201,7 +198,7 @@ func (sgt *StudentGroupTable) GetClassesById(sg *StudentGroup) (*[]Class, error)
 }
 
 // GetClasses возвращает классы для группы студентов из базы данных.
-func (sgt *StudentGroupTable) GetClassesByName(sg *StudentGroup) (*[]Class, error) {
+func (sgt *StudentGroupTable) GetClassesByName(sg StudentGroup) (*[]Class, error) {
 	if sg.isDefault() {
 		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
 	}
@@ -230,7 +227,7 @@ func (sgt *StudentGroupTable) GetClassesByName(sg *StudentGroup) (*[]Class, erro
 }
 
 // Delete удаляет группу студентов из базы данных по указанному идентификатору.
-func (sgt *StudentGroupTable) Delete(sg *StudentGroup) error {
+func (sgt *StudentGroupTable) Delete(sg StudentGroup) error {
 	_, err := sgt.db.Exec("DELETE FROM students_groups WHERE students_group_id = $1", sg.Id)
 	if err != nil {
 		return fmt.Errorf("studentGroupTable.Delete: %v", err)
