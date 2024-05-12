@@ -92,8 +92,8 @@ class _NewsBloc extends State<NewsScreen> {
       //   title: const Text('News'),
       // ),
       floatingActionButton: Container(
-        width: 50.0, // Задаем ширину
-        height: 50.0, // Задаем высоту
+        width: 52.0, // Задаем ширину
+        height: 52.0, // Задаем высоту
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary, // Цвет кнопки
           borderRadius: BorderRadius.circular(10.0),

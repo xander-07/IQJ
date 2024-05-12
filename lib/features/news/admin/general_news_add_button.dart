@@ -12,10 +12,10 @@ Widget general_news_add_button(
   String text,
 ) {
   return Container(
-    width: 150,
-    height: 55,
+    width: 151,
+    height: 54,
     padding: const EdgeInsets.only(left: 90, right: 90),
-    margin: const EdgeInsets.only(top: 20),
+    margin: const EdgeInsets.only(top: 10),
     child: ElevatedButton(
       onPressed: () {
         uploadDialog(
@@ -31,7 +31,8 @@ Widget general_news_add_button(
         'Добавить',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 16,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
       ),
     ),
