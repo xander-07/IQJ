@@ -23,6 +23,21 @@ Future<void> admin_button(BuildContext context) async {
                 ),
                 textAlign: TextAlign.center,
               ),
+    titlePadding: const EdgeInsets.only(left: 30, top: 24, right: 24),
+    title: Column(
+      children: [
+        const Row(
+          children: [
+            Flexible(
+              child: Text(
+                " Создать новость",
+                overflow: TextOverflow.clip,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -47,6 +62,8 @@ Future<void> admin_button(BuildContext context) async {
     },
   );
 }
+
+
 
 Widget two_button_add_news(BuildContext context) {
   return Wrap(
