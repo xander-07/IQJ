@@ -102,7 +102,7 @@ class ChatService extends ChangeNotifier {
   }
 
 // Create group chat with a random ID
-  Future<void> createGroupChat(List<String> memberIds) async {
+  Future<void> createGroupChat(List<String> memberIds, String groupName) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String groupChatId = generateRandomGroupId();
 
@@ -112,14 +112,18 @@ class ChatService extends ChangeNotifier {
         currentUserId: {
           'joinDate': DateTime.now(),
           'email': _auth.currentUser!.email,
+          'role':'member',
         },
         for (final memberId in memberIds)
           memberId: {
             'joinDate': DateTime.now(),
             'email': 'test@temporary.xd',
-          }
+            'role':'member',
+          },
       },
       'messages': [],
+      'id':groupChatId,
+      'name':groupName,
     };
 
     await _firestore.collection('groups').doc(groupChatId).set(chatData);

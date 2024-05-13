@@ -323,13 +323,18 @@ class _MessengerBloc extends State<MessengerScreen> {
 
           // Extract user IDs and group information from the group document
           ///////////////////// ИСПРАВИТЬ ЗДЕСЬ ///////////////////////
-          List<String> userIds = groupData['users'] as List<String>;
+          //List<String> userIds = groupData['users'] as List<String>;
           String groupId = groupDoc.id;
           String groupName = groupData['name'].toString();
-          DateTime creationTime = groupData['creationTime'] as DateTime;
+          //DateTime creationTime = groupData['creationTime'] as DateTime;
+          //print(userIds);
+          print(groupId);
+          print(groupName);
+          //print(creationTime);
+          print(groupData);
 
           // Display group chat information in chat list
-          chatList.add(_buildGroupChatListItem(groupId, groupName, creationTime, userIds));
+          chatList.add(_buildGroupChatListItem(groupId, groupName));
         });
       });
 
@@ -340,7 +345,7 @@ class _MessengerBloc extends State<MessengerScreen> {
   );
 }
 
-Widget _buildGroupChatListItem(String groupId, String groupName, DateTime creationTime, List<String> userIds) {
+Widget _buildGroupChatListItem(String groupId, String groupName) {
   // You can customize the appearance of the group chat item as needed
   return GroupBubble(
           imageUrl: 'nonononoWAITWAITWAITWAIT',
@@ -352,6 +357,7 @@ Widget _buildGroupChatListItem(String groupId, String groupName, DateTime creati
 
   Widget _buildChatListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    print(data);
       // Direct message
       if (_auth.currentUser!.email != data['email']) {
         return ChatBubble(

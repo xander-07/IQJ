@@ -35,7 +35,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
     List<String> users =
         userMap.values.map((value) => value.toString()).toList();
 
-    await _chatService.createGroupChat(users);
+    await _chatService.createGroupChat(users, groupName);
   }
 
   void onSearch() async {
