@@ -29,7 +29,11 @@ func main() {
 	go excel_parser.Parse()
 
 	// Запускает сервер на порту и "слушает" запросы.
-	if err := handlers.InitRoutes().Run(":8443"); err != nil {
+	// if err := handlers.InitRoutes().Run(":8443"); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	if err := handlers.InitRoutes().Run(":5050"); err != nil {
 		log.Fatal(err)
 	}
 }
