@@ -168,6 +168,7 @@ class _ChatBubble extends State<ChatBubble> {
                               : Container(),
                         ],
                       ),
+                      Text(widget.secondary),
                       // Text(
                       //   "печатает...",
                       //   style: TextStyle(

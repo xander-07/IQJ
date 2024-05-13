@@ -36,8 +36,8 @@ class _ChatBubble extends State<GroupBubble> {
             ) {
               return CircleAvatar(
                 radius: 6,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: const Text('A'),
+                backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                child: const Text('G'),
               );
             },
           ),
@@ -50,6 +50,7 @@ class _ChatBubble extends State<GroupBubble> {
 
   bool volume = false;
   bool push_pin = false;
+  String secondary = '';
 
   void volume_off() {
     setState(() {
@@ -67,7 +68,7 @@ class _ChatBubble extends State<GroupBubble> {
   Widget build(BuildContext context) {
     //final String username = "А. Б. Веселухов";
     String id = widget.id;
-
+    secondary = widget.secondary;
     return Column(
       children: [
         Container(
@@ -167,6 +168,7 @@ class _ChatBubble extends State<GroupBubble> {
                               : Container(),
                         ],
                       ),
+                      Text(secondary),
                       // Text(
                       //   "печатает...",
                       //   style: TextStyle(

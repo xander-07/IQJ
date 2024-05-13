@@ -9,14 +9,14 @@ import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selectio
 import 'package:iqj/features/news/admin/special_news_add_button.dart';
 import 'package:intl/intl.dart';
 
-class CreateGroupScreen extends StatefulWidget {
-  const CreateGroupScreen({super.key});
+class AddToGroupScreen extends StatefulWidget {
+  const AddToGroupScreen({super.key});
 
   @override
-  State<CreateGroupScreen> createState() => _CreateGroupScreen();
+  State<AddToGroupScreen> createState() => _AddToGroupScreen();
 }
 
-class _CreateGroupScreen extends State<CreateGroupScreen> {
+class _AddToGroupScreen extends State<AddToGroupScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ChatService _chatService = ChatService();
   TextEditingController SearchPickerController = TextEditingController();
@@ -24,33 +24,17 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   String groupName = '';
   String groupId = '';
   Map<String, dynamic> userMap = {};
+  List<String> selectedUserIds = [];
 
   void updateSelectionState(String uid, bool isSelected) {
     setState(() {
-      userMap[uid] = isSelected;
+      if (isSelected) {
+        selectedUserIds.add(uid);
+      } else {
+        selectedUserIds.remove(uid);
+      }
     });
-    print(userMap);
-  }
-
-  Future<void> createAndNavigateGroup() async {
-    String groupChatId = await createGroup();
-    Navigator.of(context).pushNamed(
-      'groupchat',
-      arguments: {
-        'name': groupName,
-        'url': 'no.',
-        'volume': false,
-        'pin': false,
-        'uid': groupChatId,
-      },
-    );
-  }
-
-  Future<String> createGroup() async {
-    List<String> users =
-        userMap.values.map((value) => value.toString()).toList();
-
-    return await _chatService.createGroupChat(users, groupName);
+    print(selectedUserIds);
   }
 
   void onSearch() async {
@@ -86,7 +70,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            createAndNavigateGroup();
+            //createAndNavigateGroup();
           },
           icon: const Icon(Icons.arrow_forward_rounded),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -107,43 +91,6 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
           children: [
             Padding(
               padding: EdgeInsets.only(bottom: 12),
-            ),
-            SizedBox(
-              width: 500,
-              height: 50,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextField(
-                  controller: groupNameController,
-                  decoration: InputDecoration(
-                    hintText: "Введите название группы...",
-                    hintFadeDuration: const Duration(milliseconds: 100),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
-                    ),
-                    hintStyle: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16.0,
-                      //height: 5,
-                      color: Color.fromRGBO(128, 128, 128, 0.6),
-                    ),
-                  ),
-                  onChanged: (text) {
-                    setState(() {
-                      groupName = text;
-                    });
-                  },
-                ),
-              ),
             ),
             Padding(
               padding: EdgeInsets.only(bottom: 12),
@@ -193,48 +140,58 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
             Padding(
               padding: EdgeInsets.only(bottom: 12),
             ),
-            _buildUserList(),
+            userList(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserList() {
+  Widget userList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('err');
+          return Text('Error: ${snapshot.error}');
         }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return Center(child: CircularProgressIndicator());
         }
-        return Column(
-          children: snapshot.data!.docs
-              .map<Widget>((doc) => _buildUserListItem(doc))
-              .toList(),
-        );
+
+        return _buildUserList(snapshot.data!);
       },
     );
   }
 
-  Widget _buildUserListItem(DocumentSnapshot document) {
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+  Widget _buildUserList(QuerySnapshot snapshot) {
+    return ListView.builder(
+      itemCount: snapshot.docs.length,
+      itemBuilder: (context, index) {
+        final DocumentSnapshot document = snapshot.docs[index];
+        final Map<String, dynamic> data =
+            document.data() as Map<String, dynamic>;
 
-    if (_auth.currentUser!.email != data['email']) {
-      final bool selected = userMap[data['uid']] as bool ??
-          false; // Check if uid exists in userMap
-      return ChatBubbleSelection(
-        imageUrl: data['picture'].toString(),
-        chatTitle: data['email'].toString(),
-        uid: data['uid'].toString(),
-        selected: selected,
-      );
-    }
+        if (_auth.currentUser!.email != data['email']) {
+          return MaterialButton(
+            onPressed: () {
+              bool isSelected = selectedUserIds.contains(data['uid']);
+              updateSelectionState(data['uid'].toString(), !isSelected);
+            },
+            child: ChatBubbleSelection(
+              imageUrl: data['picture'].toString(),
+              chatTitle: data['email'].toString(),
+              uid: data['uid'].toString(),
+              selected: selectedUserIds.contains(data['uid']),
+            ),
+          );
+        }
+        return Container(); // Exclude current user from the list
+      },
+    );
+  }
 
-    return Container();
+  void addUserToGroupChat(String groupChatId, List<String> userIds) {
+    // Add logic to add selected users to the group chat in Firestore
   }
 }

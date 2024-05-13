@@ -1,7 +1,10 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:iqj/features/messenger/data/chat_service.dart';
 import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
 import 'package:iqj/features/messenger/presentation/screens/group_bubble.dart';
 import 'package:iqj/features/messenger/presentation/screens/highlight_chat_bubble.dart';
@@ -17,6 +20,7 @@ class _MessengerBloc extends State<MessengerScreen> {
   bool _isSearch = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ChatService chatService = ChatService();
 
   void searchfilter() {
     setState(() {
@@ -258,7 +262,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                   secondary: 'secondaryText',
                 ),
                 _isntSearch_chat
-                    ? _buildChatList()
+                    ? _chatsBuilder()
                     : ((userMap.length != 0)
                         ? ChatBubble(
                             imageUrl: userMap['picture'].toString(),
@@ -298,81 +302,67 @@ class _MessengerBloc extends State<MessengerScreen> {
     );
   }
 
-  Widget _buildChatList() {
-  return StreamBuilder<QuerySnapshot>(
-    stream: FirebaseFirestore.instance.collection('users').snapshots(),
-    builder: (context, snapshot) {
-      if (snapshot.hasError) {
-        return Text('Error fetching chats');
-      }
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      }
+  Widget _chatsBuilder() {
+    return FutureBuilder(
+      future: Future.wait([
+        FirebaseFirestore.instance.collection('users').get(),
+        FirebaseFirestore.instance.collection('groups').get(),
+      ]),
+      builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.hasError) {
+          return Text('Error fetching chats');
+        }
 
-      List<Widget> chatList = [];
+        List<Widget> chatList = [];
 
-      // Load direct messages
-      chatList.addAll(snapshot.data!.docs.map<Widget>((doc) => _buildChatListItem(doc)));
+        // Load direct messages
+        chatList.addAll(snapshot.data![0].docs
+            .map<Widget>((doc) => _buildChatListItem(doc)));
 
-      // Load group chats
-      FirebaseFirestore.instance.collection('groups').get().then((groupSnapshot) {
-        groupSnapshot.docs.forEach((groupDoc) {
-          final Map<String, dynamic> groupData = groupDoc.data() as Map<String, dynamic>;
-
-          // Extract user IDs and group information from the group document
-          ///////////////////// ИСПРАВИТЬ ЗДЕСЬ ///////////////////////
-          //List<String> userIds = groupData['users'] as List<String>;
+        // Load group chats
+        snapshot.data![1].docs.forEach((groupDoc) {
+          final Map<String, dynamic> groupData =
+              groupDoc.data() as Map<String, dynamic>;
           String groupId = groupDoc.id;
           String groupName = groupData['name'].toString();
-          //DateTime creationTime = groupData['creationTime'] as DateTime;
-          //print(userIds);
-          print(groupId);
-          print(groupName);
-          //print(creationTime);
-          print(groupData);
 
-          // Display group chat information in chat list
-          chatList.add(_buildGroupChatListItem(groupId, groupName));
+          chatList.add(GroupBubble(
+            imageUrl: 'nonononoWAITWAITWAITWAIT',
+            chatTitle: groupName,
+            secondary: '...',
+            id: groupId,
+          ));
         });
-      });
 
-      return Column(
-        children: chatList,
-      );
-    },
-  );
-}
-
-Widget _buildGroupChatListItem(String groupId, String groupName) {
-  // You can customize the appearance of the group chat item as needed
-  return GroupBubble(
-          imageUrl: 'nonononoWAITWAITWAITWAIT',
-          chatTitle: groupName,
-          secondary: 'text',
-          id: groupId,
+        return Column(
+          children: chatList,
         );
-}
+      },
+    );
+  }
 
   Widget _buildChatListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    print(data);
-      // Direct message
-      if (_auth.currentUser!.email != data['email']) {
-        return ChatBubble(
-          imageUrl: data['picture'].toString(),
-          chatTitle: data['email'].toString(),
-          secondary: 'text',
-          uid: data['uid'].toString(),
-        );
-      }
+    //print(document.id);
+    // Direct message
+    if (_auth.currentUser!.email != data['email']) {
       return ChatBubble(
         imageUrl: data['picture'].toString(),
-        chatTitle:
-            'Заметки', // Replace with appropriate text for direct messages
-        secondary: 'text',
+        chatTitle: data['email'].toString(),
+        secondary: '...',
         uid: data['uid'].toString(),
       );
+    }
+    return ChatBubble(
+      imageUrl: data['picture'].toString(),
+      chatTitle: 'Заметки', // Replace with appropriate text for direct messages
+      secondary: '...',
+      uid: data['uid'].toString(),
+    );
   }
 }

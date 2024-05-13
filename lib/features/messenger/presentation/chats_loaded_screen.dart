@@ -310,10 +310,8 @@ class _ChatsListState extends State<ChatsList> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(
-                'page_person',
-                arguments: {'name': user_name, 'url': image_url, 'uid': uid},
-              );
+              // Потом сделать страницу пользователя
+
             },
             child: Row(
               children: [

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class Page_person extends StatefulWidget {
-  const Page_person({super.key});
+class GroupPage extends StatefulWidget {
+  const GroupPage({super.key});
   @override
-  State<StatefulWidget> createState() => _Page_person();
+  State<StatefulWidget> createState() => _GroupPage();
 }
 
-class _Page_person extends State<Page_person> {
+class _GroupPage extends State<GroupPage> {
   String? user_name = "..."; // Объявление user_name как поле класса
   String? image_url = "";
   String uid = "";
@@ -28,6 +28,7 @@ class _Page_person extends State<Page_person> {
     super.didChangeDependencies();
   }
 
+  // это что за код такой
   bool flag1 = true;
   bool flag2 = false;
   bool flag3 = false;
@@ -54,7 +55,6 @@ class _Page_person extends State<Page_person> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +70,7 @@ class _Page_person extends State<Page_person> {
                   return Container(
                     color: Theme.of(context).colorScheme.background,
                     height: 160,
-                    // decoration: BoxDecoration( 
+                    // decoration: BoxDecoration(
                     //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
                     // ),
                     child: Column(
@@ -86,7 +86,9 @@ class _Page_person extends State<Page_person> {
                             Text(
                               "Настройки чата",
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
                                 fontSize: 25,
                               ),
                             )
@@ -101,7 +103,9 @@ class _Page_person extends State<Page_person> {
                                 Text(
                                   "Название чата",
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -143,32 +147,36 @@ class _Page_person extends State<Page_person> {
               );
             },
           ),
-
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
               showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    color: Theme.of(context).colorScheme.background,
-                    height: 260,
-                    // decoration: BoxDecoration( 
-                    //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
-                    // ),
-                    child: Column( 
-                      children: [ 
-                        create_button_for_change_state(Icons.attach_file_outlined, "Закрепить в списке чатов", context),
-                        create_button_for_change_state(Icons.edit, "Закрепленное сообщение", context),
-                        create_button_for_change_state(Icons.refresh, "Очистить историю", context),
-                        create_button_for_change_state(Icons.close, "Выйти из чата", context),
-                        create_button_for_change_state(Icons.delete, "Выйти из чата и очистить историю", context),
-                      ],
-                    ),
-                    
-                  );
-                }
-              );
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      color: Theme.of(context).colorScheme.background,
+                      height: 260,
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
+                      // ),
+                      child: Column(
+                        children: [
+                          create_button_for_change_state(
+                              Icons.attach_file_outlined,
+                              "Закрепить в списке чатов",
+                              context),
+                          create_button_for_change_state(
+                              Icons.edit, "Закрепленное сообщение", context),
+                          create_button_for_change_state(
+                              Icons.refresh, "Очистить историю", context),
+                          create_button_for_change_state(
+                              Icons.close, "Выйти из чата", context),
+                          create_button_for_change_state(Icons.delete,
+                              "Выйти из чата и очистить историю", context),
+                        ],
+                      ),
+                    );
+                  });
             },
           ),
         ],
@@ -180,7 +188,7 @@ class _Page_person extends State<Page_person> {
               .start, // Элементы начинаются с верхней части экрана
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildThumbnailImage(image_url ?? "",117),
+            _buildThumbnailImage(image_url ?? "", 117),
             SizedBox(height: 10), // Отступ между картинкой и названием
             Text(
               user_name ?? "",
@@ -210,7 +218,7 @@ class _Page_person extends State<Page_person> {
                       icon: Icon(Icons.person_add),
                       color: Colors.orange, // Оранжевый цвет
                       onPressed: () {
-                        // Действия для кнопки с логотипом человечка с плюсом
+                        Navigator.of(context).pushNamed('addtogroup');
                       },
                     ),
                     Text(
@@ -272,7 +280,6 @@ class _Page_person extends State<Page_person> {
             Container(
               alignment: Alignment.center,
               child: DefaultTabController(
-
                   length: 5,
                   child: TabBar(
                     isScrollable: true,
@@ -282,7 +289,7 @@ class _Page_person extends State<Page_person> {
                     tabs: [
                       Tab(
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             change_flag1();
                           },
                           child: Container(
@@ -305,7 +312,7 @@ class _Page_person extends State<Page_person> {
                       ),
                       Tab(
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             change_flag2();
                           },
                           child: Container(
@@ -383,9 +390,15 @@ class _Page_person extends State<Page_person> {
                     ],
                   )),
             ),
-            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
-            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
-            if (flag1) participants(context,"Александр Павлеченко", "был сегодня в 16:00", "Администратор", image_url??""),
+            if (flag1)
+              participants(context, "Александр Павлеченко",
+                  "был сегодня в 16:00", "Администратор", image_url ?? ""),
+            if (flag1)
+              participants(context, "Александр Павлеченко",
+                  "был сегодня в 16:00", "Администратор", image_url ?? ""),
+            if (flag1)
+              participants(context, "Александр Павлеченко",
+                  "был сегодня в 16:00", "Администратор", image_url ?? ""),
           ],
         ),
       ),
@@ -393,133 +406,131 @@ class _Page_person extends State<Page_person> {
   }
 }
 
-Widget _buildThumbnailImage(String image_url,double size) {
-    try {
-      return Container(
-        padding: EdgeInsets.only(right: 12),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: Image.network(
-              image_url,
-              fit: BoxFit.fill,
-              height: 200,
-              errorBuilder: (
-                BuildContext context,
-                Object exception,
-                StackTrace? stackTrace,
-              ) {
-                return CircleAvatar(
-                  radius: 6,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: const Text('A'),
-                );
-              },
-            ),
+Widget _buildThumbnailImage(String image_url, double size) {
+  try {
+    return Container(
+      padding: EdgeInsets.only(right: 12),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: Image.network(
+            image_url,
+            fit: BoxFit.fill,
+            height: 200,
+            errorBuilder: (
+              BuildContext context,
+              Object exception,
+              StackTrace? stackTrace,
+            ) {
+              return CircleAvatar(
+                radius: 6,
+                backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                child: const Text('G'),
+              );
+            },
           ),
         ),
-      );
-    } catch (e) {
-      return Container();
-    }
+      ),
+    );
+  } catch (e) {
+    return Container();
   }
-
-
-
-Widget create_button_for_change_state(IconData icon,String text, BuildContext context){
-  return ElevatedButton(
-                          onPressed: () =>{
-
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              Icon(icon),
-                              SizedBox(width: 20,),
-                              Text( 
-                                "Закрепить в списке чатов",
-                                style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                        fontSize: 18,
-                                      ),
-                              ),
-                            ],
-                          )
-                        );
 }
 
-Widget participants(BuildContext context,String name, String time,String role,String image_url){
+Widget create_button_for_change_state(
+    IconData icon, String text, BuildContext context) {
   return ElevatedButton(
-                          onPressed: () =>{
+      onPressed: () => {},
+      style: ButtonStyle(
+        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+        backgroundColor: MaterialStatePropertyAll(
+          Theme.of(context).colorScheme.background,
+        ),
+        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          Icon(icon),
+          SizedBox(
+            width: 20,
+          ),
+          Text(
+            "Закрепить в списке чатов",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ));
+}
 
-                          }, 
-                          style: ButtonStyle(
-                            padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                            surfaceTintColor:
-                                const MaterialStatePropertyAll(Colors.transparent),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).colorScheme.background,
-                            ),
-                            shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 20,),
-                              _buildThumbnailImage(image_url, 33),
-                              SizedBox(width: 20,),
-                              Column(
-                                children: [
-                                  Text( 
-                                    name,
-                                    style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                            fontSize: 10,
-                                          ),
-                                  ),
-                                  Text( 
-                                    time,
-                                    style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSecondary,
-                                            fontSize: 10,
-                                          ),
-                                  ),
-                                  
-                                ],
-                              ),
-                              Expanded(
-                                child: Text( 
-                                  role,
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        );
+Widget participants(BuildContext context, String name, String time, String role,
+    String image_url) {
+  return ElevatedButton(
+      onPressed: () => {},
+      style: ButtonStyle(
+        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+        backgroundColor: MaterialStatePropertyAll(
+          Theme.of(context).colorScheme.background,
+        ),
+        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          _buildThumbnailImage(image_url, 33),
+          SizedBox(
+            width: 20,
+          ),
+          Column(
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 10,
+                ),
+              ),
+              Text(
+                time,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Text(
+              role,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ));
 }

@@ -8,7 +8,8 @@ import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
 import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
-import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
+import 'package:iqj/features/messenger/presentation/screens/page_group.dart';
+import 'package:iqj/features/messenger/presentation/screens/users_add_selection.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
 import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
 import 'package:iqj/features/services/presentation/screens/about_screen.dart';
@@ -112,7 +113,8 @@ class _AppState extends State<App> {
             const MessengerScreen(), // главная страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
         'groupchat': (context) => const ChatsGroupList(), // это страница диолга
-        'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
+        'grouppage': (context) => const GroupPage(), // это страница с профилем(переход из чатов)
+        'addtogroup':(context) => const AddToGroupScreen(),
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),

@@ -91,6 +91,20 @@ class ChatService extends ChangeNotifier {
         .snapshots();
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> getLastMessage(String userId, String otherId){
+    final List<String> ids = [userId, otherId];
+    ids.sort();
+    print(ids);
+    final String chatroomId = ids.join("_");
+  return _firestore
+    .collection('direct_messages')
+    .doc(chatroomId)
+    .collection('messages')
+    .orderBy('timestamp', descending: true)
+    .limit(1)
+    .get();
+}
+
   ////////////// ГРУППОВЫЕ СООБЩЕНИЯ ///////////////
   // Generate random group chat ID
   String generateRandomGroupId() {
@@ -102,7 +116,7 @@ class ChatService extends ChangeNotifier {
   }
 
 // Create group chat with a random ID
-  Future<void> createGroupChat(List<String> memberIds, String groupName) async {
+  Future<String> createGroupChat(List<String> memberIds, String groupName) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String groupChatId = generateRandomGroupId();
 
@@ -112,7 +126,7 @@ class ChatService extends ChangeNotifier {
         currentUserId: {
           'joinDate': DateTime.now(),
           'email': _auth.currentUser!.email,
-          'role':'member',
+          'role':'admin',
         },
         for (final memberId in memberIds)
           memberId: {
@@ -124,9 +138,12 @@ class ChatService extends ChangeNotifier {
       'messages': [],
       'id':groupChatId,
       'name':groupName,
+      'picture':'none',
     };
 
     await _firestore.collection('groups').doc(groupChatId).set(chatData);
+
+    return groupChatId;
   }
 
   Future<void> addUserToGroupChat(String groupChatId, String userId) async {
@@ -157,6 +174,13 @@ class ChatService extends ChangeNotifier {
         .update({'users.$userId': newData});
   }
 
+    Future<void> setGroupName(String groupId, String name) async { // Надо тестить
+    await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .update({'name': name});
+  }
+
   Future<void> sendMessageToGroup(String groupChatId, String message) async {
     // get info
     final String currentUserId = _auth.currentUser!.uid;
@@ -177,5 +201,14 @@ class ChatService extends ChangeNotifier {
         .doc(groupChatId)
         .collection('messages')
         .add(newMessage.toMap());
+  }
+
+    Stream<QuerySnapshot> getGroupMessages(String id) {
+    return _firestore
+        .collection('groups')
+        .doc(id)
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots();
   }
 }

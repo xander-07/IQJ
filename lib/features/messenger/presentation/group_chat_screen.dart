@@ -10,6 +10,7 @@ import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
 import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/file_chat.dart/file_chat.dart';
+import 'package:iqj/features/messenger/presentation/screens/group_message.dart';
 import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
 //import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -137,9 +138,8 @@ class _ChatsListState extends State<ChatsGroupList> {
 
   Widget _buildMessageList() {
     return StreamBuilder(
-      stream: _chatService.getMessages(
+      stream: _chatService.getGroupMessages(
         uid,
-        _firebaseAuth.currentUser!.uid,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -227,11 +227,12 @@ class _ChatsListState extends State<ChatsGroupList> {
     return Container(
       padding: EdgeInsets.only(left: 12, right: 12),
       alignment: alignment,
-      child: ReceiverMessage(
+      child: GroupMessage(
         message: data['message'].toString(),
         //mainAxisAlignment: mainalignment,
         url: image_url!,
-        receiver: data['senderId'] as String,
+        sender: data['senderId'] as String,
+        senderEmail: data['senderEmail'] as String,
         compare: _firebaseAuth.currentUser!.uid,
         time: DateFormat('HH:mm')
             .format((data['timestamp'] as Timestamp).toDate()),
@@ -311,7 +312,7 @@ class _ChatsListState extends State<ChatsGroupList> {
             ),
             onPressed: () {
               Navigator.of(context).pushNamed(
-                'page_person',
+                'grouppage',
                 arguments: {'name': user_name, 'url': image_url, 'uid': uid},
               );
             },
@@ -344,11 +345,11 @@ class _ChatsListState extends State<ChatsGroupList> {
                         ],
                       ),
                       Text(
-                        "печатает...",
+                        "4 участников",
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
+                          
                         ),
                       ),
                     ],
