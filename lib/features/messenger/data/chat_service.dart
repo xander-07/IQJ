@@ -56,11 +56,12 @@ class ChatService extends ChangeNotifier {
     //   message: message,
     // );
     final FileMes newFile = FileMes(
-        senderId: currentUserId,
-        senderEmail: currentUserId,
-        receiverId: receiverId,
-        message: message, // ???
-        timestamp: timestamp,);
+      senderId: currentUserId,
+      senderEmail: currentUserId,
+      receiverId: receiverId,
+      message: message, // ???
+      timestamp: timestamp,
+    );
 
     // make chatroom
     final List<String> ids = [currentUserId, receiverId];
@@ -94,34 +95,34 @@ class ChatService extends ChangeNotifier {
   // Generate random group chat ID
   String generateRandomGroupId() {
     final Random random = Random();
-    const String chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIKJLMNOPQRSTUVWXYZ0123456789';
+    const String chars =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIKJLMNOPQRSTUVWXYZ0123456789-&*()^:;%#@!?/';
     return List.generate(32, (index) => chars[random.nextInt(chars.length)])
         .join();
   }
 
 // Create group chat with a random ID
   Future<void> createGroupChat(List<String> memberIds) async {
-    print('create group called');
-    // Get info
     final String currentUserId = _auth.currentUser!.uid;
-
-    // Generate random chatroom id
     final String groupChatId = generateRandomGroupId();
-    print(groupChatId);
 
-    // Add users to the group chat
-    final Map<String, bool> users = {};
-    for (String uid in memberIds) {
-      users[uid] = true;
-    }
+    // Initialize group chat data
+    final Map<String, dynamic> chatData = {
+      'users': {
+        currentUserId: {
+          'joinDate': DateTime.now(),
+          'email': _auth.currentUser!.email,
+        },
+        for (final memberId in memberIds)
+          memberId: {
+            'joinDate': DateTime.now(),
+            'email': 'test@temporary.xd',
+          }
+      },
+      'messages': [],
+    };
 
-    print('creating group');
-    // Add users to Firestore
-    await _firestore
-        .collection('groups')
-        .doc(groupChatId)
-        .collection('users')
-        .add(users);
+    await _firestore.collection('groups').doc(groupChatId).set(chatData);
   }
 
   Future<void> addUserToGroupChat(String groupChatId, String userId) async {
@@ -135,6 +136,21 @@ class ChatService extends ChangeNotifier {
         .update({
       userId: true,
     });
+  }
+
+  Future<void> removeUserFromGroup(String groupId, String userId) async {
+    await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .update({'users.$userId': FieldValue.delete()});
+  }
+
+  Future<void> assignUserRoleInGroup(
+      String groupId, String userId, Map<String, dynamic> newData) async {
+    await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .update({'users.$userId': newData});
   }
 
   Future<void> sendMessageToGroup(String groupChatId, String message) async {

@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/screens/group_bubble.dart';
 import 'package:iqj/features/messenger/presentation/screens/highlight_chat_bubble.dart';
 
 class MessengerScreen extends StatefulWidget {
@@ -14,7 +16,7 @@ class MessengerScreen extends StatefulWidget {
 class _MessengerBloc extends State<MessengerScreen> {
   bool _isSearch = false;
 
-  final FirebaseAuth _auth =  FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void searchfilter() {
     setState(() {
@@ -25,31 +27,29 @@ class _MessengerBloc extends State<MessengerScreen> {
   bool _isntSearch_chat = true;
   TextEditingController SearchPickerController = TextEditingController();
 
-    Map<String,dynamic>userMap={
+  Map<String, dynamic> userMap = {};
 
-    };
+  void onSearch() async {
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-    void onSearch() async {
-      FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-      await _firestore
+    await _firestore
         .collection('users')
-        .where("email",isEqualTo: SearchPickerController.text)
+        .where("email", isEqualTo: SearchPickerController.text)
         .get()
-        .then( (value){
-          setState(() {
-            try{
-              userMap = value.docs[0].data();
-            }catch(e){
-              userMap = {};
-            }
- 
-            _isntSearch_chat = false;
-            print(userMap);
-            print(userMap['email']);
-          });
-        });
-    }
+        .then((value) {
+      setState(() {
+        try {
+          userMap = value.docs[0].data();
+        } catch (e) {
+          userMap = {};
+        }
+
+        _isntSearch_chat = false;
+        print(userMap);
+        print(userMap['email']);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,18 +252,22 @@ class _MessengerBloc extends State<MessengerScreen> {
               children: [
                 // Чат текущей пары
                 const HighlightChatBubble(
-                    imageUrl:
-                        'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
-                    chatTitle: 'GroupName',
-                    secondary: 'secondaryText',),
-                _isntSearch_chat? _buildUserList() : ((userMap.length!=0)
-                  ?ChatBubble(imageUrl: userMap['picture'].toString(), 
-                  chatTitle: userMap['email'].toString(),
-                   secondary: 'text', 
-                   uid: userMap['uid'].toString())
-                  :Align(
-                    alignment:Alignment.center,
-                    child: Text("чат не найден"))),
+                  imageUrl:
+                      'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
+                  chatTitle: 'GroupName',
+                  secondary: 'secondaryText',
+                ),
+                _isntSearch_chat
+                    ? _buildChatList()
+                    : ((userMap.length != 0)
+                        ? ChatBubble(
+                            imageUrl: userMap['picture'].toString(),
+                            chatTitle: userMap['email'].toString(),
+                            secondary: 'text',
+                            uid: userMap['uid'].toString())
+                        : Align(
+                            alignment: Alignment.center,
+                            child: Text("чат не найден"))),
                 // ignore: unnecessary_null_comparison
                 // Чат обычный
                 // ChatBubble(
@@ -294,83 +298,75 @@ class _MessengerBloc extends State<MessengerScreen> {
     );
   }
 
-
-  Widget _buildUserList(){
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError){
-          return const Text('err');
-        }
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        return Column(
-          children: 
-            snapshot.data!.docs
-            .map<Widget>((doc) => _buildUserListItem(doc))
-            .toList(),
+  Widget _buildChatList() {
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance.collection('users').snapshots(),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return Text('Error fetching chats');
+      }
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: CircularProgressIndicator(),
         );
-      },
-      );
-  }
+      }
 
-  Widget _buildGroupList(){
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('chatrooms').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError){
-          return const Text('err');
-        }
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        return Column(
-          children: 
-            snapshot.data!.docs
-            .map<Widget>((doc) => _buildUserListItem(doc))
-            .toList(),
+      List<Widget> chatList = [];
+
+      // Load direct messages
+      chatList.addAll(snapshot.data!.docs.map<Widget>((doc) => _buildChatListItem(doc)));
+
+      // Load group chats
+      FirebaseFirestore.instance.collection('groups').get().then((groupSnapshot) {
+        groupSnapshot.docs.forEach((groupDoc) {
+          final Map<String, dynamic> groupData = groupDoc.data() as Map<String, dynamic>;
+
+          // Extract user IDs and group information from the group document
+          ///////////////////// ИСПРАВИТЬ ЗДЕСЬ ///////////////////////
+          List<String> userIds = groupData['users'] as List<String>;
+          String groupId = groupDoc.id;
+          String groupName = groupData['name'].toString();
+          DateTime creationTime = groupData['creationTime'] as DateTime;
+
+          // Display group chat information in chat list
+          chatList.add(_buildGroupChatListItem(groupId, groupName, creationTime, userIds));
+        });
+      });
+
+      return Column(
+        children: chatList,
+      );
+    },
+  );
+}
+
+Widget _buildGroupChatListItem(String groupId, String groupName, DateTime creationTime, List<String> userIds) {
+  // You can customize the appearance of the group chat item as needed
+  return GroupBubble(
+          imageUrl: 'nonononoWAITWAITWAITWAIT',
+          chatTitle: groupName,
+          secondary: 'text',
+          id: groupId,
         );
-      },
+}
+
+  Widget _buildChatListItem(DocumentSnapshot document) {
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+      // Direct message
+      if (_auth.currentUser!.email != data['email']) {
+        return ChatBubble(
+          imageUrl: data['picture'].toString(),
+          chatTitle: data['email'].toString(),
+          secondary: 'text',
+          uid: data['uid'].toString(),
+        );
+      }
+      return ChatBubble(
+        imageUrl: data['picture'].toString(),
+        chatTitle:
+            'Заметки', // Replace with appropriate text for direct messages
+        secondary: 'text',
+        uid: data['uid'].toString(),
       );
-  }
-  
-
-  Widget _buildUserListItem(DocumentSnapshot document){
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    if (_auth.currentUser!.email != data['email']){
-      // return ListTile(
-      //   title: Text(data['email'].toString()),
-      //   onTap: (){
-      //     Navigator.of(context).pushNamed(
-      //       'chatslist',
-      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
-      //     );
-      //   },
-      // );
-      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
-    }
-    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
-  }
-
-  Widget _buildGroupItem(DocumentSnapshot document){
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    if (_auth.currentUser!.email != data['email']){
-      // return ListTile(
-      //   title: Text(data['email'].toString()),
-      //   onTap: (){
-      //     Navigator.of(context).pushNamed(
-      //       'chatslist',
-      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
-      //     );
-      //   },
-      // );
-      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
-    }
-    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
   }
 }

@@ -73,7 +73,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
           onPressed: () {
             createGroup();
             Navigator.of(context).pushNamed(
-              'chatslist',
+              'groupchat',
               arguments: {
                 'name': groupName,
                 'url': 'no.',

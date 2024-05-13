@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ChatBubbleSelection extends StatefulWidget {
+class GroupBubble extends StatefulWidget {
   final String imageUrl;
   final String chatTitle;
-  final String uid;
-  bool selected;
-  ChatBubbleSelection({
+  final String secondary;
+  final String id;
+  const GroupBubble({
     required this.imageUrl,
     required this.chatTitle,
-    required this.uid,
-    required this.selected,
+    required this.secondary,
+    required this.id,
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _ChatBubbleSelection();
+  State<StatefulWidget> createState() => _ChatBubble();
 }
 
-class _ChatBubbleSelection extends State<ChatBubbleSelection> {
+class _ChatBubble extends State<GroupBubble> {
   Widget _buildThumbnailImage() {
     try {
       return SizedBox(
@@ -48,15 +48,26 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
     }
   }
 
-  bool selected = false;
-  void setSelected() {
+  bool volume = false;
+  bool push_pin = false;
+
+  void volume_off() {
     setState(() {
-      selected = !selected;
+      volume = !volume;
+    });
+  }
+
+  void push_pin_get() {
+    setState(() {
+      push_pin = !push_pin;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    //final String username = "А. Б. Веселухов";
+    String id = widget.id;
+
     return Column(
       children: [
         Container(
@@ -77,7 +88,45 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
               ),
             ),
             onPressed: () {
-              setSelected();
+              Navigator.of(context).pushNamed(
+                'groupchat',
+                arguments: {
+                  'name': widget.chatTitle,
+                  'url': widget.imageUrl,
+                  'volume': volume,
+                  'pin': push_pin,
+                  'uid': widget.id
+                },
+              );
+              ;
+            },
+            onLongPress: () => {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.push_pin_outlined),
+                          title: Text('Закрепить'),
+                          onTap: () {
+                            push_pin_get();
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.volume_off),
+                          title: Text('Без звука'),
+                          onTap: () {
+                            volume_off();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -112,14 +161,20 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
                               fontSize: 20,
                             ),
                           ),
-                          selected
-                              ? Container(
-                                  padding: EdgeInsets.only(left: 6),
-                                  alignment: Alignment.centerRight,
-                                  child: Icon(Icons.check_circle_rounded))
+                          volume ? Icon(Icons.volume_off) : Container(),
+                          push_pin
+                              ? Icon(Icons.push_pin_outlined)
                               : Container(),
                         ],
                       ),
+                      // Text(
+                      //   "печатает...",
+                      //   style: TextStyle(
+                      //     color: Theme.of(context).colorScheme.primary,
+                      //     fontSize: 20,
+                      //     fontWeight: FontWeight.w400,
+                      //   ),
+                      // ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),

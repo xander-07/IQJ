@@ -44,8 +44,8 @@ class _ChatsListState extends State<ChatsGroupList> {
                 return CircleAvatar(
                   radius: 6,
                   backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: const Text('A'),
+                      Theme.of(context).colorScheme.tertiaryContainer,
+                  child: const Text('G'),
                 );
               },
             ),
@@ -363,15 +363,7 @@ class _ChatsListState extends State<ChatsGroupList> {
             padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.phone,
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
-                  onPressed: () {
-                    // Действие при нажатии на кнопку с телефоном
-                  },
-                ),
+                
                 IconButton(
                   icon: Icon(
                     Icons.more_vert_rounded,

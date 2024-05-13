@@ -66,6 +66,7 @@ class _ChatBubble extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
     //final String username = "А. Б. Веселухов";
+    String uid = widget.uid;
 
     return Column(
       children: [
@@ -87,39 +88,46 @@ class _ChatBubble extends State<ChatBubble> {
               ),
             ),
             onPressed: () {
-              //String name = widget.chatTitle;
               Navigator.of(context).pushNamed(
-              'chatslist',
-              arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': volume,'pin': push_pin, 'uid':widget.uid},
-          );
+                'chatslist',
+                arguments: {
+                  'name': widget.chatTitle,
+                  'url': widget.imageUrl,
+                  'volume': volume,
+                  'pin': push_pin,
+                  'uid': widget.uid
+                },
+              );
+
+              ;
             },
             onLongPress: () => {
               showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.push_pin_outlined),
-                        title: Text('Закрепить'),
-                        onTap: () {
-                          push_pin_get();
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.volume_off),
-                        title: Text('Без звука'),
-                        onTap: () {
-                          volume_off();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.push_pin_outlined),
+                          title: Text('Закрепить'),
+                          onTap: () {
+                            push_pin_get();
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.volume_off),
+                          title: Text('Без звука'),
+                          onTap: () {
+                            volume_off();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -148,14 +156,16 @@ class _ChatBubble extends State<ChatBubble> {
                           Text(
                             widget.chatTitle,
                             style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.onPrimaryContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               fontSize: 20,
                             ),
                           ),
-                          volume? Icon(Icons.volume_off) : Container(),
-                          push_pin? Icon(Icons.push_pin_outlined) : Container(),
-
+                          volume ? Icon(Icons.volume_off) : Container(),
+                          push_pin
+                              ? Icon(Icons.push_pin_outlined)
+                              : Container(),
                         ],
                       ),
                       // Text(
