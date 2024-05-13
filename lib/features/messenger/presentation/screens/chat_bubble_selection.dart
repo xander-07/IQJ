@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ChatBubble extends StatefulWidget {
+class ChatBubbleSelection extends StatefulWidget {
   final String imageUrl;
   final String chatTitle;
-  final String secondary;
   final String uid;
-  const ChatBubble({
+  bool selected;
+  ChatBubbleSelection({
     required this.imageUrl,
     required this.chatTitle,
-    required this.secondary,
     required this.uid,
+    required this.selected,
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _ChatBubble();
+  State<StatefulWidget> createState() => _ChatBubbleSelection();
 }
 
-class _ChatBubble extends State<ChatBubble> {
+class _ChatBubbleSelection extends State<ChatBubbleSelection> {
   Widget _buildThumbnailImage() {
     try {
       return SizedBox(
@@ -48,25 +48,15 @@ class _ChatBubble extends State<ChatBubble> {
     }
   }
 
-  bool volume = false;
-  bool push_pin = false;
-
-  void volume_off() {
+  bool selected = false;
+  void setSelected() {
     setState(() {
-      volume = !volume;
-    });
-  }
-
-  void push_pin_get() {
-    setState(() {
-      push_pin = !push_pin;
+      selected = !selected;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    //final String username = "А. Б. Веселухов";
-
     return Column(
       children: [
         Container(
@@ -87,39 +77,7 @@ class _ChatBubble extends State<ChatBubble> {
               ),
             ),
             onPressed: () {
-              //String name = widget.chatTitle;
-              Navigator.of(context).pushNamed(
-              'chatslist',
-              arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': volume,'pin': push_pin, 'uid':widget.uid},
-          );
-            },
-            onLongPress: () => {
-              showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.push_pin_outlined),
-                        title: Text('Закрепить'),
-                        onTap: () {
-                          push_pin_get();
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.volume_off),
-                        title: Text('Без звука'),
-                        onTap: () {
-                          volume_off();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+              setSelected();
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -153,19 +111,13 @@ class _ChatBubble extends State<ChatBubble> {
                               fontSize: 20,
                             ),
                           ),
-                          volume? Icon(Icons.volume_off) : Container(),
-                          push_pin? Icon(Icons.push_pin_outlined) : Container(),
-
+                          selected? Container(
+                            padding: EdgeInsets.only(left: 6),
+                            alignment: Alignment.centerRight,
+                            child: Icon(Icons.check_circle_rounded)) 
+                          : Container(),
                         ],
                       ),
-                      // Text(
-                      //   "печатает...",
-                      //   style: TextStyle(
-                      //     color: Theme.of(context).colorScheme.primary,
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.w400,
-                      //   ),
-                      // ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),
