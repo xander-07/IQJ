@@ -28,11 +28,34 @@ class Message {
 
 }
 
+class GroupMessage {
+  final String senderId;
+  final String senderEmail;
+  final String message;
+  final Timestamp timestamp;
+
+  GroupMessage(
+      {required this.senderId,
+      required this.senderEmail,
+      required this.message,
+      required this.timestamp,});
+
+  Map<String, dynamic> toMap(){
+    return {
+      'senderId': senderId,
+      'senderEmail': senderEmail,
+      'message': message,
+      'timestamp': timestamp,
+    };
+  }
+
+}
+
 class FileMes {
   final String senderId;
   final String senderEmail;
   final String receiverId;
-  final String message;
+  final File message;
   final Timestamp timestamp;
 
 

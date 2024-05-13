@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 
-class HighlightChatBubble extends StatefulWidget {
+class ChatBubbleSelection extends StatefulWidget {
   final String imageUrl;
   final String chatTitle;
-  final String secondary;
-  const HighlightChatBubble({
+  final String uid;
+  bool selected;
+  ChatBubbleSelection({
     required this.imageUrl,
     required this.chatTitle,
-    required this.secondary,
+    required this.uid,
+    required this.selected,
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _HighlightChatBubble();
+  State<StatefulWidget> createState() => _ChatBubbleSelection();
 }
 
-class _HighlightChatBubble extends State<HighlightChatBubble> {
+class _ChatBubbleSelection extends State<ChatBubbleSelection> {
   Widget _buildThumbnailImage() {
     try {
       return SizedBox(
@@ -46,20 +48,26 @@ class _HighlightChatBubble extends State<HighlightChatBubble> {
     }
   }
 
+  bool selected = false;
+  void setSelected() {
+    setState(() {
+      selected = !selected;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.only(right: 12, left: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-          ),
+          margin: const EdgeInsets.only(left: 12, right: 12),
           child: ElevatedButton(
             style: ButtonStyle(
               padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+              surfaceTintColor:
+                  const MaterialStatePropertyAll(Colors.transparent),
               backgroundColor: MaterialStatePropertyAll(
-                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.background,
               ),
               shadowColor: const MaterialStatePropertyAll(Colors.transparent),
               shape: MaterialStatePropertyAll(
@@ -69,10 +77,7 @@ class _HighlightChatBubble extends State<HighlightChatBubble> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(
-              'groupchat',
-              arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': false,'pin': false, 'uid': ""},
-              );
+              setSelected();
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -89,66 +94,45 @@ class _HighlightChatBubble extends State<HighlightChatBubble> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  _buildThumbnailImage(),
+                  const Padding(padding: EdgeInsets.only(right: 12)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Текущая пара",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 26,
-                        ),
-                      ),
-                      Text(
-                        "до 15:50",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 12)),
-                  Row(
-                    children: [
-                      _buildThumbnailImage(),
-                      const Padding(padding: EdgeInsets.only(right: 12)),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
                           Text(
                             widget.chatTitle,
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color:
+                                  Theme.of(context).colorScheme.onPrimaryContainer,
                               fontSize: 20,
                             ),
                           ),
-                          Text(
-                            widget.secondary,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          selected? Container(
+                            padding: EdgeInsets.only(left: 6),
+                            alignment: Alignment.centerRight,
+                            child: Icon(Icons.check_circle_rounded)) 
+                          : Container(),
                         ],
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          right: 12,
-                        ),
                       ),
                     ],
                   ),
+                  const Padding(padding: EdgeInsets.only(right: 12)),
                 ],
               ),
             ),
           ),
         ),
-        const Padding(padding: EdgeInsets.only(bottom: 18)),
+        Padding(
+          padding: const EdgeInsets.only(left: 102, right: 24),
+          child: Divider(
+            height: 1,
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+        ),
       ],
     );
   }

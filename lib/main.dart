@@ -5,6 +5,8 @@ import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
+import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
@@ -28,7 +30,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthService(),
@@ -37,28 +39,31 @@ Future<void> main() async {
   );
 
   // Код для работы пуш-уведомлений для чата (android)
-  final messaging = FirebaseMessaging.instance;
-  final settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  String? token = await messaging.getToken();
-  //print("RegToken HERERERERRERE: " + token!);
-  final _messageStreamController = BehaviorSubject<RemoteMessage>();
-   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-   _messageStreamController.sink.add(message);
- });
+  // ВАЖНО: Может выдавать ошибки при сборке на Windows.
+  // Их можно пропустить, приложение будет работать корректно.
+  // На Windows не будет пуш-уведомлений.
+//   final messaging = FirebaseMessaging.instance;
+//   final settings = await messaging.requestPermission(
+//     alert: true,
+//     announcement: false,
+//     badge: true,
+//     carPlay: false,
+//     criticalAlert: false,
+//     provisional: false,
+//     sound: true,
+//   );
+//   String? token = await messaging.getToken();
+//   //print("RegToken HERERERERRERE: " + token!);
+//   final _messageStreamController = BehaviorSubject<RemoteMessage>();
+//    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+//    _messageStreamController.sink.add(message);
+//  });
 
 }
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
- await Firebase.initializeApp();
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//  await Firebase.initializeApp();
+// }
 
 
 class App extends StatefulWidget {
@@ -104,12 +109,14 @@ class _AppState extends State<App> {
         'registration': (context) => const RegScreen(),
         'successreg': (context) => const SuccessReg(),
         'messenger': (context) =>
-            const MessengerScreen(), // главна страница сообщений
+            const MessengerScreen(), // главная страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
+        'groupchat': (context) => const ChatsGroupList(), // это страница диолга
         'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),
+        'creategroup' :(context) => const CreateGroupScreen(),
       },
       onUnknownRoute: (settings) {},
     );

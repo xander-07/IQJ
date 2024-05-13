@@ -33,4 +33,5 @@ func main() {
 	if err := handlers.InitRoutes().RunTLS(":8443", config.SertificatePath, config.KeyPath); err != nil {
 		log.Fatal(err)
 	}
+
 }

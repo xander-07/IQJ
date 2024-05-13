@@ -453,6 +453,7 @@ class _Page_person extends State<Page_person> {
             flag4? _Link_for_main_chat(context, image_url??"", "Подготовка к экзамену", "№1. Вычислить неопределённый интеграл", "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4"):Container(),
             flag4? _Link_for_main_chat(context, image_url??"", "Подготовка к экзамену", "№1. Вычислить неопределённый интеграл", "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4"):Container(),
             flag4? _Link_for_main_chat(context, image_url??"", "Подготовка к экзамену", "№1. Вычислить неопределённый интеграл", "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4"):Container(),
+            
           ],
         ),
       ),

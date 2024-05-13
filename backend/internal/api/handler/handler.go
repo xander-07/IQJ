@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	DefaultRoute        = "/"
-	NewsRoute           = "/news"
+	DefaultRoute = "/"
+	NewsRoute    = "/news"
+	//NewsSearch			= "/news_search"
 	AdvertisementsRoute = "/ad"
 	LessonsRoute        = "/lessons"
 	SignInRoute         = "/sign-in"
@@ -50,6 +51,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
 	r.GET(NewsRoute, h.HandleNews)
+	//r.GET(NewsSearch,h.HandleSearchNews)
 
 	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
 
