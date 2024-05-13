@@ -120,6 +120,13 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 	return &newsSlice, nil
 }
 
+// func (nt *NewsTable) GetNewsByHeader(text []byte)(*[]News,error){
+// 	selectQuery := `
+// 		SELECT news_id, header, link, image_links, tags, publication_time
+// 		FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2
+// 	`
+// }
+
 // Остальные методы не изменились и остаются теми же
 
 // GetLatestBlocks возвращает указанное количество последних новостных блоков.

@@ -30,6 +30,12 @@ func (h *Handler) HandleNews(c *gin.Context) {
 	}
 }
 
+// "/news_search?header="dsfasdfsda""
+
+// func (h *Handler) HandleSearchNews(c *gin.Context){
+// 	offsetStr := c.Query("header")
+// }
+
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
