@@ -27,7 +27,7 @@ type StudentTable struct {
 }
 
 // Add добавляет студента в базу данных.
-func (st *StudentTable) Add(s *Student) error {
+func (st *StudentTable) Add(s Student) error {
 	if s.isDefault() {
 		return errors.New("Student.Add: wrong data! provided *Student is empty")
 	}
@@ -45,7 +45,7 @@ func (st *StudentTable) Add(s *Student) error {
 }
 
 // GetById возвращает данные студента из базы данных по указанному идентификатору.
-func (st *StudentTable) GetById(s *Student) (*Student, error) {
+func (st *StudentTable) GetById(s Student) (*Student, error) {
 	if s.isDefault() {
 		return nil, errors.New("Student.GetById: wrong data! provided *Student is empty")
 	}
@@ -67,11 +67,11 @@ func (st *StudentTable) GetById(s *Student) (*Student, error) {
 		rows.Scan(&s.Group, pq.Array(&s.Teachers))
 	}
 
-	return s, nil
+	return &s, nil
 }
 
 // GetClasses возвращает классы студента из базы данных.
-func (st *StudentTable) GetClasses(s *Student) (*[]Class, error) {
+func (st *StudentTable) GetClasses(s Student) (*[]Class, error) {
 	if s.isDefault() {
 		return nil, errors.New("Student.GetClasses: wrong data! provided *Student is empty")
 	}
@@ -101,7 +101,7 @@ func (st *StudentTable) GetClasses(s *Student) (*[]Class, error) {
 }
 
 // GetClassesByCurrentDay возвращает классы студента по текущему дню недели и неделе.
-func (st *StudentTable) GetClassesByDay(s *Student, wc, wd int) (*[]Class, error) {
+func (st *StudentTable) GetClassesByDay(s Student, wc, wd int) (*[]Class, error) {
 	if s.isDefault() {
 		return nil, errors.New("Student.GetClassesByDay: wrong data! provided *Student is empty")
 	}
@@ -133,7 +133,7 @@ func (st *StudentTable) GetClassesByDay(s *Student, wc, wd int) (*[]Class, error
 }
 
 // Delete удаляет данные студента из базы данных по указанному идентификатору.
-func (st *StudentTable) Delete(s *Student) error {
+func (st *StudentTable) Delete(s Student) error {
 	if s.isDefault() {
 		return errors.New("Student.Delete: wrong data! Id is empty")
 	}

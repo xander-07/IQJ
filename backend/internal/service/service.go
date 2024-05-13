@@ -1,6 +1,8 @@
 package service
 
-import "iqj/database"
+import (
+	database "iqj/internal/database"
+)
 
 type Authorization interface {
 	Add(u *database.User) error

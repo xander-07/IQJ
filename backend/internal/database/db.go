@@ -91,6 +91,14 @@ func (st *DatabaseRepository) connectDatabase(connectionString string) error {
 // раздаем указатели на подключение декораторам
 func (st *DatabaseRepository) connectTables(db *sql.DB) {
 	var err error
+	st.User, err = newUserTable(db, createTableUsers)
+	if err != nil {
+		panic(err)
+	}
+	st.UserData, err = newUserDataTable(db, createTableUsersData)
+	if err != nil {
+		panic(err)
+	}
 	st.Advertisement, err = newAdvertisementTable(db, createTableAdvertisements)
 	if err != nil {
 		panic(err)
@@ -112,14 +120,6 @@ func (st *DatabaseRepository) connectTables(db *sql.DB) {
 		panic(err)
 	}
 	st.Teacher, err = newTeacherTable(db, createTableTeachers)
-	if err != nil {
-		panic(err)
-	}
-	st.User, err = newUserTable(db, createTableUsers)
-	if err != nil {
-		panic(err)
-	}
-	st.UserData, err = newUserDataTable(db, createTableUsersData)
 	if err != nil {
 		panic(err)
 	}

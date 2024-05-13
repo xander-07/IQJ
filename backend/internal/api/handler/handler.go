@@ -1,16 +1,17 @@
 package handler
 
 import (
-	middleware2 "iqj/pkg/middleware"
-	"iqj/service"
+	"iqj/internal/service"
+	"iqj/pkg/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 const (
-	DefaultRoute        = "/"
-	NewsRoute           = "/news"
+	DefaultRoute = "/"
+	NewsRoute    = "/news"
+	//NewsSearch			= "/news_search"
 	AdvertisementsRoute = "/ad"
 	LessonsRoute        = "/lessons"
 	SignInRoute         = "/sign-in"
@@ -40,7 +41,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// Добавляет заголовки CORS к ответам сервера.
 	// Необходимо для того, чтобы клиентские приложения,
 	// работающие на других доменах, могли взаимодействовать с API.
-	r.Use(middleware2.CORSMiddleware())
+	r.Use(middleware.CORSMiddleware())
 
 	// Вызов хэндлеров исходя из запроса.
 	r.GET(DefaultRoute, h.Hello)
@@ -50,6 +51,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
 	r.GET(NewsRoute, h.HandleNews)
+	//r.GET(NewsSearch,h.HandleSearchNews)
 
 	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
 
@@ -57,7 +59,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	// Группа функций, которая доступна только после аутентификации
 	authGroup := r.Group(AuthGroupRoute)
-	authGroup.Use(middleware2.WithJWTAuth)
+	authGroup.Use(middleware.WithJWTAuth)
 	{
 		authGroup.POST(NewsRoute, h.HandleAddNews)
 		authGroup.PUT(NewsRoute, h.HandleUpdateNews)

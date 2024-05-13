@@ -34,13 +34,13 @@ type ClassTable struct {
 }
 
 // Add добавляет данные в базу данных.
-// Принимает указатель на Class с непустыми полями Groups, Teacher, Count, Weekday, Week, Name, Type, Location\n
+// Принимает Class с непустыми полями Groups, Teacher, Count, Weekday, Week, Name, Type, Location\n
 // Возвращает nil при успешном добавлении.
 //
 // Прим:\n
 // a := &Class{Groups: []int{1,2,3}, Teacher: 123,TeacherName: "123", Count: 123, Weekday: 123, Week:123, Name: "123", Type: "123", Location:"123"}\n
 // err := ...Add(a) // err == nil если все хорошо
-func (ct *ClassTable) Add(c *Class) error {
+func (ct *ClassTable) Add(c Class) error {
 	// Проверяем были ли переданы данные в c
 	if c.isDefault() {
 		return errors.New("Class.Add: wrong data! provided *Class is empty")
@@ -67,13 +67,13 @@ func (ct *ClassTable) Add(c *Class) error {
 }
 
 // GetById получает данные о паре из базы данных по её Id.
-// Принимает указатель на Class с непустым полем Id\n
+// Принимает Class с непустым полем Id\n
 // Возвращает заполненный *Class, nil при успешном получении.
 //
 // Прим:\n
 // a := &Class{Id: 123}\n
 // cl, err := ...GetById(a) // err == nil если все хорошо
-func (ct *ClassTable) GetById(c *Class) (*Class, error) {
+func (ct *ClassTable) GetById(c Class) (*Class, error) {
 	// Проверяем были ли переданы данные в с
 	if c.Id == 0 {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
@@ -92,19 +92,19 @@ func (ct *ClassTable) GetById(c *Class) (*Class, error) {
 		return nil, fmt.Errorf("Class.GetById: %v", err)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
 //	СКОРО БУДЕТ УДАЛЕНО, ИСПОЛЬЗУЙТЕ GetForTeacher вместо этого, за доп. функционалом обращаться в канал бд
 //
 // GetForWeekByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
-// Принимает указатель на Class с непустыми полями Id,Week\n
+// Принимает Class с непустыми полями Id,Week\n
 // Возвращает слайс заполненных *Class, nil при успешном получении.
 //
 // Прим:\n
-// a := &Class{Id: 123, Week:123}\n
+// a := Class{Id: 123, Week:123}\n
 // cls, err := ...GetById(a) // err == nil если все хорошо
-func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
+func (ct *ClassTable) GetForWeekByTeacher(c Class) (*[]Class, error) {
 	if c.isDefault() {
 		return nil, errors.New("Class.GetForWeekByTeacher: wrong data! provided *Class is empty")
 	}
@@ -132,7 +132,7 @@ func (ct *ClassTable) GetForWeekByTeacher(c *Class) (*[]Class, error) {
 	return &resultClasses, nil
 }
 
-func (ct *ClassTable) GetForTeacher(c *Class) (*[]Class, error) {
+func (ct *ClassTable) GetForTeacher(c Class) (*[]Class, error) {
 	if c.isDefault() {
 		return nil, errors.New("Class.GetForTeacher: wrong data! provided *Class is empty")
 	}
@@ -161,13 +161,13 @@ func (ct *ClassTable) GetForTeacher(c *Class) (*[]Class, error) {
 }
 
 // GetForDayByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
-// Принимает указатель на Class с непустыми полями Id,Week,Weekday\n
+// Принимает Class с непустыми полями Id,Week,Weekday\n
 // Возвращает слайс заполненных *Class, nil при успешном получении.
 //
 // Прим:\n
-// a := &Class{Id: 123, Week:123,Weekday:123}\n
+// a := Class{Id: 123, Week:123,Weekday:123}\n
 // cls, err := ...GetById(a) // err == nil если все хорошо
-func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
+func (ct *ClassTable) GetForDayByTeacher(c Class) (*[]Class, error) {
 	if c.isDefault() {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
@@ -196,11 +196,11 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 }
 
 // GetByLocation возвращает список классов по указанному местоположению.
-// Принимает указатель на объект ClassTable (ct) и указатель на объект Class (c), содержащий местоположение класса (c.Location).
+// Принимает Class (c), содержащий местоположение класса (c.Location).
 // Возвращает указатель на срез объектов Class и ошибку при её возникновении.
 //
 // Прим:
-// classes, err := ct.GetByLocation(&Class{Location: "A101"})
+// classes, err := ct.GetByLocation(Class{Location: "A101"})
 //
 //	if err != nil {
 //	    // Обработка ошибки
@@ -209,7 +209,7 @@ func (ct *ClassTable) GetForDayByTeacher(c *Class) (*[]Class, error) {
 //	for _, class := range *classes {
 //	    // Обработка классов
 //	}
-func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
+func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	// Проверяем, что переданный объект класса не пустой
 	if c.Location == "" {
 		return nil, errors.New("Class.GetByLocation: wrong data! provided *Class is empty")
@@ -227,20 +227,10 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		// var tempGroupIds []*sql.NullInt32
 		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 		}
-		// функция конвертации sql.NullInt32 в []int
-		// resultClass.Groups = make([]int, len(tempGroupIds))
-		// func() {
-		// 	for k, v := range tempGroupIds {
-		// 		resultClass.Groups[k] = int(v.Int32)
-		// 	}
-		// }()
-
-		// конец функции конвертации
 
 		resultClass.Location = c.Location
 		resultClasses = append(resultClasses, resultClass)
@@ -250,16 +240,16 @@ func (ct *ClassTable) GetByLocation(c *Class) (*[]Class, error) {
 }
 
 // Delete удаляет класс из базы данных по указанному идентификатору класса.
-// Принимает указатель на объект ClassTable (ct) и указатель на объект Class (c), содержащий идентификатор класса (c.Id).
+// Принимает Class (c), содержащий идентификатор класса (c.Id).
 // Возвращает ошибку при её возникновении.
 //
 // Прим:
-// err := ct.Delete(&Class{Id: 123})
+// err := ct.Delete(Class{Id: 123})
 //
 //	if err != nil {
 //	    // Обработка ошибки
 //	}
-func (ct *ClassTable) Delete(c *Class) error {
+func (ct *ClassTable) Delete(c Class) error {
 	// Проверяем, что переданный объект класса не пустой
 	if c.isDefault() {
 		return errors.New("Class.Delete: wrong data! provided *Class is empty")

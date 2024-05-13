@@ -27,7 +27,7 @@ type UserDataTable struct {
 }
 
 // Add добавляет данные пользователя в базу данных.
-func (udt *UserDataTable) Add(ud *UserData) error {
+func (udt *UserDataTable) Add(ud UserData) error {
 	if ud.isDefault() {
 		return errors.New("UserData.Add: wrong data! provided *UserData is empty")
 	}
@@ -54,7 +54,7 @@ func (udt *UserDataTable) Add(ud *UserData) error {
 }
 
 // GetById возвращает данные пользователя из базы данных по указанному идентификатору.
-func (udt *UserDataTable) GetById(ud *UserData) (*UserData, error) {
+func (udt *UserDataTable) GetById(ud UserData) (*UserData, error) {
 	if ud.isDefault() {
 		return nil, errors.New("UserData.GetById: wrong data! provided *UserData is empty")
 	}
@@ -82,11 +82,11 @@ func (udt *UserDataTable) GetById(ud *UserData) (*UserData, error) {
 		return nil, fmt.Errorf("UserData.GetById: error committing transaction: %v", err)
 	}
 
-	return ud, nil
+	return &ud, nil
 }
 
 // GetByName возвращает данные пользователя из базы данных по указанному имени.
-func (udt *UserDataTable) GetByName(ud *UserData) (*UserData, error) {
+func (udt *UserDataTable) GetByName(ud UserData) (*UserData, error) {
 	if ud.Name == "" {
 		return nil, errors.New("UserData.GetByName: wrong data! provided *UserData.Name is empty")
 	}
@@ -111,11 +111,11 @@ func (udt *UserDataTable) GetByName(ud *UserData) (*UserData, error) {
 		return nil, fmt.Errorf("UserData.GetByName: error committing transaction: %v", err)
 	}
 
-	return ud, nil
+	return &ud, nil
 }
 
 // GetRoleById возвращает роль пользователя из базы данных по указанному идентификатору.
-func (udt *UserDataTable) GetRoleById(ud *UserData) (*UserData, error) {
+func (udt *UserDataTable) GetRoleById(ud UserData) (*UserData, error) {
 	if ud.Id == 0 {
 		return nil, errors.New("UserData.GetRoleById: wrong data! provided *UserData.Id is empty")
 	}
@@ -140,11 +140,11 @@ func (udt *UserDataTable) GetRoleById(ud *UserData) (*UserData, error) {
 		return nil, fmt.Errorf("UserData.GetRoleById: error committing transaction: %v", err)
 	}
 
-	return ud, nil
+	return &ud, nil
 }
 
 // Update обновляет данные пользователя в базе данных.
-func (udt *UserDataTable) Update(userData *UserData) error {
+func (udt *UserDataTable) Update(userData UserData) error {
 	if userData.Id <= 0 {
 		return errors.New("UserData.Update: userData.Id must be a positive integer")
 	}
@@ -170,7 +170,7 @@ func (udt *UserDataTable) Update(userData *UserData) error {
 }
 
 // UpdateRole обновляет роль пользователя в базе данных по указанному идентификатору.
-func (udt *UserDataTable) UpdateRole(userData *UserData) error {
+func (udt *UserDataTable) UpdateRole(userData UserData) error {
 	if userData.Id <= 0 {
 		return errors.New("UserData.UpdateRole: id must be a positive integer")
 	}
@@ -196,7 +196,7 @@ func (udt *UserDataTable) UpdateRole(userData *UserData) error {
 }
 
 // Delete удаляет данные пользователя из базы данных по указанному идентификатору.
-func (udt *UserDataTable) Delete(ud *UserData) error {
+func (udt *UserDataTable) Delete(ud UserData) error {
 	if ud.Id == 0 {
 		return errors.New("UserData.Delete: wrong data! *UserData.Id is empty")
 	}

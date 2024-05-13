@@ -26,7 +26,7 @@ type TeacherTable struct {
 }
 
 // Add добавляет преподавателя в базу данных.
-func (tt *TeacherTable) Add(t *Teacher) error {
+func (tt *TeacherTable) Add(t Teacher) error {
 	if t.isDefault() {
 		return errors.New("Teachers.Add: wrong data! provided *Teacher is empty")
 	}
@@ -43,7 +43,7 @@ func (tt *TeacherTable) Add(t *Teacher) error {
 }
 
 // GetById возвращает данные преподавателя из базы данных по указанному идентификатору.
-func (tt *TeacherTable) GetById(t *Teacher) (*Teacher, error) {
+func (tt *TeacherTable) GetById(t Teacher) (*Teacher, error) {
 	if t.isDefault() {
 		return nil, errors.New("Teachers.GetById: wrong data! provided *Teacher is empty")
 	}
@@ -60,11 +60,11 @@ func (tt *TeacherTable) GetById(t *Teacher) (*Teacher, error) {
 		return nil, fmt.Errorf("Teachers.GetById: %v", err)
 	}
 
-	return t, nil
+	return &t, nil
 }
 
 // UpdateGroups обновляет данные о группах, в которых преподает преподаватель.
-func (tt *TeacherTable) UpdateGroups(t *Teacher) (*Teacher, error) {
+func (tt *TeacherTable) UpdateGroups(t Teacher) (*Teacher, error) {
 	if t.isDefault() {
 		return nil, errors.New("Teachers.UpdateGroups: wrong data! provided *Teacher is empty")
 	}
@@ -81,10 +81,10 @@ func (tt *TeacherTable) UpdateGroups(t *Teacher) (*Teacher, error) {
 		return nil, fmt.Errorf("Teachers.UpdateGroups: %v", err)
 	}
 
-	return t, nil
+	return &t, nil
 }
 
-func (tt *TeacherTable) Delete(t *Teacher) error {
+func (tt *TeacherTable) Delete(t Teacher) error {
 	if t.isDefault() {
 		return errors.New("Teacher.Delete: wrong data! Id is empty")
 	}

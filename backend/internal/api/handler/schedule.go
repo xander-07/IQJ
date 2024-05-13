@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"iqj/database"
-	cache2 "iqj/pkg/cache"
+	"iqj/internal/database"
+	cachepkg "iqj/pkg/cache"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,14 +17,14 @@ import (
 // При неверном критерии или значении отправит null
 
 // Использование кэша
-var cache = cache2.NewLFUCache(100)
+var cache = cachepkg.NewLFUCache(100)
 
 func (h *Handler) Lessons(c *gin.Context) {
 	//Получение в criterion и value заданных значений
 	criterion := c.Query("criterion")
 	value := c.Query("value")
 
-	lesson := &database.Class{}
+	lesson := database.Class{}
 	filteredLessons := &[]database.Class{}
 
 	//Проверяем, есть ли заданное значение в кэше
@@ -44,28 +44,8 @@ func (h *Handler) Lessons(c *gin.Context) {
 			// поэтому теперь мы будем делать только так, функции sg.GetIdByName, sg.GetClassesById будут в скором времени удалены,
 			// внесите изменения в код там, где они используются
 
-			//Создание группы
-			//group := &database.StudentGroup{Name: value}
-			//Поиск ID группы по имени
-			// group, err := database.Database.StudentGroup.GetIdByName(group)
-			// if err != nil {
-			// 	if errors.Is(err, sql.ErrTxDone) {
-			// 		c.String(http.StatusBadRequest, err.Error())
-			// 		return
-			// 	}
-			// }
-			//Получаем список пар по группе из БД
-			// if group != nil {
-			// 	filteredLessons, err = database.Database.StudentGroup.GetClassesById(group)
-			// 	if err != nil {
-			// 		c.String(http.StatusBadRequest, err.Error())
-			// 		return
-			// 	}
-			// } else
-			//{
-
 			newgroup := database.StudentGroup{Name: value}
-			filteredLessons, err = database.Database.StudentGroup.GetClassesByName(&newgroup)
+			filteredLessons, err = database.Database.StudentGroup.GetClassesByName(newgroup)
 			if err != nil {
 				c.String(http.StatusBadRequest, err.Error())
 				return
@@ -74,7 +54,7 @@ func (h *Handler) Lessons(c *gin.Context) {
 			//}
 			//По преподавателю
 		case "tutor":
-			tempclass := &database.Class{TeacherName: value}
+			tempclass := database.Class{TeacherName: value}
 			//Получаем список пар по преподу
 			filteredLessons, err = database.Database.Class.GetForTeacher(tempclass)
 			if err != nil {

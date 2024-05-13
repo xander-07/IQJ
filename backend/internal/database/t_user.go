@@ -27,7 +27,7 @@ type UserTable struct {
 }
 
 // AddNew добавляет пользователя в базу данных.
-func (ut *UserTable) AddNew(u *User) (*User, error) {
+func (ut *UserTable) AddNew(u User) (*User, error) {
 	if u.isDefault() {
 		return nil, errors.New("User.Add: wrong data! provided *User is empty")
 	}
@@ -53,11 +53,11 @@ func (ut *UserTable) AddNew(u *User) (*User, error) {
 
 	u.Id = userId
 
-	return u, nil
+	return &u, nil
 }
 
 // GetById возвращает данные пользователя из базы данных по указанному идентификатору.
-func (ut *UserTable) GetById(u *User) (*User, error) {
+func (ut *UserTable) GetById(u User) (*User, error) {
 	if u.isDefault() {
 		return nil, errors.New("User.Get: wrong data! provided *User is empty")
 	}
@@ -89,11 +89,11 @@ func (ut *UserTable) GetById(u *User) (*User, error) {
 	u.Email = email
 	u.Password = password
 
-	return u, nil
+	return &u, nil
 }
 
 // Check проверяет наличие пользователя в базе данных и соответствие введенного пароля.
-func (ut *UserTable) Check(u *User) (*User, error) {
+func (ut *UserTable) Check(u User) (*User, error) {
 	if u.isDefault() {
 		return nil, errors.New("User.Check: wrong data! *User is empty")
 	}
@@ -127,11 +127,11 @@ func (ut *UserTable) Check(u *User) (*User, error) {
 		return nil, fmt.Errorf("User.Check: error committing transaction: %v", err)
 	}
 
-	return u, nil
+	return &u, nil
 }
 
 // Delete удаляет данные пользователя из базы данных по указанному идентификатору.
-func (ut *UserTable) Delete(u *User) error {
+func (ut *UserTable) Delete(u User) error {
 	if u.isDefault() {
 		return errors.New("User.Delete: wrong data! *User.Id is empty")
 	}

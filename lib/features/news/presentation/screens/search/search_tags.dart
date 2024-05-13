@@ -45,7 +45,7 @@ void search_tags(BuildContext context) {
     ),
     backgroundColor: Theme.of(context).colorScheme.background,
     surfaceTintColor: Colors.white,
-    content: create_body_tags(context),
+    content: BodyTagsWidget(),
     actions: [
       okButton,
       searchButton,

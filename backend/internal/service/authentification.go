@@ -1,7 +1,7 @@
 package service
 
 import (
-	"iqj/database"
+	database "iqj/internal/database"
 )
 
 type AuthService struct {

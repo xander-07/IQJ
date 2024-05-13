@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"iqj/database"
+	"iqj/internal/database"
 	"net/http"
 	"strconv"
 
@@ -23,7 +23,7 @@ func (h *Handler) HandleNews(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
 	} else if len(idStr) != 0 {
 		h.HandleGetNewsById(c, id)
-	} else if len(offsetStr) == 0 && len(countStr) == 0 && len(idStr) == 0 {
+	} else if (len(offsetStr) + len(countStr) + len(idStr)) == 0 {
 		h.HandleGetAllNews(c)
 	} else {
 		h.HandleGetNews(c, offset, count)
@@ -85,7 +85,7 @@ func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 	var newsDB database.News
 	newsDB.Id = id
 
-	news, err := database.Database.News.GetById(&newsDB)
+	news, err := database.Database.News.GetById(newsDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleGetNewsById:", err)
@@ -122,7 +122,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 	userId := userIdToConv.(int)
 	var userDB database.UserData
 	userDB.Id = int64(userId)
-	user, err := database.Database.UserData.GetRoleById(&userDB)
+	user, err := database.Database.UserData.GetRoleById(userDB)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleAddNews:", err)
@@ -136,7 +136,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			fmt.Println("HandleAddNews:", err)
 			return
 		}
-		ok := database.Database.News.Add(&news)
+		ok := database.Database.News.Add(news)
 		if ok != nil {
 			c.JSON(http.StatusInternalServerError, ok.Error())
 			fmt.Println("HandleAddNews:", ok)
@@ -175,7 +175,7 @@ func (h *Handler) HandleUpdateNews(c *gin.Context) {
 	userId := userIdToConv.(int)
 
 	user, err := database.Database.UserData.GetRoleById(
-		&database.UserData{
+		database.UserData{
 			Id: int64(userId),
 		})
 	if err != nil {
@@ -194,7 +194,7 @@ func (h *Handler) HandleUpdateNews(c *gin.Context) {
 			return
 		}
 
-		ok := database.Database.News.Update(&news)
+		ok := database.Database.News.Update(news)
 		if ok != nil {
 			c.JSON(http.StatusInternalServerError, ok.Error())
 			fmt.Println("HandleUpdateNews:", ok)
