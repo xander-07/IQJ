@@ -68,7 +68,12 @@ class _HighlightChatBubble extends State<HighlightChatBubble> {
                 ),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+              'groupchat',
+              arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': false,'pin': false, 'uid': ""},
+              );
+            },
             child: Container(
               margin: const EdgeInsets.only(
                 top: 12,
