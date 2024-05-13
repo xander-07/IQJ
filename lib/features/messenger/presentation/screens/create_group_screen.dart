@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
+import 'package:iqj/features/messenger/presentation/chat_buble_for_group.dart';
 import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
 import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
 import 'package:iqj/features/news/admin/special_news_add_button.dart';
@@ -221,7 +222,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
           ),
         ),
       ),
-      child: ChatBubble(
+      child: ChatBubbleGr(
                             imageUrl: userMap['picture'].toString(),
                             chatTitle: userMap['email'].toString(),
                             secondary: 'text',
