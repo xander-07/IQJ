@@ -1,6 +1,7 @@
 package main
 
 import (
+	"iqj/config"
 	"iqj/internal/api/handler"
 	"iqj/internal/database"
 	"iqj/internal/service"
@@ -29,7 +30,7 @@ func main() {
 	go excel_parser.Parse()
 
 	// Запускает сервер на порту и "слушает" запросы.
-	if err := handlers.InitRoutes().Run(":8443"); err != nil {
+	if err := handlers.InitRoutes().RunTLS(":8443", config.SertificatePath, config.KeyPath); err != nil {
 		log.Fatal(err)
 	}
 
