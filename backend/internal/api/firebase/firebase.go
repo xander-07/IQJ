@@ -5,26 +5,19 @@ import (
 	"iqj/config"
 
 	firebase "firebase.google.com/go/v4"
-	"firebase.google.com/go/v4/auth"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 )
 
 // Инициализация firebase
-func InitFirebase() (*auth.Client, error) {
+func InitFirebase() *firebase.App {
 	opt := option.WithCredentialsFile(config.OptPath)
 
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		fmt.Println("InitFirebase: error initializing app: %v\n", err)
-		return nil, err
+		return nil
 	}
 
-	client, err := app.Auth(context.Background())
-	if err != nil {
-		fmt.Println("InitFirebase: error getting Auth client: %v\n", err)
-		return nil, err
-	}
-
-	return client, nil
+	return app
 }
