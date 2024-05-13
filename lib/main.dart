@@ -114,7 +114,7 @@ class _AppState extends State<App> {
         'chatslist': (context) => const ChatsList(), // это страница диолга
         'groupchat': (context) => const ChatsGroupList(), // это страница диолга
         'grouppage': (context) => const GroupPage(), // это страница с профилем(переход из чатов)
-        'addtogroup':(context) => const AddToGroupScreen(),
+        'addtogroup':(context) => const AddToGroupScreen(),  // добавление людей в группу
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),

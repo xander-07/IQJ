@@ -48,10 +48,10 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
     }
   }
 
-  bool selected = false;
+  //bool selected = false;
   void setSelected() {
     setState(() {
-      selected = !selected;
+      widget.selected = !widget.selected;
     });
   }
 
@@ -112,7 +112,7 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
                               fontSize: 20,
                             ),
                           ),
-                          selected
+                          widget.selected
                               ? Container(
                                   padding: EdgeInsets.only(left: 6),
                                   alignment: Alignment.centerRight,

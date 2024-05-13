@@ -67,7 +67,13 @@ class _MessengerBloc extends State<MessengerScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            Navigator.of(context).pushNamed('creategroup');
+            //Navigator.of(context).pushNamed('creategroup');
+            Navigator.of(context).pushNamed(
+                'creategroup',
+                arguments: {
+                  'selected' : false,
+                },
+              );
           },
           icon: const Icon(Icons.edit),
           color: Theme.of(context).colorScheme.onPrimary,

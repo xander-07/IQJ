@@ -24,6 +24,18 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   String groupName = '';
   String groupId = '';
   Map<String, dynamic> userMap = {};
+  late bool selected = false;
+
+  @override
+  void didChangeDependencies() {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    assert(args != null, "Check args");
+    Map<String, dynamic> help = args as Map<String, dynamic>;
+    selected = help["selected"] as bool;
+
+    setState(() {});
+    super.didChangeDependencies();
+  }
 
   void updateSelectionState(String uid, bool isSelected) {
     setState(() {
@@ -193,7 +205,28 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
             Padding(
               padding: EdgeInsets.only(bottom: 12),
             ),
-            _buildUserList(),
+            userMap.length==0?   _buildUserList() 
+            : ElevatedButton(
+      onPressed: () => {},
+      style: ButtonStyle(
+        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+        backgroundColor: MaterialStatePropertyAll(
+          Theme.of(context).colorScheme.background,
+        ),
+        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      child: ChatBubble(
+                            imageUrl: userMap['picture'].toString(),
+                            chatTitle: userMap['email'].toString(),
+                            secondary: 'text',
+                            uid: userMap['uid'].toString()),
+      ),
           ],
         ),
       ),
@@ -225,13 +258,13 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     if (_auth.currentUser!.email != data['email']) {
-      final bool selected = userMap[data['uid']] as bool ??
-          false; // Check if uid exists in userMap
+      // final bool selected = userMap[data['uid']] as bool ??
+      //     false; // Check if uid exists in userMap
       return ChatBubbleSelection(
         imageUrl: data['picture'].toString(),
         chatTitle: data['email'].toString(),
         uid: data['uid'].toString(),
-        selected: selected,
+        selected: false,
       );
     }
 
