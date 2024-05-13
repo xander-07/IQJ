@@ -88,18 +88,7 @@ class _ChatBubbleGr extends State<ChatBubbleGr> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(
-                'chatslist',
-                arguments: {
-                  'name': widget.chatTitle,
-                  'url': widget.imageUrl,
-                  'volume': volume,
-                  'pin': push_pin,
-                  'uid': widget.uid
-                },
-              );
-
-              ;
+            
             },
             onLongPress: () => {
               showModalBottomSheet(
