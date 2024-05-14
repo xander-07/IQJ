@@ -63,7 +63,7 @@ class _ChatsListState extends State<ChatsList> {
   bool vol = false;
   bool pin = false;
   bool _emojiPicking = false;
-  File? imageFile = "fdsa" as File;
+  File? imageFile;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -479,10 +479,9 @@ class _ChatsListState extends State<ChatsList> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           selectFileImage();
-                          _chatService.fileUpload(uid, imageFile!);
-                          
+                          await _chatService.fileUpload(uid, imageFile!);      
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
