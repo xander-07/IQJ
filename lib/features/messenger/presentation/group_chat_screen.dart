@@ -87,7 +87,6 @@ class _ChatsListState extends State<ChatsGroupList> {
       setState(() {
         File imageFile = File(result.files.single.path!);
       });
-      
     } else {
       // User canceled the picker
     }
@@ -135,6 +134,8 @@ class _ChatsListState extends State<ChatsGroupList> {
       _emojiPicking = !_emojiPicking;
     });
   }
+
+  String msgPfp = '';
 
   Widget _buildMessageList() {
     return StreamBuilder(
@@ -215,6 +216,30 @@ class _ChatsListState extends State<ChatsGroupList> {
     );
   }
 
+  Widget getPfp(String senderId, DocumentSnapshot document) {
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    return FutureBuilder<String>(
+      future: _chatService.getProfilePicture(senderId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return GroupMessage(
+            message: data['message'].toString(),
+            url: snapshot.data ??
+                '', // Use the retrieved profile picture URL here
+            sender: senderId,
+            senderEmail: data['senderEmail'] as String,
+            compare: _firebaseAuth.currentUser!.uid,
+            time: DateFormat('HH:mm')
+                .format((data['timestamp'] as Timestamp).toDate()),
+          );
+        } else {
+          // Handle loading or error states here
+          return CircularProgressIndicator(); // Or ErrorWidget() as needed
+        }
+      },
+    );
+  }
+
   Widget _buildMessageListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     print(data);
@@ -227,16 +252,7 @@ class _ChatsListState extends State<ChatsGroupList> {
     return Container(
       padding: EdgeInsets.only(left: 12, right: 12),
       alignment: alignment,
-      child: GroupMessage(
-        message: data['message'].toString(),
-        //mainAxisAlignment: mainalignment,
-        url: image_url!,
-        sender: data['senderId'] as String,
-        senderEmail: data['senderEmail'] as String,
-        compare: _firebaseAuth.currentUser!.uid,
-        time: DateFormat('HH:mm')
-            .format((data['timestamp'] as Timestamp).toDate()),
-      ),
+      child: getPfp(data['senderId'] as String, document),
     );
   }
 
@@ -349,7 +365,6 @@ class _ChatsListState extends State<ChatsGroupList> {
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.outline,
                           fontSize: 12,
-                          
                         ),
                       ),
                     ],
@@ -364,7 +379,6 @@ class _ChatsListState extends State<ChatsGroupList> {
             padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
-                
                 IconButton(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -481,22 +495,21 @@ class _ChatsListState extends State<ChatsGroupList> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString(); 
-                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg'); 
-                          //        var uploadTask = storageRef.putFile(_image!); 
-                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL(); 
-  
-                          //        firestore.collection("Driver Details").add({ 
-                          //          "Name": nameController.text, 
-                          //          "Age": ageController.text, 
-                          //          "Driving Licence": dlController.text, 
-                          //          "Address.": adController.text, 
-                          //          "Phone No.": phnController.text, 
-                          //          // Add image reference to document 
-                          //          "Image": downloadUrl.toString()  
-                          //        }); 
-                          sendMessage();
+                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString();
+                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg');
+                          //        var uploadTask = storageRef.putFile(_image!);
+                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL();
 
+                          //        firestore.collection("Driver Details").add({
+                          //          "Name": nameController.text,
+                          //          "Age": ageController.text,
+                          //          "Driving Licence": dlController.text,
+                          //          "Address.": adController.text,
+                          //          "Phone No.": phnController.text,
+                          //          // Add image reference to document
+                          //          "Image": downloadUrl.toString()
+                          //        });
+                          sendMessage();
                         },
                         icon: Icon(Icons.send),
                       ),

@@ -87,15 +87,15 @@ class ChatService extends ChangeNotifier {
     XFile? pickedFIle;
 
     pickedFIle = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedFIle != null){
+    if (pickedFIle != null) {
       File imageFile = File(pickedFIle.path);
-      if (imageFile != null){
+      if (imageFile != null) {
         fileUpload(receiverId, imageFile);
       }
     }
   }
 
-  UploadTask uploadFile(File image,String filename){
+  UploadTask uploadFile(File image, String filename) {
     FirebaseStorage firebaseStorage = FirebaseStorage.instance;
     Reference reference = firebaseStorage.ref().child(filename);
     UploadTask uploadTask = reference.putFile(image);
@@ -112,12 +112,12 @@ class ChatService extends ChangeNotifier {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     UploadTask uploadTask = uploadFile(imageFile, fileName);
 
-    try{
+    try {
       TaskSnapshot snapshot = await uploadTask;
       String imageUrl = await snapshot.ref.getDownloadURL();
 
       sendMessage(receiverId, imageUrl);
-    } on FirebaseException catch(e){
+    } on FirebaseException catch (e) {
       sendMessage(receiverId, e.toString());
       print("ошибочка в отпрвочке картиночик :( ");
     }
@@ -137,19 +137,34 @@ class ChatService extends ChangeNotifier {
         .snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getLastMessage(String userId, String otherId){
+  Future<String> getProfilePicture(String userId) async {
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('users').doc(userId).get();
+
+    if (snapshot.exists) {
+      Map<String, dynamic>? data = snapshot.data();
+      String profilePictureUrl = data!['picture'] as String;
+
+      return profilePictureUrl;
+    } else {
+      return '';
+    }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getLastMessage(
+      String userId, String otherId) {
     final List<String> ids = [userId, otherId];
     ids.sort();
     print(ids);
     final String chatroomId = ids.join("_");
-  return _firestore
-    .collection('direct_messages')
-    .doc(chatroomId)
-    .collection('messages')
-    .orderBy('timestamp', descending: true)
-    .limit(1)
-    .get();
-}
+    return _firestore
+        .collection('direct_messages')
+        .doc(chatroomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+  }
 
   ////////////// ГРУППОВЫЕ СООБЩЕНИЯ ///////////////
   // Generate random group chat ID
@@ -162,7 +177,8 @@ class ChatService extends ChangeNotifier {
   }
 
 // Create group chat with a random ID
-  Future<String> createGroupChat(List<String> memberIds, String groupName) async {
+  Future<String> createGroupChat(
+      List<String> memberIds, String groupName) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String groupChatId = generateRandomGroupId();
 
@@ -172,19 +188,18 @@ class ChatService extends ChangeNotifier {
         currentUserId: {
           'joinDate': DateTime.now(),
           'email': _auth.currentUser!.email,
-          'role':'admin',
+          'role': 'admin',
         },
         for (final memberId in memberIds)
           memberId: {
             'joinDate': DateTime.now(),
             'email': 'test@temporary.xd',
-            'role':'member',
+            'role': 'member',
           },
       },
-      'messages': [],
-      'id':groupChatId,
-      'name':groupName,
-      'picture':'none',
+      'id': groupChatId,
+      'name': groupName,
+      'picture': 'none',
     };
 
     await _firestore.collection('groups').doc(groupChatId).set(chatData);
@@ -220,11 +235,9 @@ class ChatService extends ChangeNotifier {
         .update({'users.$userId': newData});
   }
 
-    Future<void> setGroupName(String groupId, String name) async { // Надо тестить
-    await _firestore
-        .collection('groups')
-        .doc(groupId)
-        .update({'name': name});
+  Future<void> setGroupName(String groupId, String name) async {
+    // Надо тестить
+    await _firestore.collection('groups').doc(groupId).update({'name': name});
   }
 
   Future<void> sendMessageToGroup(String groupChatId, String message) async {
@@ -249,7 +262,7 @@ class ChatService extends ChangeNotifier {
         .add(newMessage.toMap());
   }
 
-    Stream<QuerySnapshot> getGroupMessages(String id) {
+  Stream<QuerySnapshot> getGroupMessages(String id) {
     return _firestore
         .collection('groups')
         .doc(id)
