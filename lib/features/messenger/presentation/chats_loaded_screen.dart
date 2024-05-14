@@ -480,8 +480,8 @@ class _ChatsListState extends State<ChatsList> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          selectFileImage();
-                          await _chatService.fileUpload(uid, imageFile!);      
+                          //selectFileImage();
+                          await _chatService.getImage(uid);      
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),

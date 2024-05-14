@@ -81,7 +81,7 @@ class ChatService extends ChangeNotifier {
 
   Future getImage(
     String receiverId,
-    File imageFile,
+    // File imageFile,
   ) async {
     ImagePicker imagePicker = ImagePicker();
     XFile? pickedFIle;
