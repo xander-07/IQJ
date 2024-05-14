@@ -96,10 +96,9 @@ class _ChatBubble extends State<GroupBubble> {
                   'url': widget.imageUrl,
                   'volume': volume,
                   'pin': push_pin,
-                  'uid': widget.id
+                  'uid': widget.id,
                 },
               );
-              ;
             },
             onLongPress: () => {
               showModalBottomSheet(
@@ -162,10 +161,8 @@ class _ChatBubble extends State<GroupBubble> {
                               fontSize: 20,
                             ),
                           ),
-                          volume ? Icon(Icons.volume_off) : Container(),
-                          push_pin
-                              ? Icon(Icons.push_pin_outlined)
-                              : Container(),
+                          if (volume) const Icon(Icons.volume_off) else Container(),
+                          if (push_pin) const Icon(Icons.push_pin_outlined) else Container(),
                         ],
                       ),
                       Text(secondary),

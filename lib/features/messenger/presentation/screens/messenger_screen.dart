@@ -32,6 +32,7 @@ class _MessengerBloc extends State<MessengerScreen> {
   TextEditingController SearchPickerController = TextEditingController();
 
   Map<String, dynamic> userMap = {};
+  Map<String, dynamic> groupMap = {};
 
   void onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,6 +54,24 @@ class _MessengerBloc extends State<MessengerScreen> {
         print(userMap['email']);
       });
     });
+
+    await _firestore
+        .collection('groups')
+        .where("name", isEqualTo: SearchPickerController.text)
+        .get()
+        .then((value) {
+      setState(() {
+        try {
+          groupMap = value.docs[0].data();
+        } catch (e) {
+          groupMap = {};
+        }
+
+        _isntSearch_chat = false;
+        print(groupMap);
+        print(groupMap['name']);
+      });
+    });
   }
 
   @override
@@ -69,11 +88,11 @@ class _MessengerBloc extends State<MessengerScreen> {
           onPressed: () {
             //Navigator.of(context).pushNamed('creategroup');
             Navigator.of(context).pushNamed(
-                'creategroup',
-                arguments: {
-                  'selected' : false,
-                },
-              );
+              'creategroup',
+              arguments: {
+                'selected': false,
+              },
+            );
           },
           icon: const Icon(Icons.edit),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -267,17 +286,26 @@ class _MessengerBloc extends State<MessengerScreen> {
                   chatTitle: 'GroupName',
                   secondary: 'secondaryText',
                 ),
-                _isntSearch_chat
-                    ? _chatsBuilder()
-                    : ((userMap.length != 0)
-                        ? ChatBubble(
-                            imageUrl: userMap['picture'].toString(),
-                            chatTitle: userMap['email'].toString(),
-                            secondary: 'text',
-                            uid: userMap['uid'].toString())
-                        : Align(
-                            alignment: Alignment.center,
-                            child: Text("чат не найден"))),
+                if (_isntSearch_chat)
+                  _chatsBuilder()
+                else if (userMap.isNotEmpty)
+                  ChatBubble(
+                    imageUrl: userMap['picture'].toString(),
+                    chatTitle: userMap['email'].toString(),
+                    secondary: 'text',
+                    uid: userMap['uid'].toString(),
+                  )
+                else if (groupMap.isNotEmpty)
+                  GroupBubble(
+                    imageUrl: groupMap['picture'].toString(),
+                    chatTitle: groupMap['name'].toString(),
+                    secondary: '',
+                    id: groupMap['id'].toString(),
+                  )
+                else
+                  Align(
+                    child: Text("чат не найден"),
+                  )
                 // ignore: unnecessary_null_comparison
                 // Чат обычный
                 // ChatBubble(
