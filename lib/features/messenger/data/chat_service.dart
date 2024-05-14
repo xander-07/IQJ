@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:iqj/features/messenger/domain/message.dart';
 
 class ChatService extends ChangeNotifier {
@@ -77,6 +78,23 @@ class ChatService extends ChangeNotifier {
   //       .collection('messages')
   //       .add(newFile.toMap());
   // }
+
+  Future getImage(
+    String receiverId,
+    File imageFile,
+  ) async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedFIle;
+
+    pickedFIle = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFIle != null){
+      File imageFile = File(pickedFIle.path);
+      if (imageFile != null){
+        fileUpload(receiverId, imageFile);
+      }
+    }
+  }
+
   UploadTask uploadFile(File image,String filename){
     FirebaseStorage firebaseStorage = FirebaseStorage.instance;
     Reference reference = firebaseStorage.ref().child(filename);
@@ -101,7 +119,7 @@ class ChatService extends ChangeNotifier {
       sendMessage(receiverId, imageUrl);
     } on FirebaseException catch(e){
       sendMessage(receiverId, e.toString());
-      print(e);
+      print("ошибочка в отпрвочке картиночик :( ");
     }
   }
 

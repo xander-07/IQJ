@@ -63,7 +63,7 @@ class _ChatsListState extends State<ChatsList> {
   bool vol = false;
   bool pin = false;
   bool _emojiPicking = false;
-  File? imageFile;
+  File? imageFile = "fdsa" as File;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -124,9 +124,9 @@ class _ChatsListState extends State<ChatsList> {
       );
       _msgController.clear();
     }
-    if (imageFile != null && imageFile!.existsSync()) {
-      await _chatService.sendMessFile(uid, imageFile!);
-    }
+    // if (imageFile != null && imageFile!.existsSync()) {
+    //   await _chatService.getImage(uid, imageFile!);
+    // }
   }
 
   void emojiPickerSet() {
@@ -481,6 +481,8 @@ class _ChatsListState extends State<ChatsList> {
                       IconButton(
                         onPressed: () {
                           selectFileImage();
+                          _chatService.fileUpload(uid, imageFile!);
+                          
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
