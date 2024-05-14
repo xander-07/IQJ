@@ -92,6 +92,7 @@ func scraper2(newsblarr []NewsBlock) {
 		news.Link = newsblarr[i].Link
 		news.Content = text
 		news.ImageLinks = mas
+		news.Author = "РТУ МИРЭА"
 		mas = nil
 		tagsArr := strings.Split(tags, ", ")
 		news.Tags = tagsArr

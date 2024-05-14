@@ -30,6 +30,12 @@ func (h *Handler) HandleNews(c *gin.Context) {
 	}
 }
 
+// "/news_search?header="dsfasdfsda""
+
+// func (h *Handler) HandleSearchNews(c *gin.Context){
+// 	offsetStr := c.Query("header")
+// }
+
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
@@ -111,7 +117,7 @@ func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 //	}
 //
 // создает в бд переданную новость.
-// POST /api/news
+// POST /auth/news
 func (h *Handler) HandleAddNews(c *gin.Context) {
 	userIdToConv, exists := c.Get("userId")
 	if !exists {
@@ -136,6 +142,16 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			fmt.Println("HandleAddNews:", err)
 			return
 		}
+		var user2 database.User
+		var user3 *database.User
+		user2.Id = int64(userId)
+		user3, err = database.Database.User.GetById(user2)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			fmt.Println("HandleAddNews:", err)
+			return
+		}
+		news.Author = user3.Email
 		ok := database.Database.News.Add(news)
 		if ok != nil {
 			c.JSON(http.StatusInternalServerError, ok.Error())

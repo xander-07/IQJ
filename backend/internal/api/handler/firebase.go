@@ -22,6 +22,7 @@ type UserInfo struct {
 	CreationTime   string `json:"creation_time"`
 	Position       string `json:"position"`
 	Institute      string `json:"institute"`
+	Role           string `json:"role"`
 }
 
 // Вывод всех пользователей из firebase
@@ -58,6 +59,7 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 		userInfo.Email = userFirestore.Data()["email"].(string)
 		userInfo.Institute = userFirestore.Data()["institute"].(string)
 		userInfo.PhoneNumber = userFirestore.Data()["phone"].(string)
+		userInfo.Role = userFirestore.Data()["role"].(string)
 
 		userList = append(userList, userInfo)
 	}
