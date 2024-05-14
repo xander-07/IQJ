@@ -151,20 +151,26 @@ class ChatService extends ChangeNotifier {
     }
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getLastMessage(
-      String userId, String otherId) {
-    final List<String> ids = [userId, otherId];
-    ids.sort();
-    print(ids);
-    final String chatroomId = ids.join("_");
-    return _firestore
-        .collection('direct_messages')
-        .doc(chatroomId)
-        .collection('messages')
-        .orderBy('timestamp', descending: true)
-        .limit(1)
-        .get();
-  }
+  Future<String> getLastMessage(String userId, String otherId) async {
+  final List<String> ids = [userId, otherId];
+  ids.sort();
+  print(ids);
+  final String chatroomId = ids.join("_");
+  
+  final querySnapshot = await _firestore
+    .collection('direct_messages')
+    .doc(chatroomId)
+    .collection('messages')
+    .orderBy('timestamp', descending: true)
+    .limit(1)
+    .get();
+  
+  final lastMessage = querySnapshot.docs.isNotEmpty
+    ? querySnapshot.docs.first.data()['message'].toString()
+    : 'No messages found';
+  
+  return lastMessage;
+}
 
   ////////////// ГРУППОВЫЕ СООБЩЕНИЯ ///////////////
   // Generate random group chat ID

@@ -381,22 +381,37 @@ class _MessengerBloc extends State<MessengerScreen> {
   }
 
   Widget _buildChatListItem(DocumentSnapshot document) {
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    //print(document.id);
-    // Direct message
-    if (_auth.currentUser!.email != data['email']) {
-      return ChatBubble(
-        imageUrl: data['picture'].toString(),
-        chatTitle: data['email'].toString(),
-        secondary: '...',
-        uid: data['uid'].toString(),
-      );
-    }
+  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+  final ChatService _chatService = ChatService();
+  String last_message='';
+
+  // _chatService.getLastMessage(_auth.currentUser!.uid, data['uid'].toString()).then((String lastMessage) {
+  //   // Здесь устанавливаем значение last_message после завершения асинхронной операции
+  //   setState(() {
+  //     last_message = lastMessage;
+  //   });
+  // }).catchError((error) {
+  //   // Обработка возможных ошибок
+  //   setState(() {
+  //     last_message = ''; // Устанавливаем значение по умолчанию или обработку ошибки
+  //   });
+  // });
+
+  // Остальной код метода
+  if (_auth.currentUser!.email != data['email']) {
     return ChatBubble(
       imageUrl: data['picture'].toString(),
-      chatTitle: 'Заметки', // Replace with appropriate text for direct messages
-      secondary: '...',
+      chatTitle: data['email'].toString(),
+      secondary: last_message ?? '', // Используйте значение по умолчанию или обработку неопределенного значения
       uid: data['uid'].toString(),
     );
   }
+  return ChatBubble(
+    imageUrl: data['picture'].toString(),
+    chatTitle: 'Заметки',
+    secondary: last_message ?? '',
+    uid: data['uid'].toString(),
+  );
+}
+
 }
