@@ -77,11 +77,32 @@ class ChatService extends ChangeNotifier {
   //       .collection('messages')
   //       .add(newFile.toMap());
   // }
-  UploadTask uploadTask(File image,String filename){
+  UploadTask uploadFile(File image,String filename){
     FirebaseStorage firebaseStorage = FirebaseStorage.instance;
     Reference reference = firebaseStorage.ref().child(filename);
     UploadTask uploadTask = reference.putFile(image);
     return uploadTask;
+  }
+
+  Future fileUpload(
+    //int typemesage,
+    String receiverId,
+    File imageFile,
+    //String chatId,
+    //String preeId,
+  ) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    UploadTask uploadTask = uploadFile(imageFile, fileName);
+
+    try{
+      TaskSnapshot snapshot = await uploadTask;
+      String imageUrl = await snapshot.ref.getDownloadURL();
+
+      sendMessage(receiverId, imageUrl);
+    } on FirebaseException catch(e){
+      sendMessage(receiverId, e.toString());
+      print(e);
+    }
   }
 
   // Get messages
