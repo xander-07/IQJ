@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
@@ -50,8 +51,7 @@ class ReceiverMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double maxWidth =
-            MediaQuery.of(context).size.width * 0.7; 
+        double maxWidth = MediaQuery.of(context).size.width * 0.7;
         double minWidth = 100.0;
         double calculatedWidth =
             constraints.maxWidth > maxWidth ? maxWidth : constraints.maxWidth;
@@ -84,9 +84,15 @@ class ReceiverMessage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          message,
+                        Linkify(
+                          text: message,
                           style: Theme.of(context).textTheme.bodyText1,
+                          linkStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 16,
+                            decorationColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                         SizedBox(height: 4),
                         Align(

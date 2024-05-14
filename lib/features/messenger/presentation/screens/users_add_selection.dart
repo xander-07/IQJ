@@ -24,17 +24,28 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
   String groupName = '';
   String groupId = '';
   Map<String, dynamic> userMap = {};
-  List<String> selectedUserIds = [];
+  Map<String, bool> selectedMap = {};
+
+  @override
+  void didChangeDependencies() {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    assert(args != null, "Check args");
+    Map<String, dynamic> help = args as Map<String, dynamic>;
+    groupId =
+        help["groupid"] as String; // Присваивание значения переменной user_name
+    setState(() {});
+    super.didChangeDependencies();
+  }
 
   void updateSelectionState(String uid, bool isSelected) {
     setState(() {
-      if (isSelected) {
-        selectedUserIds.add(uid);
-      } else {
-        selectedUserIds.remove(uid);
-      }
+      userMap[uid] = isSelected;
     });
-    print(selectedUserIds);
+  }
+
+  Future<void> addToGroup() async {
+    List<String> memberIds = selectedMap.keys.toList();
+    return await _chatService.addUsersToGroupChat(memberIds, groupId);
   }
 
   void onSearch() async {
@@ -51,9 +62,6 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
         } catch (e) {
           userMap = {};
         }
-
-        print(userMap);
-        print(userMap['email']);
       });
     });
   }
@@ -70,7 +78,8 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            //createAndNavigateGroup();
+            addToGroup();
+            Navigator.of(context).pop();
           },
           icon: const Icon(Icons.arrow_forward_rounded),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -81,7 +90,7 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
       // Заголовок экрана
       appBar: AppBar(
         title: Text(
-          'Создать группу',
+          'Добавить в группу',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         backgroundColor: Theme.of(context).colorScheme.background,
@@ -140,58 +149,69 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
             Padding(
               padding: EdgeInsets.only(bottom: 12),
             ),
-            userList(),
+            _buildUserList(),
           ],
         ),
       ),
     );
   }
 
-  Widget userList() {
+  Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return const Text('err');
         }
-
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        return _buildUserList(snapshot.data!);
-      },
-    );
-  }
-
-  Widget _buildUserList(QuerySnapshot snapshot) {
-    return ListView.builder(
-      itemCount: snapshot.docs.length,
-      itemBuilder: (context, index) {
-        final DocumentSnapshot document = snapshot.docs[index];
-        final Map<String, dynamic> data =
-            document.data() as Map<String, dynamic>;
-
-        if (_auth.currentUser!.email != data['email']) {
-          return MaterialButton(
-            onPressed: () {
-              bool isSelected = selectedUserIds.contains(data['uid']);
-              updateSelectionState(data['uid'].toString(), !isSelected);
-            },
-            child: ChatBubbleSelection(
-              imageUrl: data['picture'].toString(),
-              chatTitle: data['email'].toString(),
-              uid: data['uid'].toString(),
-              selected: selectedUserIds.contains(data['uid']),
-            ),
+          return const Center(
+            child: CircularProgressIndicator(),
           );
         }
-        return Container(); // Exclude current user from the list
+        return Column(
+          children: snapshot.data!.docs
+              .map<Widget>((doc) => _buildUserListItem(doc))
+              .toList(),
+        );
       },
     );
   }
 
-  void addUserToGroupChat(String groupChatId, List<String> userIds) {
-    // Add logic to add selected users to the group chat in Firestore
-  }
+  Widget _buildUserListItem(DocumentSnapshot document) {
+  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+  return FutureBuilder<bool>(
+    future: _chatService.isUserInGroup(data['uid'] as String, groupId),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return SizedBox();
+      } else if (snapshot.hasError) {
+        return SizedBox();
+      } else {
+        bool isMember = snapshot.data ?? false;
+        if (_auth.currentUser!.email != data['email'] && !isMember) {
+          return ChatBubbleSelection(
+            imageUrl: data['picture'].toString(),
+            chatTitle: data['email'].toString(),
+            uid: data['uid'].toString(),
+            selected: selectedMap.containsKey(data['uid'])
+                ? selectedMap[data['uid']]!
+                : false,
+            onSelectionChanged: (uid, selected) {
+              setState(() {
+                if (selected) {
+                  selectedMap[uid] = true;
+                } else {
+                  selectedMap.remove(uid);
+                }
+              });
+            },
+          );
+        } else {
+          return Container(); 
+        }
+      }
+    },
+  );
+}
+
 }

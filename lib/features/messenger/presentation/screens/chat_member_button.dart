@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ChatBubbleSelection extends StatefulWidget {
+class ChatMember extends StatefulWidget {
   final String imageUrl;
   final String chatTitle;
   final String uid;
-  bool selected;
-  final Function(String, bool) onSelectionChanged;
-  ChatBubbleSelection({
+  final String role;
+  ChatMember({
     required this.imageUrl,
     required this.chatTitle,
     required this.uid,
-    required this.selected,
-    required this.onSelectionChanged,
+    required this.role,
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _ChatBubbleSelection();
+  State<StatefulWidget> createState() => _ChatMember();
 }
 
-class _ChatBubbleSelection extends State<ChatBubbleSelection> {
+class _ChatMember extends State<ChatMember> {
   Widget _buildThumbnailImage() {
     try {
       return SizedBox(
@@ -50,19 +48,6 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
     }
   }
 
-  //bool selected = false;
-  void setSelected() {
-    setState(() {
-      widget.selected = !widget.selected;
-    });
-  }
-
-  void toggleSelection() {
-    setState(() {
-      widget.onSelectionChanged(widget.uid, !widget.selected);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,10 +69,8 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
                 ),
               ),
             ),
-            onPressed: () {
-              //setSelected();
-              toggleSelection();
-            },
+            onLongPress: () {},
+            onPressed: () {},
             child: Container(
               margin: const EdgeInsets.only(
                 top: 12,
@@ -121,17 +104,32 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
                               fontSize: 20,
                             ),
                           ),
-                          widget.selected
-                              ? Container(
-                                  padding: EdgeInsets.only(left: 6),
-                                  alignment: Alignment.centerRight,
-                                  child: Icon(Icons.check_circle_rounded))
-                              : Container(),
                         ],
+                      ),
+                      Text(
+                        'был недавно',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        widget.role == 'admin' ? 'Администратор' : 'Участник',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.primary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

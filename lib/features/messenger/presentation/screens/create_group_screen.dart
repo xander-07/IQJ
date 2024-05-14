@@ -25,6 +25,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   String groupName = '';
   String groupId = '';
   Map<String, dynamic> userMap = {};
+  Map<String, bool> selectedMap = {};
   // Это ломает программу)))
   // late bool selected = false;
 
@@ -43,11 +44,29 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
     setState(() {
       userMap[uid] = isSelected;
     });
-    print(userMap);
   }
 
   Future<void> createAndNavigateGroup() async {
     String groupChatId = await createGroup();
+
+    // // Iterate over the selectedMap and add each user to the group chat
+    // await Future.forEach(selectedMap.keys, (String uid) async {
+    //   // Get the user information from Firestore
+    //   DocumentSnapshot userDoc =
+    //       await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    //   final Map<String, dynamic> data = userDoc.data()! as Map<String, dynamic>;
+
+    //   if (userDoc.exists) {
+    //     String userEmail = data['email'].toString();
+    //     DateTime joinDate = DateTime.now();
+    //     String userRole = 'member'; // Default role
+
+    //     // Add the user to the group chat
+    //     await _chatService.addUserToGroupChat(
+    //         groupChatId, uid, userEmail, userRole, joinDate);
+    //   }
+    // });
+
     Navigator.of(context).popAndPushNamed(
       'groupchat',
       arguments: {
@@ -61,10 +80,8 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   }
 
   Future<String> createGroup() async {
-    List<String> users =
-        userMap.values.map((value) => value.toString()).toList();
-
-    return await _chatService.createGroupChat(users, groupName);
+    List<String> memberIds = selectedMap.keys.toList();
+    return await _chatService.createGroupChat(memberIds, groupName);
   }
 
   void onSearch() async {
@@ -239,6 +256,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   }
 
   Widget _buildUserList() {
+    print(selectedMap);
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
@@ -263,13 +281,22 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     if (_auth.currentUser!.email != data['email']) {
-      // final bool selected = userMap[data['uid']] as bool ??
-      //     false; // Check if uid exists in userMap
       return ChatBubbleSelection(
         imageUrl: data['picture'].toString(),
         chatTitle: data['email'].toString(),
         uid: data['uid'].toString(),
-        selected: false,
+        selected: selectedMap.containsKey(data['uid'])
+            ? selectedMap[data['uid']]!
+            : false,
+        onSelectionChanged: (uid, selected) {
+          setState(() {
+            if (selected) {
+              selectedMap[uid] = true;
+            } else {
+              selectedMap.remove(uid);
+            }
+          });
+        },
       );
     }
 

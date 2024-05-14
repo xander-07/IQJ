@@ -36,7 +36,8 @@ class _ChatBubble extends State<GroupBubble> {
             ) {
               return CircleAvatar(
                 radius: 6,
-                backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                backgroundColor:
+                    Theme.of(context).colorScheme.tertiaryContainer,
                 child: const Text('G'),
               );
             },
@@ -147,32 +148,42 @@ class _ChatBubble extends State<GroupBubble> {
                 children: [
                   _buildThumbnailImage(),
                   const Padding(padding: EdgeInsets.only(right: 12)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            widget.chatTitle,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 20,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              widget.chatTitle,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 20,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          if (volume) const Icon(Icons.volume_off) else Container(),
-                          if (push_pin) const Icon(Icons.push_pin_outlined) else Container(),
-                        ],
-                      ),
-                      Text(
-                        secondary,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.outline,
+                            if (volume)
+                              const Icon(Icons.volume_off)
+                            else
+                              Container(),
+                            if (push_pin)
+                              const Icon(Icons.push_pin_outlined)
+                            else
+                              Container(),
+                          ],
                         ),
-                      ),
-                    ],
+                        Text(
+                          secondary,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),
                 ],

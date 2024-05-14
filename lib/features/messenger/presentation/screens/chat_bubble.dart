@@ -148,34 +148,38 @@ class _ChatBubble extends State<ChatBubble> {
                 children: [
                   _buildThumbnailImage(),
                   const Padding(padding: EdgeInsets.only(right: 12)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            widget.chatTitle,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              fontSize: 20,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              widget.chatTitle,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 20,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          volume ? Icon(Icons.volume_off) : Container(),
-                          push_pin
-                              ? Icon(Icons.push_pin_outlined)
-                              : Container(),
-                        ],
-                      ),
-                      Text(
-                        widget.secondary,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.outline,
+                            volume ? Icon(Icons.volume_off) : Container(),
+                            push_pin
+                                ? Icon(Icons.push_pin_outlined)
+                                : Container(),
+                          ],
                         ),
-                      ),
-                    ],
+                        Text(
+                          widget.secondary,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),
                 ],

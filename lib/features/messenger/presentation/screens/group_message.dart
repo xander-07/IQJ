@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
@@ -94,9 +95,15 @@ class GroupMessage extends StatelessWidget {
                                 ),
                               )
                             : Container(),
-                        Text(
-                          message,
+                        Linkify(
+                          text: message,
                           style: Theme.of(context).textTheme.bodyText1,
+                          linkStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 16,
+                            decorationColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                         SizedBox(height: 4),
                         Align(

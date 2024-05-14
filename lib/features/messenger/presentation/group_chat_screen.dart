@@ -108,6 +108,7 @@ class _ChatsListState extends State<ChatsGroupList> {
 
     setState(() {});
     super.didChangeDependencies();
+    _updateMemberCount(uid);
   }
 
   final TextEditingController _msgController = TextEditingController();
@@ -127,6 +128,15 @@ class _ChatsListState extends State<ChatsGroupList> {
     if (imageFile != null && imageFile!.existsSync()) {
       //await _chatService.sendMessFile(uid, imageFile!);
     }
+  }
+
+  int memberCount = 0;
+
+  Future<void> _updateMemberCount(String groupId) async {
+    int count = await _chatService.getNumberOfUsersInGroup(groupId);
+    setState(() {
+      memberCount = count;
+    });
   }
 
   void emojiPickerSet() {
@@ -316,8 +326,8 @@ class _ChatsListState extends State<ChatsGroupList> {
               padding: const MaterialStatePropertyAll(EdgeInsets.zero),
               surfaceTintColor:
                   const MaterialStatePropertyAll(Colors.transparent),
-              backgroundColor: MaterialStatePropertyAll(
-                Theme.of(context).colorScheme.background,
+              backgroundColor: const MaterialStatePropertyAll(
+                Colors.transparent,
               ),
               shadowColor: const MaterialStatePropertyAll(Colors.transparent),
               shape: MaterialStatePropertyAll(
@@ -361,7 +371,7 @@ class _ChatsListState extends State<ChatsGroupList> {
                         ],
                       ),
                       Text(
-                        "4 участников",
+                        "$memberCount участников",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.outline,
                           fontSize: 12,
