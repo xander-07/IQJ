@@ -126,7 +126,7 @@ class _ChatsListState extends State<ChatsGroupList> {
       _msgController.clear();
     }
     if (imageFile != null && imageFile!.existsSync()) {
-      await _chatService.sendMessFile(uid, imageFile!);
+      //await _chatService.sendMessFile(uid, imageFile!);
     }
   }
 
