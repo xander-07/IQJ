@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:iqj/features/messenger/domain/message.dart';
 
@@ -41,40 +42,46 @@ class ChatService extends ChangeNotifier {
         .add(newMessage.toMap());
   }
 
-  Future<void> sendMessFile(String receiverId, File message) async {
-    // get info
-    final String currentUserId = _auth.currentUser!.uid;
-    final String currentUserEmail = _auth.currentUser!.email.toString();
-    final Timestamp timestamp = Timestamp.now();
+  // Future<void> sendMessFile(String receiverId, File message) async {
+  //   // get info
+  //   final String currentUserId = _auth.currentUser!.uid;
+  //   final String currentUserEmail = _auth.currentUser!.email.toString();
+  //   final Timestamp timestamp = Timestamp.now();
 
-    // create msg
-    // final Message newMessage = Message(
-    //   senderId: currentUserId,
-    //   senderEmail: currentUserEmail,
-    //   receiverId: receiverId,
-    //   timestamp: timestamp,
-    //   message: message,
-    // );
-    final FileMes newFile = FileMes(
-      senderId: currentUserId,
-      senderEmail: currentUserId,
-      receiverId: receiverId,
-      message: message, // ???
-      timestamp: timestamp,
-    );
+  //   // create msg
+  //   // final Message newMessage = Message(
+  //   //   senderId: currentUserId,
+  //   //   senderEmail: currentUserEmail,
+  //   //   receiverId: receiverId,
+  //   //   timestamp: timestamp,
+  //   //   message: message,
+  //   // );
+  //   final FileMes newFile = FileMes(
+  //     senderId: currentUserId,
+  //     senderEmail: currentUserId,
+  //     receiverId: receiverId,
+  //     message: message, // ???
+  //     timestamp: timestamp,
+  //   );
 
-    // make chatroom
-    final List<String> ids = [currentUserId, receiverId];
-    ids.sort();
-    print(ids);
-    final String chatRoomId = ids.join("_");
+  //   // make chatroom
+  //   final List<String> ids = [currentUserId, receiverId];
+  //   ids.sort();
+  //   print(ids);
+  //   final String chatRoomId = ids.join("_");
 
-    // add to db
-    await _firestore
-        .collection('direct_messages')
-        .doc(chatRoomId)
-        .collection('messages')
-        .add(newFile.toMap());
+  //   // add to db
+  //   await _firestore
+  //       .collection('direct_messages')
+  //       .doc(chatRoomId)
+  //       .collection('messages')
+  //       .add(newFile.toMap());
+  // }
+  UploadTask uploadTask(File image,String filename){
+    FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+    Reference reference = firebaseStorage.ref().child(filename);
+    UploadTask uploadTask = reference.putFile(image);
+    return uploadTask;
   }
 
   // Get messages
