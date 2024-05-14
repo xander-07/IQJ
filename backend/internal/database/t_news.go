@@ -134,7 +134,7 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	// Подготовим запрос на получение последних новостных блоков
 	selectQuery := `
-		SELECT news_id, header, link, image_links, tags, news_author_id, publication_time
+		SELECT news_id, header, link, image_links, tags, news_author_name, publication_time
 		FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2
 	`
 
@@ -165,7 +165,7 @@ func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 func (nt *NewsTable) GetLatestBlocksForStudents(count, offset int) (*[]News, error) {
 	// Подготовим запрос на получение последних новостных блоков для студентов
 	selectQuery := `
-		SELECT news_id, header, link, image_links, news_author_id, publication_time
+		SELECT news_id, header, link, image_links, news_author_name, publication_time
 		FROM news WHERE is_for_students = true
 		ORDER BY publication_time DESC LIMIT $1 OFFSET $2
 	`
@@ -231,7 +231,7 @@ func (nt *NewsTable) Update(n News) error {
 			image_links = $3,
 			tags = $4,
 			is_for_students = $5,
-			news_author_id = $6
+			news_author_name = $6
 			publication_time = $7
 		WHERE news_id = $8
 	`
