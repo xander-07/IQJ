@@ -127,11 +127,22 @@ class _ChatsListState extends State<ChatsList> {
     // if (imageFile != null && imageFile!.existsSync()) {
     //   await _chatService.getImage(uid, imageFile!);
     // }
+    if (imageFile != null && imageFile!.existsSync()) {
+       await _chatService.fileUpload(uid,imageFile!); 
+    }
   }
 
   void emojiPickerSet() {
     setState(() {
       _emojiPicking = !_emojiPicking;
+    });
+  }
+
+  bool file_check = false;
+
+  void checkFIle(){
+    setState(() {
+      file_check = !file_check;
     });
   }
 
@@ -438,7 +449,7 @@ class _ChatsListState extends State<ChatsList> {
               padding: EdgeInsets.all(6),
               child: Column(
                 children: [
-                  (imageFile != null && imageFile!.existsSync())
+                  (imageFile != null && imageFile!.existsSync() && file_check)
                       ? Container(
                           //height: 100,
                           width: MediaQuery.of(context).size.width,
@@ -480,8 +491,9 @@ class _ChatsListState extends State<ChatsList> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          //selectFileImage();
-                          await _chatService.getImage(uid);      
+                          selectFileImage();
+                          checkFIle();
+                          //await _chatService.fileUpload(uid,imageFile!);      
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
@@ -502,7 +514,7 @@ class _ChatsListState extends State<ChatsList> {
                           //          "Image": downloadUrl.toString()  
                           //        }); 
                           sendMessage();
-
+                          checkFIle();
                         },
                         icon: Icon(Icons.send),
                       ),
