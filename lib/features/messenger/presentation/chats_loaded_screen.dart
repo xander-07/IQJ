@@ -245,7 +245,7 @@ class _ChatsListState extends State<ChatsList> {
         receiver: data['senderId'] as String,
         compare: _firebaseAuth.currentUser!.uid,
         time: DateFormat('HH:mm')
-            .format((data['timestamp'] as Timestamp).toDate()),
+            .format((data['timestamp'] as Timestamp).toDate()), 
       ),
     );
   }

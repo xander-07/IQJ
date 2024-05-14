@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 // class Message extends StatelessWidget {
@@ -36,6 +38,7 @@ class ReceiverMessage extends StatelessWidget {
   final String receiver;
   final String compare;
   final String time;
+  //final bool image_flag;
 
   const ReceiverMessage({
     Key? key,
@@ -43,11 +46,20 @@ class ReceiverMessage extends StatelessWidget {
     required this.message,
     required this.receiver,
     required this.compare,
-    required this.time,
+    required this.time, //required this.image_flag,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
+    bool isStringLink(String input) {
+      Uri? uri = Uri.tryParse(input);
+      if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         double maxWidth =
@@ -84,10 +96,12 @@ class ReceiverMessage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        (!isStringLink(message))?
                         Text(
                           message,
                           style: Theme.of(context).textTheme.bodyText1,
-                        ),
+                        ) : _buildImage(message),
+                        //_buildThumbnailImage(message),
                         SizedBox(height: 4),
                         Align(
                           alignment: Alignment.bottomRight,
@@ -127,6 +141,40 @@ Widget _buildThumbnailImage(String image_url) {
         height: 33,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32),
+          child: Image.network(
+            image_url,
+            fit: BoxFit.fill,
+            height: 200,
+            errorBuilder: (
+              BuildContext context,
+              Object exception,
+              StackTrace? stackTrace,
+            ) {
+              return CircleAvatar(
+                radius: 6,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: const Text('A'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  } catch (e) {
+    return Container();
+  }
+}
+
+
+Widget _buildImage(String image_url) {
+  try {
+    return Container(
+      padding: EdgeInsets.only(right: 7),
+      child: SizedBox(
+        width: 250,
+        height: 250,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(2), // Половина ширины или высоты
           child: Image.network(
             image_url,
             fit: BoxFit.fill,
