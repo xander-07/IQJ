@@ -168,15 +168,13 @@ class _ChatBubble extends State<ChatBubble> {
                               : Container(),
                         ],
                       ),
-                      Text(widget.secondary),
-                      // Text(
-                      //   "печатает...",
-                      //   style: TextStyle(
-                      //     color: Theme.of(context).colorScheme.primary,
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.w400,
-                      //   ),
-                      // ),
+                      Text(
+                        widget.secondary,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),

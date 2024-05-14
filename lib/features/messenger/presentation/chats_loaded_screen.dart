@@ -342,10 +342,10 @@ class _ChatsListState extends State<ChatsList> {
                         ],
                       ),
                       Text(
-                        "печатает...",
+                        "был в сети недавно",
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

@@ -165,15 +165,13 @@ class _ChatBubble extends State<GroupBubble> {
                           if (push_pin) const Icon(Icons.push_pin_outlined) else Container(),
                         ],
                       ),
-                      Text(secondary),
-                      // Text(
-                      //   "печатает...",
-                      //   style: TextStyle(
-                      //     color: Theme.of(context).colorScheme.primary,
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.w400,
-                      //   ),
-                      // ),
+                      Text(
+                        secondary,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),

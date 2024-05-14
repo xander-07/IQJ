@@ -344,9 +344,7 @@ class _MessengerBloc extends State<MessengerScreen> {
       ]),
       builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           return Text('Error fetching chats');
@@ -358,19 +356,37 @@ class _MessengerBloc extends State<MessengerScreen> {
         chatList.addAll(snapshot.data![0].docs
             .map<Widget>((doc) => _buildChatListItem(doc)));
 
-        // Load group chats
+        // Load group chats using getLastGroupMessage function
         snapshot.data![1].docs.forEach((groupDoc) {
           final Map<String, dynamic> groupData =
               groupDoc.data() as Map<String, dynamic>;
           String groupId = groupDoc.id;
           String groupName = groupData['name'].toString();
 
-          chatList.add(GroupBubble(
-            imageUrl: 'nonononoWAITWAITWAITWAIT',
-            chatTitle: groupName,
-            secondary: '...',
-            id: groupId,
-          ));
+          chatList.add(
+            FutureBuilder<String>(
+              future: chatService.getLastGroupMessage(groupId),
+              initialData:
+                  'Loading...', // Initial value while waiting for the future
+              builder: (context, AsyncSnapshot<String> messageSnapshot) {
+                String lastMessage = messageSnapshot.data ?? '';
+
+                if (messageSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (messageSnapshot.hasError) {
+                  return Text('Error fetching last message');
+                }
+
+                return GroupBubble(
+                  imageUrl: 'nonononoWAITWAITWAITWAIT',
+                  chatTitle: groupName,
+                  secondary: lastMessage,
+                  id: groupId,
+                );
+              },
+            ),
+          );
         });
 
         return Column(
@@ -381,37 +397,38 @@ class _MessengerBloc extends State<MessengerScreen> {
   }
 
   Widget _buildChatListItem(DocumentSnapshot document) {
-  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-  final ChatService _chatService = ChatService();
-  String last_message='';
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    final ChatService _chatService = ChatService();
 
-  // _chatService.getLastMessage(_auth.currentUser!.uid, data['uid'].toString()).then((String lastMessage) {
-  //   // Здесь устанавливаем значение last_message после завершения асинхронной операции
-  //   setState(() {
-  //     last_message = lastMessage;
-  //   });
-  // }).catchError((error) {
-  //   // Обработка возможных ошибок
-  //   setState(() {
-  //     last_message = ''; // Устанавливаем значение по умолчанию или обработку ошибки
-  //   });
-  // });
+    return FutureBuilder<String>(
+      future: _chatService.getLastMessage(
+          _auth.currentUser!.uid, data['uid'].toString()),
+      initialData: 'Loading...', // Initial value while waiting for the future
+      builder: (context, AsyncSnapshot<String> snapshot) {
+        String lastMessage = snapshot.data ?? '';
 
-  // Остальной код метода
-  if (_auth.currentUser!.email != data['email']) {
-    return ChatBubble(
-      imageUrl: data['picture'].toString(),
-      chatTitle: data['email'].toString(),
-      secondary: last_message ?? '', // Используйте значение по умолчанию или обработку неопределенного значения
-      uid: data['uid'].toString(),
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // You can return another loading indicator here
+        } else if (snapshot.hasError) {
+          return Text('Error fetching last message');
+        }
+
+        if (_auth.currentUser!.email != data['email']) {
+          return ChatBubble(
+            imageUrl: data['picture'].toString(),
+            chatTitle: data['email'].toString(),
+            secondary: lastMessage,
+            uid: data['uid'].toString(),
+          );
+        }
+
+        return ChatBubble(
+          imageUrl: data['picture'].toString(),
+          chatTitle: 'Заметки',
+          secondary: lastMessage,
+          uid: data['uid'].toString(),
+        );
+      },
     );
   }
-  return ChatBubble(
-    imageUrl: data['picture'].toString(),
-    chatTitle: 'Заметки',
-    secondary: last_message ?? '',
-    uid: data['uid'].toString(),
-  );
-}
-
 }
