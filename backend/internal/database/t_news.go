@@ -45,9 +45,9 @@ func (nt *NewsTable) Add(n News) error {
 	// Подготовим запрос на добавление новости
 	insertQuery := `
 		INSERT INTO news (header, link, news_text, image_links, tags, is_for_students, news_author_id, publication_time)
-		SELECT $1, $2, $3, $4, $5, $6, $7
+		SELECT $1, $2, $3, $4, $5, $6, $7, $8
 		WHERE NOT EXISTS (
-			SELECT 1 FROM news WHERE header = $1 AND publication_time = $7
+			SELECT 1 FROM news WHERE header = $1 AND publication_time = $8
 		)
 	`
 	// Выполним запрос
