@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS news (
     image_links TEXT[],
     tags VARCHAR(255)[],
     is_for_students BOOL NOT NULL,
-    news_author_id INT NOT NULL,
+    news_author_name TEXT NOT NULL,
     publication_time TIMESTAMP
 );
 `

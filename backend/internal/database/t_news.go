@@ -18,7 +18,7 @@ type News struct {
 	ImageLinks      []string `json:"image_link"`        // Ссылки на изображения
 	Tags            []string `json:"tags"`              // Теги
 	IsForStudents   bool     `json:"is_for_students"`   // Для кого предназначена новость (для студентов -> true)
-	AuthorID        int      `json:"author_id`          // id автора новости
+	Author          string   `json:"author_name"`       // id автора новости
 	PublicationTime string   `json:"publication_time"`  // Время публикации новости в формате "DD.MM.YYYY"
 }
 
@@ -52,7 +52,7 @@ func (nt *NewsTable) Add(n News) error {
 	`
 	// Выполним запрос
 	_, err = nt.db.Exec(insertQuery,
-		n.Header, n.Link, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.AuthorID, n.PublicationTime)
+		n.Header, n.Link, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime)
 	if err != nil {
 		return fmt.Errorf("News.Add: %v", err)
 	}
@@ -81,7 +81,7 @@ func (nt *NewsTable) GetById(n News) (*News, error) {
 	// Создадим новую переменную News для заполнения данными
 	var news News
 	// Заполним переменную данными из строки
-	err := row.Scan(&news.Header, &news.Link, &news.Content, pq.Array(&news.ImageLinks), pq.Array(&news.Tags), &news.IsForStudents, &news.AuthorID, &news.PublicationTime)
+	err := row.Scan(&news.Header, &news.Link, &news.Content, pq.Array(&news.ImageLinks), pq.Array(&news.Tags), &news.IsForStudents, &news.Author, &news.PublicationTime)
 	if err != nil {
 		return nil, fmt.Errorf("News.GetById: %v", err)
 	}
@@ -110,7 +110,7 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 	// Пройдемся по всем строкам и заполним структуру News
 	for rows.Next() {
 		var news News
-		err := rows.Scan(&news.Id, &news.Header, &news.Link, &news.Content, pq.Array(&news.ImageLinks), pq.Array(&news.Tags), &news.IsForStudents, &news.AuthorID, &news.PublicationTime)
+		err := rows.Scan(&news.Id, &news.Header, &news.Link, &news.Content, pq.Array(&news.ImageLinks), pq.Array(&news.Tags), &news.IsForStudents, &news.Author, &news.PublicationTime)
 		if err != nil {
 			return nil, fmt.Errorf("News.GetById: %v", err)
 		}
@@ -150,7 +150,7 @@ func (nt *NewsTable) GetLatestBlocks(count, offset int) (*[]News, error) {
 	// Пройдемся по всем строкам и заполним структуру News
 	for rows.Next() {
 		var resultNews News
-		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.AuthorID, &resultNews.PublicationTime)
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.Author, &resultNews.PublicationTime)
 		if err != nil {
 			return nil, fmt.Errorf("News.GetLatest: %v", err)
 		}
@@ -182,7 +182,7 @@ func (nt *NewsTable) GetLatestBlocksForStudents(count, offset int) (*[]News, err
 	// Пройдемся по всем строкам и заполним структуру News
 	for rows.Next() {
 		var resultNews News
-		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), &resultNews.AuthorID, &resultNews.PublicationTime)
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), &resultNews.Author, &resultNews.PublicationTime)
 		if err != nil {
 			return nil, fmt.Errorf("News.GetLatestForStudents: %v", err)
 		}
@@ -237,7 +237,7 @@ func (nt *NewsTable) Update(n News) error {
 	`
 
 	// Выполним запрос
-	_, err := nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.AuthorID, n.PublicationTime, n.Id)
+	_, err := nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime, n.Id)
 	if err != nil {
 		return fmt.Errorf("News.Update: %v", err)
 	}
