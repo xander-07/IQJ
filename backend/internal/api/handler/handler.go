@@ -16,7 +16,8 @@ const (
 	NewsTags   = "/news_tags"
 	NewsDate   = "/news_date"
 
-	AdvertisementsRoute = "/ad"
+	AdvertisementsRoute    = "/ad"
+	AllAdvertisementsRoute = "/ad_all"
 
 	LessonsRoute = "/lessons"
 
@@ -62,6 +63,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.GET(NewsDate, h.HandleSearchNewsByDate)
 
 	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
+	r.GET(AllAdvertisementsRoute, h.HandleGetAllAdvertisements)
 
 	r.GET(LessonsRoute, h.Lessons)
 
@@ -75,6 +77,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		authGroup.POST(AdvertisementsRoute, h.HandlePostAdvertisement)
 		authGroup.PUT(AdvertisementsRoute, h.HandleUpdateAdvertisements)
+		authGroup.DELETE(AdvertisementsRoute, h.HandleDeleteAdvertisement)
 
 		authGroup.PUT(UpdateRoleRoute, h.HandleUpdateUserRole)
 

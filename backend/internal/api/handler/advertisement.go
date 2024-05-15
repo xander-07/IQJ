@@ -2,11 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"iqj/internal/database"
 	"net/http"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 // Выдает массив с объявлениями, у которых срок годности
@@ -133,22 +132,8 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 // Функция для получения всех объявлений, имеющихся в бд на данный момент.
 // Извлекает из запроса параметр all_ads, который должен быть равен 1 для работы.
 // Используется функция GetAllAds, которая получает срез всех объявлений в бд.
-// Использование с GET: /news?all_ads=1
+// Использование с GET: /ad_all
 func (h *Handler) HandleGetAllAdvertisements(c *gin.Context) {
-	all_adsStr := c.Query("all_ads")
-
-	all_ads, err := strconv.Atoi(all_adsStr)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleGetAllAdvertisements:", err)
-		return
-	}
-
-	if all_ads != 1 {
-		c.JSON(http.StatusBadRequest, "All_ads != 1")
-		fmt.Println("HandleGetAllAdvertisements: all_ads != 1")
-		return
-	}
 
 	allads, err := database.Database.Advertisement.GetAll()
 	if err != nil {
@@ -157,4 +142,55 @@ func (h *Handler) HandleGetAllAdvertisements(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, allads)
+}
+
+func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
+	userIdToConv, ok := c.Get("userId")
+	if !ok {
+		c.String(http.StatusUnauthorized, "User ID not found")
+		fmt.Println("HandleDeleteAdvertisement:", ok)
+		return
+	}
+	userId := userIdToConv.(int)
+
+	user, err := database.Database.UserData.GetRoleById(
+		database.UserData{
+			Id: int64(userId),
+		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleDeleteAdvertisement:", err)
+		return
+	}
+
+	if user.Role == "moderator" {
+		idStr := c.Query("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			fmt.Println("HandleDeleteAdvertisement:", err)
+			return
+		}
+
+		var advertisement database.Advertisement
+		advertisement.Id = id
+
+		_, err = database.Database.Advertisement.GetById(advertisement)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "The advertisement with the specified id does not exist")
+			fmt.Println("HandleDeleteAdvertisement:", err)
+			return
+		}
+
+		err = database.Database.Advertisement.Delete(&advertisement)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			fmt.Println("HandleDeleteAdvertisement:", err)
+			return
+		}
+
+		c.JSON(http.StatusOK, fmt.Sprintf("The advertisement with the id=%v was successfully deleted", id))
+	} else {
+		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
+	}
 }

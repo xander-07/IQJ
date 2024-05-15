@@ -74,7 +74,7 @@ func (at *AdvertisementTable) Add(a *Advertisement) error {
 // ads, err := ...Get() // err == nil если все хорошо
 func (at *AdvertisementTable) Get() (*[]Advertisement, error) {
 	rows, err := at.db.Query(
-		"SELECT advertiesment_id, content, creation_date, expiration_date FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
+		"SELECT advertisement_id, content, creation_date, expiration_date FROM advertisements WHERE expiration_date > $1 ORDER BY creation_date DESC",
 		time.Now(),
 	)
 
@@ -119,6 +119,34 @@ func (at *AdvertisementTable) GetAll() (*[]Advertisement, error) {
 	return &resultAdvertisementArr, nil
 }
 
+// GetById возвращает новость из базы данных по указанному идентификатору.
+func (at *AdvertisementTable) GetById(a Advertisement) (*Advertisement, error) {
+	// Проверяем передан ли ID рекламного объявления
+	if a.Id == 0 {
+		return nil, errors.New("Advertisement.GetById: wrong data! provided advertisementID is empty")
+	}
+
+	// Подготовим запрос на получение новости по ID
+	selectQuery := `
+		SELECT content, creation_date, expiration_date
+		FROM advertisements WHERE advertisement_id = $1
+	`
+
+	// Выполним запрос и получим строки
+	row := at.db.QueryRow(selectQuery, a.Id)
+
+	// Создадим новую переменную News для заполнения данными
+	var advertisement Advertisement
+	// Заполним переменную данными из строки
+	err := row.Scan(&advertisement.Content, &advertisement.CreationDate, &advertisement.ExpirationDate)
+	if err != nil {
+		return nil, fmt.Errorf("Advertisement.GetById: %v", err)
+	}
+
+	// Вернем заполненную структуру News и nil
+	return &advertisement, nil
+}
+
 func (at *AdvertisementTable) Update(a *Advertisement) error {
 
 	if a.isDefault() {
@@ -130,7 +158,7 @@ func (at *AdvertisementTable) Update(a *Advertisement) error {
 		SET content = $1,
 			creation_date = $2,
 			expiration_date= $3
-			WHERE advertiesment_id = $4`,
+			WHERE advertisement_id = $4`,
 		a.Content, a.CreationDate, a.ExpirationDate, a.Id,
 	)
 
@@ -155,7 +183,7 @@ func (at *AdvertisementTable) Delete(a *Advertisement) error {
 	}
 
 	_, err := at.db.Exec(
-		"DELETE FROM advertisements WHERE advertiesmentId = $1",
+		"DELETE FROM advertisements WHERE advertisement_id = $1",
 		a.Id,
 	)
 	if err != nil {
