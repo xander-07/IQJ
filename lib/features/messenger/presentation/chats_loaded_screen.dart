@@ -322,7 +322,10 @@ class _ChatsListState extends State<ChatsList> {
             ),
             onPressed: () {
               // Потом сделать страницу пользователя
-
+              Navigator.of(context).pushNamed(
+                'userpage',
+                arguments: {'name': user_name, 'url': image_url, 'uid': uid},
+              );
             },
             child: Row(
               children: [

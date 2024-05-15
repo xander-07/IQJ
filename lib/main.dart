@@ -9,6 +9,7 @@ import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_group.dart';
+import 'package:iqj/features/messenger/presentation/screens/user_page.dart';
 import 'package:iqj/features/messenger/presentation/screens/users_add_selection.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
 import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
@@ -114,6 +115,7 @@ class _AppState extends State<App> {
         'chatslist': (context) => const ChatsList(), // это страница диолга
         'groupchat': (context) => const ChatsGroupList(), // это страница диолга
         'grouppage': (context) => const GroupPage(), // это страница с профилем(переход из чатов)
+        'userpage' : (context) => const UserPage(),
         'addtogroup':(context) => const AddToGroupScreen(),  // добавление людей в группу
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
