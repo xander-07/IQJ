@@ -30,11 +30,23 @@ func (h *Handler) HandleNews(c *gin.Context) {
 	}
 }
 
-// "/news_search?header="dsfasdfsda""
+// "/news_search?header=dsfasdfsda"
+// Получает header из запроса, вызывает функцию GetNewsByHeader,
+// которая вернет массив с последними новостями.
+// Выдает новости пользователю в формате JSON.
+// Например при GET /news_search?header=Преподаватели вернет новости у которых есть в названиее слово Преподаватели.
 
-// func (h *Handler) HandleSearchNews(c *gin.Context){
-// 	offsetStr := c.Query("header")
-// }
+func (h *Handler) HandleSearchNews(c *gin.Context) {
+	offsetStr := c.Query("header")
+
+	latestNews, err := database.Database.News.GetNewsByHeader(offsetStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetNews:", err)
+		return
+	}
+	c.JSON(http.StatusOK, latestNews)
+}
 
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.

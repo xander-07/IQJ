@@ -121,12 +121,45 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 	return &newsSlice, nil
 }
 
-// func (nt *NewsTable) GetNewsByHeader(text []byte)(*[]News,error){
-// 	selectQuery := `
-// 		SELECT news_id, header, link, image_links, tags, publication_time
-// 		FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2
-// 	`
-// }
+// GetNewsByHeader возвращает новости которые начинаються с определенного слова
+
+func (nt *NewsTable) GetNewsByHeader(word string) (*[]News, error) {
+	selectQuery := `
+	SELECT news_id, header, link, image_links, tags, publication_time
+	FROM news
+	WHERE header LIKE '%' || $1 || '%'
+	ORDER BY publication_time DESC
+	`
+	// query := `SELECT suggestion FROM suggestions WHERE suggestion LIKE $1 || '%'`
+	rows, err := nt.db.Query(selectQuery, word)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetLatest: %v", err)
+	}
+	defer rows.Close()
+
+	var resultNewsArr []News
+
+	// for rows.Next() {
+	// 	var resultNews News
+	// 	err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.Author, &resultNews.PublicationTime)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("News.GetLatest: %v", err)
+	// 	}
+	// 	resultNewsArr = append(resultNewsArr, resultNews)
+	// }
+	for rows.Next() {
+		var resultNews News
+		// Удалите &resultNews.Author из списка аргументов
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetLatest: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
+	// Вернем срез с последними новостными блоками и nil
+	return &resultNewsArr, nil
+}
 
 // Остальные методы не изменились и остаются теми же
 
