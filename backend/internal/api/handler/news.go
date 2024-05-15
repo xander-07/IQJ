@@ -356,7 +356,7 @@ func (h *Handler) HandleDeleteNews(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, fmt.Sprintf("The news with the id=%v was successfully deleted", id))
+		c.JSON(http.StatusNoContent, fmt.Sprintf("The news with the id=%v was successfully deleted", id))
 	} else {
 		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
 	}
