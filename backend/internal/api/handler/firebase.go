@@ -250,9 +250,141 @@ func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
 }
 
 func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
+	userIdToConv, ok := c.Get("userId")
+	if !ok {
+		c.String(http.StatusUnauthorized, "User ID not found")
+		fmt.Println("HandleUpdateFirebaseUser:", ok)
+		return
+	}
+	userId := userIdToConv.(int)
 
+	user, err := database.Database.UserData.GetRoleById(
+		database.UserData{
+			Id: int64(userId),
+		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+
+	if user.Role == "moderator" {
+		var userFirebase User
+
+		err := c.BindJSON(&userFirebase)
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+			fmt.Println("HandleUpdateFirebaseUser:", err)
+			return
+		}
+
+		clientAuth, err := firebase.InitFirebase().Auth(context.Background())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		params := (&auth.UserToUpdate{}).
+			Email(userFirebase.Email).
+			Password(userFirebase.Password).
+			PhoneNumber(userFirebase.PhoneNumber).
+			DisplayName(userFirebase.DisplayName)
+
+		u, err := clientAuth.UpdateUser(context.Background(), userFirebase.UID, params)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Println("HandleUpdateFirebaseUser:", err)
+			return
+		}
+
+		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Println("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		defer clientFirestore.Close()
+
+		fullName := strings.Fields(userFirebase.DisplayName)
+
+		_, err = clientFirestore.Collection("users").Doc(u.UID).Set(context.Background(), map[string]interface{}{
+			"email":      userFirebase.Email,
+			"institute":  userFirebase.Institute,
+			"name":       fullName[1],
+			"patronymic": fullName[2],
+			"phone":      userFirebase.PhoneNumber,
+			"position":   userFirebase.Position,
+			"role":       userFirebase.Role,
+			"surname":    fullName[0],
+			"uid":        u.UID,
+			"picture":    userFirebase.Picture,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, userFirebase)
+	} else {
+		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
+	}
 }
 
 func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
+	userIdToConv, ok := c.Get("userId")
+	if !ok {
+		c.String(http.StatusUnauthorized, "User ID not found")
+		fmt.Println("HandleUpdateNews:", ok)
+		return
+	}
+	userId := userIdToConv.(int)
 
+	user, err := database.Database.UserData.GetRoleById(
+		database.UserData{
+			Id: int64(userId),
+		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleUpdateNews:", err)
+		return
+	}
+
+	if user.Role == "moderator" {
+		uidStr := c.Query("uid")
+
+		clientAuth, err := firebase.InitFirebase().Auth(context.Background())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		if err := clientAuth.DeleteUser(context.Background(), uidStr); err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Println("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		defer clientFirestore.Close()
+
+		// Удаление данных пользователя из Firestore
+		if _, err := clientFirestore.Collection("users").Doc(uidStr).Delete(context.Background()); err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			fmt.Println("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			return
+		}
+
+		c.JSON(http.StatusNoContent, fmt.Sprintf("The user with the uid=%v was successfully deleted", uidStr))
+	} else {
+		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
+	}
 }
