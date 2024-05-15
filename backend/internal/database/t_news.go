@@ -346,7 +346,7 @@ func (nt *NewsTable) Update(n News) error {
 			image_links = $3,
 			tags = $4,
 			is_for_students = $5,
-			news_author_name = $6
+			news_author_name = $6,
 			publication_time = $7
 		WHERE news_id = $8
 	`
