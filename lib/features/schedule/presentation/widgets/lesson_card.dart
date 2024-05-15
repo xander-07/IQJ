@@ -142,7 +142,7 @@ class LessonCard extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(
-                                  text: lesson.classroom,
+                                  text: lesson.location,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w400),
                                 ),
