@@ -3,6 +3,7 @@ class Lesson {
   final String location;
   final String teacher;
   final List<String> groups;
+  final int order;
   final String type;
 
   Lesson({
@@ -10,6 +11,7 @@ class Lesson {
     required this.location,
     required this.teacher,
     required this.groups,
+    required this.order,
     required this.type,
   });
 
@@ -19,6 +21,7 @@ class Lesson {
       location: json['class_location'] as String,
       teacher: json['class_teacher_name'] as String,
       groups: json['class_group_ids'] as List<String>? ?? [''],
+      order: json['class_count'] as int,
       type: _types[json['class_type'] as String]?? 'Другое',
     );
   }

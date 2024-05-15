@@ -6,9 +6,8 @@ import 'package:iqj/features/schedule/domain/lesson.dart';
 
 class LessonCard extends StatelessWidget {
   final Lesson lesson;
-  final int index;
   final bool isCompact;
-  const LessonCard(this.lesson, this.index, this.isCompact, {super.key});
+  const LessonCard(this.lesson, this.isCompact, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,7 @@ class LessonCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${index + 1} пара",
+                          "${lesson.order} пара",
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
@@ -72,7 +71,7 @@ class LessonCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          _lessonTime[index],
+                          _lessonTime[lesson.order - 1],
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w400,
@@ -88,10 +87,11 @@ class LessonCard extends StatelessWidget {
                   ? []
                   : [
                       Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .inverseSurface
-                              .withAlpha(144)),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .inverseSurface
+                            .withAlpha(144),
+                      ),
                       // MARK: Нижние строки
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -113,7 +113,8 @@ class LessonCard extends StatelessWidget {
                                 TextSpan(
                                   text: lesson.groups[0],
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             ),
@@ -144,7 +145,8 @@ class LessonCard extends StatelessWidget {
                                 TextSpan(
                                   text: lesson.location,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             ),
