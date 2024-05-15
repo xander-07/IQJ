@@ -149,6 +149,15 @@ class ChatService extends ChangeNotifier {
     }
   }
 
+  bool isStringLink(String input) {
+    Uri? uri = Uri.tryParse(input);
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<String> getLastMessage(String userId, String otherId) async {
     final List<String> ids = [userId, otherId];
     ids.sort();
@@ -163,10 +172,38 @@ class ChatService extends ChangeNotifier {
         .get();
 
     final lastMessage = querySnapshot.docs.isNotEmpty
-        ? querySnapshot.docs.first.data()['message'].toString()
+        ? querySnapshot.docs.first.data()['senderEmail'].toString() +
+            ": " +
+            (!isStringLink(querySnapshot.docs.first.data()['message'].toString())
+            ? querySnapshot.docs.first.data()['message'].toString()
+            : "[Ссылка]") +
+            " • " +
+            _formatTimestamp(
+                querySnapshot.docs.first.data()['timestamp'] as Timestamp)
         : 'Нет сообщений';
 
     return lastMessage;
+  }
+
+  // Helper function, no requests made here. Move along, citizen.
+  String _formatTimestamp(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    final currentDate = DateTime.now();
+    if (dateTime.year == currentDate.year &&
+        dateTime.month == currentDate.month &&
+        dateTime.day == currentDate.day) {
+      return "Сегодня, ${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
+    } else {
+      return "${dateTime.day}.${dateTime.month}.${dateTime.year}, ${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
+    }
+  }
+
+  // Thanks ChatGPT this sucks.
+  String _twoDigits(int n) {
+    if (n >= 10) {
+      return "$n";
+    }
+    return "0$n";
   }
 
   Future<String> getUserEmail(String uid) async {
@@ -283,30 +320,28 @@ class ChatService extends ChangeNotifier {
     Map<String, dynamic>? usersData =
         groupSnapshot.data() as Map<String, dynamic>?;
 
-        //print(usersData);
+    //print(usersData);
 
     // Check if usersData is not null and contains the user's UID
     if (usersData!.containsKey('users')) {
       // Extract the 'users' map from usersData
       Map<String, dynamic>? usersMap =
           usersData['users'] as Map<String, dynamic>?;
-          print(usersMap);
+      print(usersMap);
 
+      // Extract the user data from usersMap using the user ID
+      Map<String, dynamic>? userData =
+          usersMap![userId] as Map<String, dynamic>?;
+      print('userdata');
+      print(userData);
 
-        // Extract the user data from usersMap using the user ID
-        Map<String, dynamic>? userData = usersMap![userId] as Map<String, dynamic>?;
-        print('userdata');
-        print(userData);
-        
-        // Check if userData is not null and contains the role key
-          // Retrieve the user role from userData and return it
-          String userRole = userData!['role'].toString();
-          return userRole;
-        }
-        return 's';
-      }
-    
-
+      // Check if userData is not null and contains the role key
+      // Retrieve the user role from userData and return it
+      String userRole = userData!['role'].toString();
+      return userRole;
+    }
+    return 's';
+  }
 
   Future<bool> isUserInGroup(String userId, String groupId) async {
     try {
@@ -368,14 +403,15 @@ class ChatService extends ChangeNotifier {
         .add(newMessage.toMap());
   }
 
-  Stream<QuerySnapshot> getGroupMessages(String id) {
+  Stream<QuerySnapshot> getGroupMessages(String groupId) {
     return _firestore
         .collection('groups')
-        .doc(id)
+        .doc(groupId) // Use groupId here
         .collection('messages')
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
+
 
   Future<String> getLastGroupMessage(String groupId) async {
     final querySnapshot = await _firestore
@@ -387,7 +423,12 @@ class ChatService extends ChangeNotifier {
         .get();
 
     final lastMessage = querySnapshot.docs.isNotEmpty
-        ? querySnapshot.docs.first.data()['message'].toString()
+        ? querySnapshot.docs.first.data()['senderEmail'].toString() +
+            ": " +
+            querySnapshot.docs.first.data()['message'].toString() +
+            " • " +
+            _formatTimestamp(
+                querySnapshot.docs.first.data()['timestamp'] as Timestamp)
         : 'Нет сообщений';
 
     return lastMessage;
@@ -426,7 +467,8 @@ class ChatService extends ChangeNotifier {
         return [];
       }
 
-      Map<String, dynamic>? usersData = groupSnapshot.data() as Map<String, dynamic>;
+      Map<String, dynamic>? usersData =
+          groupSnapshot.data() as Map<String, dynamic>;
 
       List<Map<String, dynamic>> usersList = [];
       usersData['users'].forEach((key, value) {

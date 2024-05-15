@@ -24,7 +24,7 @@ class _ChatBubble extends State<GroupBubble> {
         width: 64,
         height: 64,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(16),
           child: Image.network(
             widget.imageUrl,
             fit: BoxFit.fill,
@@ -34,11 +34,17 @@ class _ChatBubble extends State<GroupBubble> {
               Object exception,
               StackTrace? stackTrace,
             ) {
-              return CircleAvatar(
-                radius: 6,
-                backgroundColor:
-                    Theme.of(context).colorScheme.tertiaryContainer,
-                child: const Text('G'),
+              return Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                ),
+                child: Text(
+                  'G',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,),
+                ),
               );
             },
           ),

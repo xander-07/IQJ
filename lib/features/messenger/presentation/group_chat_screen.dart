@@ -32,7 +32,7 @@ class _ChatsListState extends State<ChatsGroupList> {
           width: 45,
           height: 45,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(12),
             child: Image.network(
               image_url,
               fit: BoxFit.fill,
@@ -42,11 +42,18 @@ class _ChatsListState extends State<ChatsGroupList> {
                 Object exception,
                 StackTrace? stackTrace,
               ) {
-                return CircleAvatar(
-                  radius: 6,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.tertiaryContainer,
-                  child: const Text('G'),
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 );
               },
             ),
@@ -65,6 +72,7 @@ class _ChatsListState extends State<ChatsGroupList> {
   bool pin = false;
   bool _emojiPicking = false;
   File? imageFile;
+  // late Stream<QuerySnapshot> _messagesStream;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -147,11 +155,10 @@ class _ChatsListState extends State<ChatsGroupList> {
 
   String msgPfp = '';
 
-  Widget _buildMessageList() {
+  Widget _buildMessageList(List<DocumentSnapshot<Object?>> documents, String id) {
+    print(id);
     return StreamBuilder(
-      stream: _chatService.getGroupMessages(
-        uid,
-      ),
+      stream: _chatService.getGroupMessages(uid),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -163,26 +170,50 @@ class _ChatsListState extends State<ChatsGroupList> {
         }
 
         List<Widget> messageWidgets = [];
-        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+        DateTime? nextDate;
+        for (int i = snapshot.data!.docs.length - 1; i >= 0; i--) {
           final document = snapshot.data!.docs[i];
           final Map<String, dynamic> data =
               document.data()! as Map<String, dynamic>;
           final messageDate = (data['timestamp'] as Timestamp).toDate();
 
-          if (currentDate == null || messageDate.day != currentDate!.day) {
-            messageWidgets.add(_buildDateWidget(messageDate));
-            currentDate = messageDate;
+          // Check if there's a next message and get its date
+          if (i > 0) {
+            final nextDocument = snapshot.data!.docs[i - 1];
+            final nextData = nextDocument.data()! as Map<String, dynamic>;
+            nextDate = (nextData['timestamp'] as Timestamp).toDate();
           }
 
           messageWidgets.add(_buildMessageListItem(document));
+
+          // Compare the current message's date with the next message's date
+          if (nextDate == null || messageDate.day > nextDate.day) {
+            messageWidgets.add(_buildDateWidget(messageDate));
+          }
         }
+
+        try {
+          final document = snapshot.data!.docs.first;
+          final Map<String, dynamic> data =
+              document.data()! as Map<String, dynamic>;
+          final oldestMessageDate = (data['timestamp'] as Timestamp).toDate();
+          print(oldestMessageDate);
+          if (nextDate != null) {
+            messageWidgets.add(_buildDateWidget(oldestMessageDate));
+          }
+        } catch (e) {
+          print('Exception: $e');
+        }
+
+        // Call _scrollToBottom after messageList is built
+        //_scrollToBottom();
 
         return Align(
           alignment: Alignment.bottomCenter,
           child: ListView.builder(
             padding: EdgeInsets.only(bottom: 8),
             physics: ClampingScrollPhysics(),
-            //reverse: true,
+            reverse: true,
             shrinkWrap: true,
             controller: _scrollController,
             itemCount: messageWidgets.length,
@@ -269,10 +300,11 @@ class _ChatsListState extends State<ChatsGroupList> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+    // _scrollController = ScrollController();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollToBottom();
+    // });
+    //_messagesStream = _chatService.getGroupMessages(uid);
   }
 
   void _scrollToBottom() {
@@ -440,7 +472,23 @@ class _ChatsListState extends State<ChatsGroupList> {
       body: Column(
         children: [
           Expanded(
-            child: _buildMessageList(),
+            child: StreamBuilder(
+              stream: _chatService.getGroupMessages(uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  // Convert the stream of QuerySnapshot to a list of DocumentSnapshot
+                  final List<DocumentSnapshot> documents =
+                      snapshot.data!.docs.toList();
+                  return _buildMessageList(documents, 'oDkIf#v)CAVDT)l)JMDB3YGY)XN#7Tgk');
+                }
+              },
+            ),
           ),
           Align(
             alignment: Alignment.bottomLeft,

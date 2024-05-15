@@ -5,11 +5,13 @@ class ChatBubble extends StatefulWidget {
   final String chatTitle;
   final String secondary;
   final String uid;
+  final String phone;
   const ChatBubble({
     required this.imageUrl,
     required this.chatTitle,
     required this.secondary,
     required this.uid,
+    required this.phone,
     super.key,
   });
 
@@ -95,7 +97,8 @@ class _ChatBubble extends State<ChatBubble> {
                   'url': widget.imageUrl,
                   'volume': volume,
                   'pin': push_pin,
-                  'uid': widget.uid
+                  'uid': widget.uid,
+                  'phone': widget.phone,
                 },
               );
 

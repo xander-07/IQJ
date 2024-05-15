@@ -63,6 +63,36 @@ class _GroupPage extends State<GroupPage> {
     });
   }
 
+  void change_flag3() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = true;
+      flag4 = false;
+      flag5 = false;
+    });
+  }
+
+  void change_flag4() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = true;
+      flag5 = false;
+    });
+  }
+
+  void change_flag5() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = true;
+    });
+  }
+
   int memberCount = 0;
 
   Future<void> _updateMemberCount(String groupId) async {
@@ -125,49 +155,50 @@ class _GroupPage extends State<GroupPage> {
   }
 
   Widget _buildUserListItem(
-  DocumentSnapshot document,
-  Map<String, dynamic>? userData,
-) {
-  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    DocumentSnapshot document,
+    Map<String, dynamic>? userData,
+  ) {
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
-  return FutureBuilder<bool>(
-    future: chatService.isUserInGroup(data['uid'] as String, uid),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return SizedBox(); // Return a placeholder widget while loading
-      } else if (snapshot.hasError) {
-        return SizedBox(); // Return a placeholder widget on error
-      } else {
-        bool isMember = snapshot.data ?? false;
-
-        // Check if the user is not a member and display ChatMember widget
-        if (isMember) {
-          return FutureBuilder<String>(
-            future: getUserRole(data['uid'].toString()),
-            builder: (context, roleSnapshot) {
-              if (roleSnapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Return a placeholder widget while loading
-              } else if (roleSnapshot.hasError) {
-                return SizedBox(); // Return a placeholder widget on error
-              } else {
-                String userRole = roleSnapshot.data ?? 'Unknown'; // Get the user role from the snapshot data
-                return ChatMember(
-                  imageUrl: data['picture'].toString(),
-                  chatTitle: data['email'].toString(),
-                  uid: data['uid'].toString(),
-                  role: userRole,
-                );
-              }
-            },
-          );
+    return FutureBuilder<bool>(
+      future: chatService.isUserInGroup(data['uid'] as String, uid),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(); // Return a placeholder widget while loading
+        } else if (snapshot.hasError) {
+          return SizedBox(); // Return a placeholder widget on error
         } else {
-          return Container(); // Return an empty container if the user is a member
-        }
-      }
-    },
-  );
-}
+          bool isMember = snapshot.data ?? false;
 
+          // Check if the user is not a member and display ChatMember widget
+          if (isMember) {
+            return FutureBuilder<String>(
+              future: getUserRole(data['uid'].toString()),
+              builder: (context, roleSnapshot) {
+                if (roleSnapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // Return a placeholder widget while loading
+                } else if (roleSnapshot.hasError) {
+                  return SizedBox(); // Return a placeholder widget on error
+                } else {
+                  String userRole = roleSnapshot.data ??
+                      'Unknown'; // Get the user role from the snapshot data
+                  return ChatMember(
+                    imageUrl: data['picture'].toString(),
+                    chatTitle: data['email'].toString(),
+                    uid: data['uid'].toString(),
+                    role: userRole,
+                    groupId: uid,
+                  );
+                }
+              },
+            );
+          } else {
+            return Container(); // Return an empty container if the user is a member
+          }
+        }
+      },
+    );
+  }
 
   Future<String> getUserRole(String uids) async {
     return await chatService.getUserRoleInGroup(uid, uids);
@@ -381,7 +412,9 @@ class _GroupPage extends State<GroupPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.person_add),
-                      color: Colors.orange, // Оранжевый цвет
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Оранжевый цвет
                       onPressed: () {
                         Navigator.of(context)
                             .pushNamed('addtogroup', arguments: {
@@ -403,7 +436,9 @@ class _GroupPage extends State<GroupPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.notifications),
-                      color: Colors.orange, // Оранжевый цвет
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Оранжевый цвет
                       onPressed: () {
                         // Действия для кнопки с логотипом колокольчика
                       },
@@ -422,7 +457,9 @@ class _GroupPage extends State<GroupPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.search),
-                      color: Colors.orange, // Оранжевый цвет
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Оранжевый цвет
                       onPressed: () {
                         // Действия для кнопки с логотипом лупы
                       },
@@ -454,50 +491,47 @@ class _GroupPage extends State<GroupPage> {
                     indicatorPadding: EdgeInsets.only(top: 10, bottom: 10),
                     dividerHeight: 0,
                     tabAlignment: TabAlignment.start,
+                    onTap: (value) {
+                      if (value == 0) change_flag1();
+                      if (value == 1) change_flag2();
+                      if (value == 2) change_flag3();
+                      if (value == 3) change_flag4();
+                      if (value == 4) change_flag5();
+                    },
                     tabs: [
                       Tab(
-                        child: GestureDetector(
-                          onTap: () {
-                            change_flag1();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Text(
+                            "Участники",
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontSize: 10,
                             ),
-                            child: Text(
-                              "Участники",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 10,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
                       Tab(
-                        child: GestureDetector(
-                          onTap: () {
-                            change_flag2();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Text(
+                            "Медиа",
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontSize: 10,
                             ),
-                            child: Text(
-                              "Медиа",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 10,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
@@ -558,7 +592,100 @@ class _GroupPage extends State<GroupPage> {
                     ],
                   )),
             ),
-            _buildUserList(),
+            if (flag1) _buildUserList(),
+            Wrap(
+              children: [
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
+              ],
+            ),
+            flag3
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag3
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag3
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag3
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag3
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag4
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
           ],
         ),
       ),
@@ -574,7 +701,7 @@ Widget _buildThumbnailImage(String image_url, double size) {
         width: size,
         height: size,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(32), // было 32
           child: Image.network(
             image_url,
             fit: BoxFit.fill,
@@ -584,11 +711,24 @@ Widget _buildThumbnailImage(String image_url, double size) {
               Object exception,
               StackTrace? stackTrace,
             ) {
-              return CircleAvatar(
-                radius: 6,
-                backgroundColor:
-                    Theme.of(context).colorScheme.tertiaryContainer,
-                child: const Text('G'),
+              // return CircleAvatar(
+              //   radius: 6,
+              //   backgroundColor:
+              //       Theme.of(context).colorScheme.tertiaryContainer,
+              //   child: const Text('G'),
+              // );
+              return Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                ),
+                child: Text(
+                  'G',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
               );
             },
           ),
@@ -635,4 +775,160 @@ Widget create_button_for_change_state(
           ),
         ],
       ));
+}
+
+Widget _buildSquer(String image_url, double size) {
+  try {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+              12), // Используем радиус 12 для получения квадратных углов
+          child: Image.network(
+            image_url,
+            fit: BoxFit.fill,
+            errorBuilder: (
+              BuildContext context,
+              Object exception,
+              StackTrace? stackTrace,
+            ) {
+              return Container(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer, // Вместо CircleAvatar используем обычный контейнер с цветом фона
+                child: const Text('A'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  } catch (e) {
+    return Container();
+  }
+}
+
+Widget _File_in_main_chat(
+    BuildContext context, String image_url, String name, String info) {
+  return ElevatedButton(
+      onPressed: () => {},
+      style: ButtonStyle(
+        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+        backgroundColor: MaterialStatePropertyAll(
+          Theme.of(context).colorScheme.background,
+        ),
+        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          _buildSquer(image_url, 40),
+          SizedBox(
+            width: 20,
+          ),
+          Column(
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.download,
+                    size: 12,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    info,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 10,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          )
+        ],
+      ));
+}
+
+Widget _Link_for_main_chat(BuildContext context, String image_url, String name,
+    String info, String link) {
+  return ElevatedButton(
+    onPressed: () => {},
+    style: ButtonStyle(
+      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+      surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+      backgroundColor: MaterialStatePropertyAll(
+        Theme.of(context).colorScheme.background,
+      ),
+      shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+      shape: MaterialStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    ),
+    child: Row(
+      children: [
+        // SizedBox(width: 20,),
+        _buildSquer(image_url, 40),
+        // SizedBox(width: 20,),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                info,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontSize: 10,
+                ),
+              ),
+              // SizedBox(width: 10,),
+              Text(
+                link,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:intl/intl.dart';
 
 // class Message extends StatelessWidget {
@@ -51,7 +52,7 @@ class ReceiverMessage extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {  
+  Widget build(BuildContext context) {
     bool isStringLink(String input) {
       Uri? uri = Uri.tryParse(input);
       if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
@@ -71,63 +72,63 @@ class ReceiverMessage extends StatelessWidget {
             calculatedWidth < minWidth ? minWidth : calculatedWidth;
 
         return MaterialButton(
-          onPressed: () {  },
+          onPressed: () {},
           onLongPress: () => {
             showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    color: Theme.of(context).colorScheme.background,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          //leading: Icon(Icons.push_pin_outlined),
-                          title: Text('Удалить сообщение'),
-                          onTap: () {
-                            //push_pin_get();
-                          },
-                        ),
-                        ListTile(
-                          //leading: Icon(Icons.volume_off),
-                          title: Text('Копировать'),
-                          onTap: () {
-                            //volume_off();
-                          },
-                        ),
-                        ListTile(
-                          //leading: Icon(Icons.volume_off),
-                          title: Text('Закрепить'),
-                          onTap: () {
-                            //volume_off();
-                          },
-                        ),
-                        ListTile(
-                          //leading: Icon(Icons.volume_off),
-                          title: Text('Ответить'),
-                          onTap: () {
-                            //volume_off();
-                          },
-                        ),
-                        ListTile(
-                          //leading: Icon(Icons.volume_off),
-                          title: Text('Изменить'),
-                          onTap: () {
-                            //volume_off();
-                          },
-                        ),
-                        ListTile(
-                          //leading: Icon(Icons.volume_off),
-                          title: Text('Переслать'),
-                          onTap: () {
-                            //volume_off();
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  color: Theme.of(context).colorScheme.background,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        //leading: Icon(Icons.push_pin_outlined),
+                        title: Text('Удалить сообщение'),
+                        onTap: () {
+                          //push_pin_get();
+                        },
+                      ),
+                      ListTile(
+                        //leading: Icon(Icons.volume_off),
+                        title: Text('Копировать'),
+                        onTap: () {
+                          //volume_off();
+                        },
+                      ),
+                      ListTile(
+                        //leading: Icon(Icons.volume_off),
+                        title: Text('Закрепить'),
+                        onTap: () {
+                          //volume_off();
+                        },
+                      ),
+                      ListTile(
+                        //leading: Icon(Icons.volume_off),
+                        title: Text('Ответить'),
+                        onTap: () {
+                          //volume_off();
+                        },
+                      ),
+                      ListTile(
+                        //leading: Icon(Icons.volume_off),
+                        title: Text('Изменить'),
+                        onTap: () {
+                          //volume_off();
+                        },
+                      ),
+                      ListTile(
+                        //leading: Icon(Icons.volume_off),
+                        title: Text('Переслать'),
+                        onTap: () {
+                          //volume_off();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           },
           child: Container(
             width: finalWidth,
@@ -145,7 +146,8 @@ class ReceiverMessage extends StatelessWidget {
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(12),
                         topRight: Radius.circular(12),
-                        bottomLeft: Radius.circular(receiver != compare ? 4 : 12),
+                        bottomLeft:
+                            Radius.circular(receiver != compare ? 4 : 12),
                         bottomRight: Radius.circular(12),
                       ),
                     ),
@@ -155,17 +157,19 @@ class ReceiverMessage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          (!isStringLink(message))?
-                          Linkify(
-                            text: message,
-                            style: Theme.of(context).textTheme.bodyText1,
-                            linkStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 16,
-                              decorationColor:
-                                  Theme.of(context).colorScheme.primary,
-                            ),
-                          ) : _buildImage(message),
+                          (!isStringLink(message))
+                              ? Linkify(
+                                  text: message,
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                  linkStyle: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontSize: 16,
+                                    decorationColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                )
+                              : _buildImage(message),
                           //_buildThumbnailImage(message),
                           SizedBox(height: 4),
                           Align(
@@ -231,31 +235,36 @@ Widget _buildThumbnailImage(String image_url) {
   }
 }
 
-
 Widget _buildImage(String image_url) {
   try {
     return Container(
-      padding: EdgeInsets.only(right: 7),
+      //padding: EdgeInsets.only(right: 7),
       child: SizedBox(
-        width: 250,
+        //width: 250,
         height: 250,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(2), // Половина ширины или высоты
-          child: Image.network(
-            image_url,
-            fit: BoxFit.fill,
-            height: 200,
-            errorBuilder: (
-              BuildContext context,
-              Object exception,
-              StackTrace? stackTrace,
-            ) {
-              return CircleAvatar(
-                radius: 6,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: const Text('A'),
-              );
-            },
+        child: // Половина ширины или высоты
+            InstaImageViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image(
+              image: Image.network(
+                image_url,
+                fit: BoxFit.fill,
+                height: 200,
+                errorBuilder: (
+                  BuildContext context,
+                  Object exception,
+                  StackTrace? stackTrace,
+                ) {
+                  return CircleAvatar(
+                    radius: 6,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    child: const Text('A'),
+                  );
+                },
+              ).image,
+            ),
           ),
         ),
       ),

@@ -74,6 +74,79 @@ class _MessengerBloc extends State<MessengerScreen> {
     });
   }
 
+  bool flag1 = true;
+  bool flag2 = false;
+  bool flag3 = false;
+  bool flag4 = false;
+  bool flag5 = false;
+  bool flag6 = false;
+
+  void change_flag1() {
+    setState(() {
+      flag1 = true;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag2() {
+    setState(() {
+      flag1 = false;
+      flag2 = true;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag3() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = true;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag4() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = true;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag5() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = true;
+      flag6 = false;
+    });
+  }
+
+  void change_flag6() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -209,66 +282,109 @@ class _MessengerBloc extends State<MessengerScreen> {
               children: <Widget>[
                 const Padding(padding: EdgeInsets.only(right: 12)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag1();
+                  },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag1) ? MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag1) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   child: const Text('Все'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag2();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag2) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag2) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Группы'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag3();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag3) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag3) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Студенты'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag4();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag4) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag4) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Преподаватели'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag5();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag5) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag5) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Руководство'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag6();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag6) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag6) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Прочее'),
                 ),
@@ -280,12 +396,12 @@ class _MessengerBloc extends State<MessengerScreen> {
             child: ListView(
               children: [
                 // Чат текущей пары
-                const HighlightChatBubble(
-                  imageUrl:
-                      'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
-                  chatTitle: 'GroupName',
-                  secondary: 'secondaryText',
-                ),
+                // const HighlightChatBubble(
+                //   imageUrl:
+                //       'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
+                //   chatTitle: 'GroupName',
+                //   secondary: 'secondaryText',
+                // ),
                 if (_isntSearch_chat)
                   _chatsBuilder()
                 else if (userMap.isNotEmpty)
@@ -294,6 +410,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                     chatTitle: userMap['email'].toString(),
                     secondary: 'text',
                     uid: userMap['uid'].toString(),
+                    phone: userMap['phone'].toString(),
                   )
                 else if (groupMap.isNotEmpty)
                   GroupBubble(
@@ -304,30 +421,8 @@ class _MessengerBloc extends State<MessengerScreen> {
                   )
                 else
                   Align(
-                    child: Text("чат не найден"),
+                    child: Text("Чатов не найдено."),
                   )
-                // ignore: unnecessary_null_comparison
-                // Чат обычный
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Денис',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Стас',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'АPI',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Gewin',
-                //     secondary: 'secondaryText',),
               ],
             ),
           ),
@@ -353,10 +448,13 @@ class _MessengerBloc extends State<MessengerScreen> {
         List<Widget> chatList = [];
 
         // Load direct messages
+        if (flag1 || flag3 || flag4 || flag5 || flag6) {
         chatList.addAll(snapshot.data![0].docs
             .map<Widget>((doc) => _buildChatListItem(doc)));
+        }
 
         // Load group chats using getLastGroupMessage function
+        if (flag1 || flag2 || flag6)
         snapshot.data![1].docs.forEach((groupDoc) {
           final Map<String, dynamic> groupData =
               groupDoc.data() as Map<String, dynamic>;
@@ -379,7 +477,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                 }
 
                 return GroupBubble(
-                  imageUrl: 'nonononoWAITWAITWAITWAIT',
+                  imageUrl: '',
                   chatTitle: groupName,
                   secondary: lastMessage,
                   id: groupId,
@@ -419,6 +517,7 @@ class _MessengerBloc extends State<MessengerScreen> {
             chatTitle: data['email'].toString(),
             secondary: lastMessage,
             uid: data['uid'].toString(),
+            phone: data['phone'].toString(),
           );
         }
 
@@ -427,6 +526,7 @@ class _MessengerBloc extends State<MessengerScreen> {
           chatTitle: 'Заметки',
           secondary: lastMessage,
           uid: data['uid'].toString(),
+          phone: data['phone'].toString(),
         );
       },
     );

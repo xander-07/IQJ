@@ -60,74 +60,134 @@ class GroupMessage extends StatelessWidget {
         double finalWidth =
             calculatedWidth < minWidth ? minWidth : calculatedWidth;
 
-        return Container(
-          width: finalWidth,
-          margin: EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (sender != compare) _buildThumbnailImage(url),
-              Expanded(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: sender != compare
-                        ? Theme.of(context).colorScheme.onInverseSurface
-                        : Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                      bottomLeft: Radius.circular(sender != compare ? 4 : 12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                  ),
-                  position: DecorationPosition.background,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+        return MaterialButton(
+          onPressed: () {},
+          onLongPress: () => {
+            showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    color: Theme.of(context).colorScheme.background,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        sender != compare
-                            ? Text(
-                                senderEmail,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                              )
-                            : Container(),
-                        Linkify(
-                          text: message,
-                          style: Theme.of(context).textTheme.bodyText1,
-                          linkStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 16,
-                            decorationColor:
-                                Theme.of(context).colorScheme.primary,
-                          ),
+                        ListTile(
+                          //leading: Icon(Icons.push_pin_outlined),
+                          title: Text('Удалить сообщение'),
+                          onTap: () {
+                            //push_pin_get();
+                          },
                         ),
-                        SizedBox(height: 4),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                time,
-                                style: TextStyle(fontSize: 10),
-                              ),
-                              if (sender == compare)
-                                SvgPicture.asset(
-                                  'assets/icons/chat/send_mes.svg',
-                                ),
-                            ],
-                          ),
+                        ListTile(
+                          //leading: Icon(Icons.volume_off),
+                          title: Text('Копировать'),
+                          onTap: () {
+                            //volume_off();
+                          },
+                        ),
+                        ListTile(
+                          //leading: Icon(Icons.volume_off),
+                          title: Text('Закрепить'),
+                          onTap: () {
+                            //volume_off();
+                          },
+                        ),
+                        ListTile(
+                          //leading: Icon(Icons.volume_off),
+                          title: Text('Ответить'),
+                          onTap: () {
+                            //volume_off();
+                          },
+                        ),
+                        ListTile(
+                          //leading: Icon(Icons.volume_off),
+                          title: Text('Изменить'),
+                          onTap: () {
+                            //volume_off();
+                          },
+                        ),
+                        ListTile(
+                          //leading: Icon(Icons.volume_off),
+                          title: Text('Переслать'),
+                          onTap: () {
+                            //volume_off();
+                          },
                         ),
                       ],
                     ),
+                  );
+                }),
+          },
+          child: Container(
+            width: finalWidth,
+            margin: EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (sender != compare) _buildThumbnailImage(url),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: sender != compare
+                          ? Theme.of(context).colorScheme.onInverseSurface
+                          : Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                        bottomLeft: Radius.circular(sender != compare ? 4 : 12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    position: DecorationPosition.background,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          sender != compare
+                              ? Text(
+                                  senderEmail,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                )
+                              : Container(),
+                          Linkify(
+                            text: message,
+                            style: Theme.of(context).textTheme.bodyText1,
+                            linkStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 16,
+                              decorationColor:
+                                  Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  time,
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                                if (sender == compare)
+                                  SvgPicture.asset(
+                                    'assets/icons/chat/send_mes.svg',
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

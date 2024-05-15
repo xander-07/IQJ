@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
@@ -41,7 +42,6 @@ class _UserPage extends State<UserPage> {
   bool flag2 = false;
   bool flag3 = false;
   bool flag4 = false;
-  bool flag5 = false;
 
   void change_flag1() {
     setState(() {
@@ -49,7 +49,6 @@ class _UserPage extends State<UserPage> {
       flag2 = false;
       flag3 = false;
       flag4 = false;
-      flag5 = false;
     });
   }
 
@@ -59,7 +58,24 @@ class _UserPage extends State<UserPage> {
       flag2 = true;
       flag3 = false;
       flag4 = false;
-      flag5 = false;
+    });
+  }
+
+  void change_flag3() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = true;
+      flag4 = false;
+    });
+  }
+
+  void change_flag4() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = true;
     });
   }
 
@@ -71,103 +87,6 @@ class _UserPage extends State<UserPage> {
       memberCount = count;
     });
   }
-
-  Widget _buildUserList() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Text('err');
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        // Extract user IDs from the snapshot data
-        List userIds = snapshot.data!.docs.map((doc) => doc['uid']).toList();
-
-        // Call getUsersInGroup function to fetch user data for the group
-        return FutureBuilder<List<Map<String, dynamic>>>(
-          future: chatService.getUsersInGroup(uid), // Pass the group ID here
-          builder: (context, groupSnapshot) {
-            if (groupSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (groupSnapshot.hasError) {
-              return Text('Error fetching users in group');
-            } else {
-              // Extract user data from the group snapshot
-              List<Map<String, dynamic>> usersData = groupSnapshot.data ?? [];
-
-              // Build UI components for each user
-              return Column(
-                children: snapshot.data!.docs
-                    .where((doc) => userIds.contains(doc['uid']))
-                    .map<Widget>((doc) {
-                  List<Map<String, dynamic>> usersData =
-                      groupSnapshot.data ?? [];
-
-                  Map<String, dynamic> userData = usersData.firstWhere(
-                    (userData) => userData['uid'] == doc['uid'],
-                    orElse: () => {},
-                  );
-
-                  // Build UI component for the current user
-                  return _buildUserListItem(doc, userData);
-                }).toList(),
-              );
-            }
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildUserListItem(
-  DocumentSnapshot document,
-  Map<String, dynamic>? userData,
-) {
-  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-
-  return FutureBuilder<bool>(
-    future: chatService.isUserInGroup(data['uid'] as String, uid),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return SizedBox(); // Return a placeholder widget while loading
-      } else if (snapshot.hasError) {
-        return SizedBox(); // Return a placeholder widget on error
-      } else {
-        bool isMember = snapshot.data ?? false;
-
-        // Check if the user is not a member and display ChatMember widget
-        if (isMember) {
-          return FutureBuilder<String>(
-            future: getUserRole(data['uid'].toString()),
-            builder: (context, roleSnapshot) {
-              if (roleSnapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Return a placeholder widget while loading
-              } else if (roleSnapshot.hasError) {
-                return SizedBox(); // Return a placeholder widget on error
-              } else {
-                String userRole = roleSnapshot.data ?? 'Unknown'; // Get the user role from the snapshot data
-                return ChatMember(
-                  imageUrl: data['picture'].toString(),
-                  chatTitle: data['email'].toString(),
-                  uid: data['uid'].toString(),
-                  role: userRole,
-                );
-              }
-            },
-          );
-        } else {
-          return Container(); // Return an empty container if the user is a member
-        }
-      }
-    },
-  );
-}
-
 
   Future<String> getUserRole(String uids) async {
     return await chatService.getUserRoleInGroup(uid, uids);
@@ -184,146 +103,151 @@ class _UserPage extends State<UserPage> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              showModalBottomSheet(
-                backgroundColor: Theme.of(context).colorScheme.background,
-                context: context,
-                builder: (BuildContext context) {
-                  print('opening thing');
-                  return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                      return Container(
-                        height: 200,
-                        margin: const EdgeInsets.all(18),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: Icon(Icons.close),
-                                ),
-                                const Padding(
-                                    padding: EdgeInsets.only(right: 12)),
-                                Text(
-                                  "Настройки чата",
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                    fontSize: 25,
-                                  ),
-                                )
-                              ],
-                            ),
-                            const Padding(padding: EdgeInsets.only(bottom: 12)),
-                            Row(
-                              children: [
-                                _buildThumbnailImage(image_url ?? "", 70),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Название группы",
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.only(bottom: 6)),
-                                      SizedBox(
-                                        height: 48,
-                                        child: TextField(
-                                          controller: groupNameChangeController,
-                                          maxLines: 1,
-                                          decoration: InputDecoration(
-                                            hintText: "Введите название...",
-                                            hintStyle: const TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 16.0,
-                                            ),
-                                            fillColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                                .withAlpha(32),
-                                            filled: true,
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                              borderSide: BorderSide(
-                                                width: 0,
-                                                style: BorderStyle.none,
-                                              ),
-                                            ),
-                                            hoverColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                                .withAlpha(32),
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 16,
-                                            ),
-                                            suffixIcon: Container(
-                                              margin: EdgeInsets.only(right: 6),
-                                              child: SizedBox(
-                                                child: IconButton(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  icon: const Icon(
-                                                    Icons.check,
-                                                  ),
-                                                  onPressed: () {
-                                                    // Действие
-                                                    print(
-                                                        'changing group name!');
-                                                    chatService.setGroupName(
-                                                        uid,
-                                                        groupNameChangeController
-                                                            .text);
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
+              // showModalBottomSheet(
+              //   backgroundColor: Theme.of(context).colorScheme.background,
+              //   context: context,
+              //   builder: (BuildContext context) {
+              //     print('opening thing');
+              //     return StatefulBuilder(
+              //       builder: (BuildContext context, StateSetter setState) {
+              //         return Container(
+              //           height: 200,
+              //           margin: const EdgeInsets.all(18),
+              //           child: Column(
+              //             children: [
+              //               Row(
+              //                 children: [
+              //                   IconButton(
+              //                     onPressed: () {
+              //                       Navigator.of(context).pop();
+              //                     },
+              //                     icon: Icon(Icons.close),
+              //                   ),
+              //                   const Padding(
+              //                       padding: EdgeInsets.only(right: 12)),
+              //                   Text(
+              //                     "Настройки чата",
+              //                     style: TextStyle(
+              //                       color: Theme.of(context)
+              //                           .colorScheme
+              //                           .onPrimaryContainer,
+              //                       fontSize: 25,
+              //                     ),
+              //                   )
+              //                 ],
+              //               ),
+              //               const Padding(padding: EdgeInsets.only(bottom: 12)),
+              //               Row(
+              //                 children: [
+              //                   _buildThumbnailImage(image_url ?? "", 70),
+              //                   Expanded(
+              //                     child: Column(
+              //                       crossAxisAlignment:
+              //                           CrossAxisAlignment.start,
+              //                       mainAxisAlignment: MainAxisAlignment.center,
+              //                       children: [
+              //                         Text(
+              //                           "Название группы",
+              //                           style: TextStyle(
+              //                             color: Theme.of(context)
+              //                                 .colorScheme
+              //                                 .onPrimaryContainer,
+              //                             fontSize: 14,
+              //                           ),
+              //                         ),
+              //                         Padding(
+              //                             padding: EdgeInsets.only(bottom: 6)),
+              //                         SizedBox(
+              //                           height: 48,
+              //                           child: TextField(
+              //                             controller: groupNameChangeController,
+              //                             maxLines: 1,
+              //                             decoration: InputDecoration(
+              //                               hintText: "Введите название...",
+              //                               hintStyle: const TextStyle(
+              //                                 fontFamily: 'Inter',
+              //                                 fontWeight: FontWeight.w400,
+              //                                 fontSize: 16.0,
+              //                               ),
+              //                               fillColor: Theme.of(context)
+              //                                   .colorScheme
+              //                                   .primary
+              //                                   .withAlpha(32),
+              //                               filled: true,
+              //                               border: OutlineInputBorder(
+              //                                 borderRadius:
+              //                                     BorderRadius.circular(10.0),
+              //                                 borderSide: BorderSide(
+              //                                   width: 0,
+              //                                   style: BorderStyle.none,
+              //                                 ),
+              //                               ),
+              //                               hoverColor: Theme.of(context)
+              //                                   .colorScheme
+              //                                   .primary
+              //                                   .withAlpha(32),
+              //                               contentPadding:
+              //                                   const EdgeInsets.symmetric(
+              //                                 horizontal: 12,
+              //                                 vertical: 16,
+              //                               ),
+              //                               suffixIcon: Container(
+              //                                 margin: EdgeInsets.only(right: 6),
+              //                                 child: SizedBox(
+              //                                   child: IconButton(
+              //                                     color: Theme.of(context)
+              //                                         .colorScheme
+              //                                         .primary,
+              //                                     icon: const Icon(
+              //                                       Icons.check,
+              //                                     ),
+              //                                     onPressed: () {
+              //                                       // Действие
+              //                                       print(
+              //                                           'changing group name!');
+              //                                       chatService.setGroupName(
+              //                                           uid,
+              //                                           groupNameChangeController
+              //                                               .text);
+              //                                       Navigator.of(context).pop();
+              //                                     },
+              //                                   ),
+              //                                 ),
+              //                               ),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //         );
+              //       },
+              //     );
+              //   },
+              // );
             },
           ),
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
               showModalBottomSheet(
+                backgroundColor: Theme.of(context).colorScheme.background,
                   context: context,
                   builder: (BuildContext context) {
                     return Container(
-                      color: Theme.of(context).colorScheme.background,
+                      //color: Theme.of(context).colorScheme.background,
                       height: 260,
-                      // decoration: BoxDecoration(
-                      //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
-                      // ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12)),
+                        //color: Theme.of(context).colorScheme.background,
+                      ),
+                      margin: const EdgeInsets.all(18),
                       child: Column(
                         children: [
                           create_button_for_change_state(
@@ -395,7 +319,9 @@ class _UserPage extends State<UserPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.notifications),
-                      color: Colors.orange, // Оранжевый цвет
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Оранжевый цвет
                       onPressed: () {
                         // Действия для кнопки с логотипом колокольчика
                       },
@@ -414,7 +340,9 @@ class _UserPage extends State<UserPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.search),
-                      color: Colors.orange, // Оранжевый цвет
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Оранжевый цвет
                       onPressed: () {
                         // Действия для кнопки с логотипом лупы
                       },
@@ -446,27 +374,28 @@ class _UserPage extends State<UserPage> {
                     indicatorPadding: EdgeInsets.only(top: 10, bottom: 10),
                     dividerHeight: 0,
                     tabAlignment: TabAlignment.start,
+                    onTap: (value) {
+                      if (value == 0) change_flag1();
+                      if (value == 1) change_flag2();
+                      if (value == 2) change_flag3();
+                      if (value == 3) change_flag4();
+                    },
                     tabs: [
                       Tab(
-                        child: GestureDetector(
-                          onTap: () {
-                            change_flag2();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Text(
+                            "Медиа",
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                              fontSize: 10,
                             ),
-                            child: Text(
-                              "Медиа",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 10,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
@@ -527,7 +456,6 @@ class _UserPage extends State<UserPage> {
                     ],
                   )),
             ),
-            _buildUserList(),
           ],
         ),
       ),
@@ -542,24 +470,27 @@ Widget _buildThumbnailImage(String image_url, double size) {
       child: SizedBox(
         width: size,
         height: size,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(56),
-          child: Image.network(
-            image_url,
-            fit: BoxFit.fill,
-            height: 200,
-            errorBuilder: (
-              BuildContext context,
-              Object exception,
-              StackTrace? stackTrace,
-            ) {
-              return CircleAvatar(
-                radius: 6,
-                backgroundColor:
-                    Theme.of(context).colorScheme.tertiaryContainer,
-                child: const Text('G'),
-              );
-            },
+        child: InstaImageViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(56),
+            child: Image.network(
+              image_url,
+              fit: BoxFit.fill,
+              height: size,
+              width: size,
+              errorBuilder: (
+                BuildContext context,
+                Object exception,
+                StackTrace? stackTrace,
+              ) {
+                return CircleAvatar(
+                  radius: 6,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  child: const Text('A'),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -572,20 +503,22 @@ Widget _buildThumbnailImage(String image_url, double size) {
 Widget create_button_for_change_state(
     IconData icon, String text, BuildContext context) {
   return ElevatedButton(
-      onPressed: () => {},
-      style: ButtonStyle(
-        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
-        backgroundColor: MaterialStatePropertyAll(
-          Theme.of(context).colorScheme.background,
-        ),
-        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-        shape: MaterialStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    onPressed: () => {},
+    style: ButtonStyle(
+      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+      surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+      backgroundColor: MaterialStatePropertyAll(
+        Colors.transparent,
+      ),
+      shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+      shape: MaterialStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
+    ),
+    child: Container(
+      height: 42,
       child: Row(
         children: [
           SizedBox(
@@ -596,12 +529,14 @@ Widget create_button_for_change_state(
             width: 20,
           ),
           Text(
-            "Закрепить в списке чатов",
+            text,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryContainer,
               fontSize: 18,
             ),
           ),
         ],
-      ));
+      ),
+    ),
+  );
 }
