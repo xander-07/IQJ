@@ -369,28 +369,28 @@ class _UserPage extends State<UserPage> {
               mainAxisAlignment: MainAxisAlignment
                   .spaceEvenly, // Равномерное распределение по оси X
               children: [
-                Column(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.person_add),
-                      color: Colors.orange, // Оранжевый цвет
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed('addtogroup', arguments: {
-                          "groupid": uid,
-                        });
-                      },
-                    ),
-                    Text(
-                      "Добавить",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ), // Текст ниже первой кнопки
-                  ],
-                ),
+                // Column(
+                //   children: [
+                //     IconButton(
+                //       icon: Icon(Icons.person_add),
+                //       color: Colors.orange, // Оранжевый цвет
+                //       onPressed: () {
+                //         Navigator.of(context)
+                //             .pushNamed('addtogroup', arguments: {
+                //           "groupid": uid,
+                //         });
+                //       },
+                //     ),
+                //     Text(
+                //       "Добавить",
+                //       style: TextStyle(
+                //         color: Theme.of(context).colorScheme.primary,
+                //         fontSize: 16,
+                //         fontWeight: FontWeight.w400,
+                //       ),
+                //     ), // Текст ниже первой кнопки
+                //   ],
+                // ),
                 Column(
                   children: [
                     IconButton(
