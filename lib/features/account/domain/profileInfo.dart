@@ -21,18 +21,19 @@ class _ProfileInfoState extends State<ProfileInfo> {
             "Валентинов\nВалентин\nВалентинович",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
               height: 1,
             ),
             textAlign: TextAlign.left,
           ),
-          SizedBox(height: 10,),
+          SizedBox(height: 7,),
           Text(
             "valentinov@mirea.ru",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 21,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

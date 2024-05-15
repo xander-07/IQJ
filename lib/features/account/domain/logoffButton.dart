@@ -66,15 +66,17 @@ class LogoffButton extends StatefulWidget {
 class _LogoffButtonState extends State<LogoffButton> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 45.0), // задайте нужное значение отступа
+      child: Container(
+        height: 60,
+        width: 189,
         child: TextButton(
           style: ElevatedButton.styleFrom(
             //alignment: Alignment.center,
-            backgroundColor: const Color.fromARGB(255, 193, 85, 78),
-            fixedSize: Size(200, 70), 
+            backgroundColor: const Color(0xFFC1554E),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(60),
+              borderRadius: BorderRadius.circular(35),
             ),
           ),
           onPressed: () {
@@ -90,7 +92,7 @@ class _LogoffButtonState extends State<LogoffButton> {
             ),
           ),
         ),
+      ),
     );
   }
-
 }
