@@ -337,7 +337,11 @@ func (nt *NewsTable) Update(n News) error {
 	if n.isDefault() {
 		return errors.New("News.Update: wrong data! provided *News is empty")
 	}
-
+	formattedDate, err := time.Parse("02.01.2006", n.PublicationTime)
+	if err != nil {
+		return err
+	}
+	n.PublicationTime = formattedDate.Format("2006-01-02 15:04:05")
 	// Подготовим запрос на обновление новости по ID
 	updateQuery := `
 		UPDATE news
@@ -352,7 +356,7 @@ func (nt *NewsTable) Update(n News) error {
 	`
 
 	// Выполним запрос
-	_, err := nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime, n.Id)
+	_, err = nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime, n.Id)
 	if err != nil {
 		return fmt.Errorf("News.Update: %v", err)
 	}
