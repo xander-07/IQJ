@@ -2,13 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"iqj/internal/database"
 	"net/http"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
+// Начальная функция по /news , из которой в зависимости от query параметров идет вызов соответствующей ручки
 func (h *Handler) HandleNews(c *gin.Context) {
 	offsetStr := c.Query("offset")
 	offset, _ := strconv.Atoi(offsetStr)
@@ -49,7 +49,11 @@ func (h *Handler) HandleSearchNews(c *gin.Context) {
 		fmt.Println("HandleGetNews:", err)
 		return
 	}
-	c.JSON(http.StatusOK, latestNews)
+	if len(*latestNews) == 0 {
+		c.JSON(http.StatusBadRequest, "There is no news with such a header")
+	} else {
+		c.JSON(http.StatusOK, latestNews)
+	}
 }
 
 // "/news_tags?tags=ИПТИП"
@@ -105,6 +109,7 @@ func (h *Handler) HandleSearchNewsByDate(c *gin.Context) {
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
 // Например при GET /news?offset=1&count=5 вернет новости с первой по шестую.
+
 func (h *Handler) HandleGetNews(c *gin.Context, offset, count int) {
 	switch {
 	case offset < 0:
@@ -141,6 +146,7 @@ func (h *Handler) HandleGetNews(c *gin.Context, offset, count int) {
 // вызывает функцию GetNewsByID, которая получает полную новость из бд.
 // Выдает полную новость пользователю в формате JSON.
 // Например при GET /newsid?id=13 вернет новость с id = 13.
+
 func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 	switch {
 	case id < 0:
@@ -183,6 +189,7 @@ func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 //
 // создает в бд переданную новость.
 // POST /auth/news
+
 func (h *Handler) HandleAddNews(c *gin.Context) {
 	userIdToConv, exists := c.Get("userId")
 	if !exists {
@@ -207,6 +214,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			fmt.Println("HandleAddNews:", err)
 			return
 		}
+
 		var user2 database.User
 		var user3 *database.User
 		user2.Id = int64(userId)
@@ -217,6 +225,14 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			return
 		}
 		news.Author = user3.Email
+
+		news.IsForStudents = false
+		for i := range news.Tags {
+			if news.Tags[i] == "студентам" {
+				news.IsForStudents = true
+			}
+		}
+
 		ok := database.Database.News.Add(news)
 		if ok != nil {
 			c.JSON(http.StatusInternalServerError, ok.Error())
@@ -233,6 +249,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 // Извлекает из запроса параметр all, который должен быть равен 1 для корректной работы
 // Используется функция GetAllNews, которая получает срез всех новостей в бд
 // Использование с GET: /news?all=1
+
 func (h *Handler) HandleGetAllNews(c *gin.Context) {
 
 	allNews, err := database.Database.News.GetAll()
@@ -245,7 +262,8 @@ func (h *Handler) HandleGetAllNews(c *gin.Context) {
 }
 
 // Функция для обновления новости по её id.
-// Использование с PUT: /api/news
+// Использование с PUT: /auth/news
+
 func (h *Handler) HandleUpdateNews(c *gin.Context) {
 	userIdToConv, ok := c.Get("userId")
 	if !ok {
