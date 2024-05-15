@@ -9,17 +9,21 @@ import (
 )
 
 const (
-	DefaultRoute        = "/"
-	NewsRoute           = "/news"
-	NewsSearch          = "/news_search"
-	NewsTags            = "/news_tags"
-	NewsDate            = "/news_date"
+	DefaultRoute = "/"
+
+	NewsRoute  = "/news"
+	NewsSearch = "/news_search"
+	NewsTags   = "/news_tags"
+	NewsDate   = "/news_date"
+
 	AdvertisementsRoute = "/ad"
-	LessonsRoute        = "/lessons"
-	SignInRoute         = "/sign-in"
-	SignUpRoute         = "/sign-up"
-	WebSignInRoute      = "/web_sign-in"
-	UpdateRoleRoute     = "/update_role"
+
+	LessonsRoute = "/lessons"
+
+	SignInRoute     = "/sign-in"
+	SignUpRoute     = "/sign-up"
+	WebSignInRoute  = "/web_sign-in"
+	UpdateRoleRoute = "/update_role"
 
 	AuthGroupRoute = "/auth"
 
@@ -67,6 +71,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		authGroup.POST(NewsRoute, h.HandleAddNews)
 		authGroup.PUT(NewsRoute, h.HandleUpdateNews)
+		authGroup.DELETE(NewsRoute, h.HandleDeleteNews)
 
 		authGroup.POST(AdvertisementsRoute, h.HandlePostAdvertisement)
 		authGroup.PUT(AdvertisementsRoute, h.HandleUpdateAdvertisements)

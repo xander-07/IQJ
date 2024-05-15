@@ -108,7 +108,7 @@ func (h *Handler) HandleSearchNewsByDate(c *gin.Context) {
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
-// Например при GET /news?offset=1&count=5 вернет новости с первой по шестую.
+// Например, при GET /news?offset=1&count=5 вернет новости с первой по шестую.
 
 func (h *Handler) HandleGetNews(c *gin.Context, offset, count int) {
 	switch {
@@ -145,7 +145,7 @@ func (h *Handler) HandleGetNews(c *gin.Context, offset, count int) {
 // Извлекает id из параметров запроса,
 // вызывает функцию GetNewsByID, которая получает полную новость из бд.
 // Выдает полную новость пользователю в формате JSON.
-// Например при GET /newsid?id=13 вернет новость с id = 13.
+// Например, при GET /news?id=13 вернет новость с id = 13.
 
 func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 	switch {
@@ -248,7 +248,7 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 // Функция для получения всех полных новостей, имеющихся в бд на данный момент.
 // Извлекает из запроса параметр all, который должен быть равен 1 для корректной работы
 // Используется функция GetAllNews, которая получает срез всех новостей в бд
-// Использование с GET: /news?all=1
+// Использование с GET: /news
 
 func (h *Handler) HandleGetAllNews(c *gin.Context) {
 
@@ -301,6 +301,62 @@ func (h *Handler) HandleUpdateNews(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, news)
+	} else {
+		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
+	}
+}
+
+// Извлекает id из параметров запроса
+// Проверяет, есть ли новость с указанным id в бд
+// если есть удаляет новость, иначе выводит сообщение, что такой новости нет.
+// Например, при DELETE /auth/news?id=13 удалит новость с id = 13.
+
+func (h *Handler) HandleDeleteNews(c *gin.Context) {
+	userIdToConv, ok := c.Get("userId")
+	if !ok {
+		c.String(http.StatusUnauthorized, "User ID not found")
+		fmt.Println("HandleDeleteNews:", ok)
+		return
+	}
+	userId := userIdToConv.(int)
+
+	user, err := database.Database.UserData.GetRoleById(
+		database.UserData{
+			Id: int64(userId),
+		})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleDeleteNews:", err)
+		return
+	}
+
+	if user.Role == "moderator" {
+		idStr := c.Query("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			fmt.Println("HandleDeleteNews:", err)
+			return
+		}
+
+		var news database.News
+		news.Id = id
+
+		_, err = database.Database.News.GetById(news)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "The news with the specified id does not exist")
+			fmt.Println("HandleDeleteNews:", err)
+			return
+		}
+
+		err = database.Database.News.Delete(news)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			fmt.Println("HandleDeleteNews:", err)
+			return
+		}
+
+		c.JSON(http.StatusOK, fmt.Sprintf("The news with the id=%v was successfully deleted", id))
 	} else {
 		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
 	}
