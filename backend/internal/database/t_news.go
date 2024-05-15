@@ -197,6 +197,52 @@ func (nt *NewsTable) GetNewsByTags(words string) (*[]News, error) {
 	return &resultNewsArr, nil
 }
 
+//// GetNewsByDate возвращает новости которые имеют определенную дату с 1 числа по 2
+
+func (nt *NewsTable) GetNewsByDate(startDateSTR, endDateSTR string) (*[]News, error) {
+	layout := "2006-01-02T15:04:05Z" // Формат строки даты-времени
+
+	startDate, err := time.Parse(layout, startDateSTR)
+	if err != nil {
+		// Обработка ошибки
+		fmt.Println("Ошибка при разборе строки даты-времени:", err)
+	}
+	endDate, err := time.Parse(layout, endDateSTR)
+	if err != nil {
+		// Обработка ошибки
+		fmt.Println("Ошибка при разборе строки даты-времени:", err)
+	}
+	// Подготовим запрос на получение новостных блоков между двумя датами
+	selectQuery := `
+	  SELECT news_id, header, link, image_links, tags, news_author_name, publication_time
+	  FROM news
+	  WHERE publication_time >= $1 AND publication_time <= $2
+	  ORDER BY publication_time DESC
+	`
+
+	// Выполним запрос и получим строки
+	rows, err := nt.db.Query(selectQuery, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetNewsByDate: %v", err)
+	}
+	defer rows.Close()
+
+	// Создадим срез для хранения новостных блоков
+	var resultNewsArr []News
+	// Пройдемся по всем строкам и заполним структуру News
+	for rows.Next() {
+		var resultNews News
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.Author, &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetNewsByDate: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
+	// Вернем срез с новостными блоками и nil
+	return &resultNewsArr, nil
+}
+
 // Остальные методы не изменились и остаются теми же
 
 // GetLatestBlocks возвращает указанное количество последних новостных блоков.

@@ -73,6 +73,34 @@ func (h *Handler) HandleSearchNewsByTags(c *gin.Context) {
 	c.JSON(http.StatusOK, latestNews)
 }
 
+// "/news_date?date=2024-05-14T00:00:00Z"
+// 2024-05-14T00:00:00Z
+//2024-04-22T00:00:00Z
+// которая вернет массив с последними новостями.
+// Выдает новости пользователю в формате JSON.
+// Например при GET /news_date?date1=2024-05-12T00:00:00Z&date2=2024-05-14T00:00:00Z вернет новости c 12 мая по 14 мая
+
+func (h *Handler) HandleSearchNewsByDate(c *gin.Context) {
+	offsetStr1 := c.Query("date1")
+	if len(offsetStr1) == 0 {
+		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
+		return
+	}
+	offsetStr2 := c.Query("date2")
+	if len(offsetStr2) == 0 {
+		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
+		return
+	}
+
+	latestNews, err := database.Database.News.GetNewsByDate(offsetStr1, offsetStr2)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetNews:", err)
+		return
+	}
+	c.JSON(http.StatusOK, latestNews)
+}
+
 // Получает offset и count из запроса, вызывает функцию GetLatestNewsBlocks,
 // которая вернет массив с последними новостями.
 // Выдает новости пользователю в формате JSON.
