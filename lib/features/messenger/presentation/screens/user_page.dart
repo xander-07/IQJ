@@ -566,7 +566,7 @@ Widget _buildThumbnailImage(String image_url, double size) {
         width: size,
         height: size,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(56),
           child: Image.network(
             image_url,
             fit: BoxFit.fill,
