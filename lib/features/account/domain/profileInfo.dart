@@ -15,23 +15,27 @@ class _ProfileInfoState extends State<ProfileInfo> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomLeft,
-      child: const Column(
+      child: Column(
         children: [
           Text(
             "Валентинов\nВалентин\nВалентинович",
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w500,
               height: 1,
             ),
             textAlign: TextAlign.left,
           ),
-          SizedBox(height: 7,),
+          const SizedBox(height: 7,),
           Text(
             "valentinov@mirea.ru",
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),

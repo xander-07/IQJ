@@ -77,14 +77,18 @@ class _ListButtonState extends State<ListButton> {
                   height: 56,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Color(0xFF594512),
+                    color: Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
                   ),
                 ),
                 const SizedBox(width: 13),
-                const Text(
+                Text(
                   "Журнал успеваемости",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
                     fontFamily: 'Inter',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -94,7 +98,7 @@ class _ListButtonState extends State<ListButton> {
             ),
           ),
         ),
-        SizedBox(height: 11,),
+        const SizedBox(height: 11,),
         Container(
           height: 77,
           width: 323,
@@ -119,14 +123,18 @@ class _ListButtonState extends State<ListButton> {
                   height: 56,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Color(0xFF594512),
+                    color:Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
                   ),
                 ),
                 const SizedBox(width: 13),
-                const Text(
+                Text(
                   "Объявления",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
                     fontFamily: 'Inter',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -136,7 +144,7 @@ class _ListButtonState extends State<ListButton> {
             ),
           ),
         ),
-        SizedBox(height: 11,),
+        const SizedBox(height: 11,),
         Container(
           height: 77,
           width: 323,
@@ -161,14 +169,18 @@ class _ListButtonState extends State<ListButton> {
                   height: 56,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Color(0xFF594512),
+                    color:Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
                   ),
                 ),
                 const SizedBox(width: 13),
-                const Text(
+                Text(
                   "Что-то ещё",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
                     fontFamily: 'Inter',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
