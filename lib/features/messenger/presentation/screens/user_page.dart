@@ -440,36 +440,13 @@ class _UserPage extends State<UserPage> {
             Container(
               alignment: Alignment.center,
               child: DefaultTabController(
-                  length: 5,
+                  length: 4,
                   child: TabBar(
                     isScrollable: true,
                     indicatorPadding: EdgeInsets.only(top: 10, bottom: 10),
                     dividerHeight: 0,
                     tabAlignment: TabAlignment.start,
                     tabs: [
-                      Tab(
-                        child: GestureDetector(
-                          onTap: () {
-                            change_flag1();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: Text(
-                              "Участники",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontSize: 10,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ),
                       Tab(
                         child: GestureDetector(
                           onTap: () {
