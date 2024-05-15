@@ -85,7 +85,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		firebaseGroup := authGroup.Group(FirebaseGroupRoute)
 		{
 			firebaseGroup.GET(FirebaseUserRoute, h.HandleListUsers)
+			firebaseGroup.POST(FirebaseUserRoute, h.HandleCreateFirebaseUser)
 			firebaseGroup.PUT(FirebaseUserRoute, h.HandleUpdateFirebaseUser)
+			firebaseGroup.DELETE(FirebaseUserRoute, h.HandleDeleteFirebaseUser)
 		}
 	}
 
