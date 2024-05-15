@@ -38,8 +38,33 @@ func (h *Handler) HandleNews(c *gin.Context) {
 
 func (h *Handler) HandleSearchNews(c *gin.Context) {
 	offsetStr := c.Query("header")
+	if len(offsetStr) == 0 {
+		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
+		return
+	}
 
 	latestNews, err := database.Database.News.GetNewsByHeader(offsetStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		fmt.Println("HandleGetNews:", err)
+		return
+	}
+	c.JSON(http.StatusOK, latestNews)
+}
+
+// "/news_tags?tags=ИПТИП"
+// Получает tags из запроса, вызывает функцию GetNewsByTags,
+// которая вернет массив с последними новостями.
+// Выдает новости пользователю в формате JSON.
+// Например при GET /news_tags?tags=ИПТИП вернет новости у которых есть тег ИПТИП.
+func (h *Handler) HandleSearchNewsByTags(c *gin.Context) {
+	offsetStr := c.Query("tags")
+	if len(offsetStr) == 0 {
+		c.JSON(http.StatusBadRequest, "You cannot send the id together with count or offset at the same time")
+		return
+	}
+
+	latestNews, err := database.Database.News.GetNewsByTags(offsetStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleGetNews:", err)

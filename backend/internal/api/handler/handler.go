@@ -12,6 +12,7 @@ const (
 	DefaultRoute        = "/"
 	NewsRoute           = "/news"
 	NewsSearch          = "/news_search"
+	NewsTags            = "/news_tags"
 	AdvertisementsRoute = "/ad"
 	LessonsRoute        = "/lessons"
 	SignInRoute         = "/sign-in"
@@ -52,6 +53,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	r.GET(NewsRoute, h.HandleNews)
 	r.GET(NewsSearch, h.HandleSearchNews)
+	r.GET(NewsTags, h.HandleSearchNewsByTags)
 
 	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
 

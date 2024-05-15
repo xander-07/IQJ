@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -158,6 +159,41 @@ func (nt *NewsTable) GetNewsByHeader(word string) (*[]News, error) {
 	}
 
 	// Вернем срез с последними новостными блоками и nil
+	return &resultNewsArr, nil
+}
+
+// GetNewsByTags возвращает новости которые имеют определенный тег
+
+func (nt *NewsTable) GetNewsByTags(words string) (*[]News, error) {
+	// Разделяем входную строку на массив слов
+	wordList := strings.Split(words, " ")
+	// Формируем параметр для SQL запроса в виде массива
+	wordParam := pq.Array(wordList)
+
+	selectQuery := `
+	SELECT news_id, header, link, image_links, tags, publication_time
+	FROM news
+	WHERE tags && $1
+	ORDER BY publication_time DESC
+	`
+	rows, err := nt.db.Query(selectQuery, wordParam)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetByTags: %v", err)
+	}
+	defer rows.Close()
+
+	var resultNewsArr []News
+
+	for rows.Next() {
+		var resultNews News
+		// Убедитесь, что количество аргументов в rows.Scan соответствует количеству выбранных столбцов
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetByTags: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
 	return &resultNewsArr, nil
 }
 
