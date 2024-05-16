@@ -10,17 +10,17 @@ import (
 
 // Структура учебной пары
 type Class struct {
-	Id          int      `json:"class_id"`                   // Id пары
-	Groups      []int    `json:"class_group_ids,omitempty"`  // Список Id групп, для которых пара
-	GroupsNames []string `json:"class_group_names"`          // список названий групп, т.к. не все группы есть в таблице учебных групп
-	Teacher     int      `json:"class_teacher_id,omitempty"` // Id преподавателя, который ведет пару
-	TeacherName string   `json:"class_teacher_name"`         // фио преподавателя
-	Count       int      `json:"class_count"`                // Какая пара по счету за день
-	Weekday     int      `json:"class_weekday"`              // Номер дня недели
-	Week        int      `json:"class_week"`                 // Номер учебной неделяя
-	Name        string   `json:"class_name"`                 // Название пары
-	Type        string   `json:"class_type"`                 // Тип пары
-	Location    string   `json:"class_location,omitempty"`   // Местонахождение
+	Id          int      `json:"class_id"`                 // Id пары
+	Groups      []int    `json:"class_group_ids"`          // Список Id групп, для которых пара
+	GroupsNames []string `json:"class_group_names"`        // список названий групп, т.к. не все группы есть в таблице учебных групп
+	Teacher     int      `json:"class_teacher_id"`         // Id преподавателя, который ведет пару
+	TeacherName string   `json:"class_teacher_name"`       // фио преподавателя
+	Count       int      `json:"class_count"`              // Какая пара по счету за день
+	Weekday     int      `json:"class_weekday"`            // Номер дня недели
+	Week        int      `json:"class_week"`               // Номер учебной неделяя
+	Name        string   `json:"class_name"`               // Название пары
+	Type        string   `json:"class_type"`               // Тип пары
+	Location    string   `json:"class_location,omitempty"` // Местонахождение
 }
 
 // Проверяет переданы ли в структуру какие-либо данные
@@ -172,7 +172,7 @@ func (ct *ClassTable) GetForDayByTeacher(c Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id, class_group_names, count, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_names, class_teacher_name, count, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3`,
 		c.Id, c.Week, c.Weekday)

@@ -2,6 +2,7 @@ package excel_parser
 
 import (
 	"iqj/internal/database"
+	"strings"
 	"strconv"
 )
 
@@ -49,16 +50,11 @@ func find(table [][]string, id int) (int, error) {
 			//Присваивание значений полям в соответствии с положением таблицы
 			row.Id = id
 			row.Count, _ = strconv.Atoi(table[i][j-4-count_iter])
-			row.Teacher = teacherid
-			row.TeacherName = table[i][j+2]
 			if table[i][j-1-count_iter] == "I" {
 				row.Week = 1
 			} else {
 				row.Week = 2
 			}
-			row.Name = table[i][j]
-			row.Type = table[i][j+1]
-			row.Location = table[i][j+3]
 			//Поиск ID группы из БД
 			group.Name = table[1][j]
 			_, err := database.Database.StudentGroup.GetIdByName(group) // TODO: сделать группу вместо заглушки
@@ -103,7 +99,70 @@ func find(table [][]string, id int) (int, error) {
 			//Присваивание полей групп и ID групп и обнуление список
 			row.Groups = groupids
 			row.GroupsNames = groups
+			//Если пара разделена на подгруппы (английский, лабы)
+			if strings.Contains(table[i][j], "\n\n") {
+				//Создаем еще одну пару и заполняем ее
+				var row1 database.Class
+				row1.Id = id+1
+				row1.Groups = row.Groups
+				row1.GroupsNames = row.GroupsNames
+				row1.Count = row.Count
+				row1.Week = row.Week
+				row1.Weekday = row.Weekday
+				//Подгруппы разделены двойным переносом строки
+				classes := strings.Split(table[i][j], "\n\n")
+				class_types := strings.Split(table[i][j+1], "\n\n")
+				teacher_names := strings.Split(table[i][j+2], "\n\n")
+				classrooms := strings.Split(table[i][j+3], "\n\n")
 
+				row.Name = classes[0]
+				row1.Name = classes[1]
+				row.Type = class_types[0]
+				row1.Type = class_types[1]
+				row.Teacher = teacherid
+				row.Teacher = teacherid+1
+				row.TeacherName = teacher_names[0]
+				row1.TeacherName = teacher_names[1]
+				row.Location = classrooms[0]
+				row1.Location = classrooms[1]
+				// функция проверки на массив нулей, для избежания занесения в бд массива вида [0,0,0] (это вызывает ошибку sql)
+				c := 0
+				for _, v := range row.Groups {
+					if v == 0 {
+						c++
+					}
+				}
+				if c == len(row.Groups) {
+					row.Groups = []int{1, 2, 3, 4}
+					row1.Groups = []int{1, 2, 3, 4}
+				}
+				if row.Teacher == 0 {
+					row.Teacher = 123
+				}
+				if row1.Teacher == 0 {
+					row1.Teacher = 123
+				}
+				//Изменение итераторов
+				if iter == 5 {
+					iter = 10
+					count_iter = 0
+				} else {
+					iter = 5
+					count_iter = 5
+				}
+				id += 2
+				teacherid += 2
+				groupids = nil
+				groups = nil
+				err = database.Database.Class.Add(row)
+				err = database.Database.Class.Add(row1)
+				continue
+			}
+			row.Teacher = teacherid
+			row.TeacherName = table[i][j+2]
+			row.Name = table[i][j]
+			row.Type = table[i][j+1]
+			row.Location = table[i][j+3]
 			// функция проверки на массив нулей, для избежания занесения в бд массива вида [0,0,0] (это вызывает ошибку sql)
 			// теперь еще и учителя меняет с 0 на 123
 			func() {

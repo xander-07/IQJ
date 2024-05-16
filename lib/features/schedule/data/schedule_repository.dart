@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:iqj/features/schedule/domain/day.dart';
+import 'package:iqj/features/schedule/domain/lesson.dart';
 
-// TODO:
+// Время начала отсчета
+final DateTime _startDate = DateTime(2024, 2, 5);
 
-Future<List<Day>> fetchSchedule(String criterion, String target) async {
+Future<Map<DateTime, List<Lesson>>> fetchSchedule(
+    String criterion, String target) async {
   final response = await http.get(
     Uri(
       scheme: 'https',
@@ -14,20 +16,25 @@ Future<List<Day>> fetchSchedule(String criterion, String target) async {
       queryParameters: {'criterion': criterion, 'value': target},
     ),
   );
+
   if (response.statusCode == 200) {
-    final body = json.decode(response.body) as List<Map<String, dynamic>>;
-    List<Day> schedule = [];
-    body.map(
-      (e) {
-        DateTime _date = DateTime(2024, );
-      },
-    );
+    final body = json.decode(response.body) as List<dynamic>;
+    final Map<DateTime, List<Lesson>> schedule = {};
+
+    for (final element in body) {
+      final item = element as Map<String, dynamic>;
+      final lesson = Lesson.fromJson(item);
+      // Генерируем ключ DateTime для расписания с учётом начального дня
+      final weekday = item['class_weekday'] as int;
+      final week = item['class_week'] as int;
+      final date =
+          _startDate.add(Duration(days: (week - 1) * 7 + (weekday - 1)));
+
+      (schedule[date] ??= []).add(lesson);
+    }
+
     return schedule;
   } else {
-    throw Exception(response.statusCode);
+    throw Exception('Ошибка запроса, код: ${response.statusCode}');
   }
 }
-
-// TODO:
-// MARK: кэширование расписания
-void cacheSchedule() {}

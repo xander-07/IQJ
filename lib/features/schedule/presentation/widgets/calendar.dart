@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:iqj/features/schedule/domain/lesson.dart';
 import 'package:iqj/features/schedule/presentation/bloc/schedule_bloc.dart';
 import 'package:iqj/features/schedule/presentation/bloc/schedule_event.dart';
+import 'package:iqj/features/schedule/presentation/bloc/schedule_state.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Calendar extends StatefulWidget {
@@ -12,21 +15,33 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
+  final _firstStudyWeekStart = DateTime(2024, 2, 5);
   CalendarFormat _format = CalendarFormat.month; // Формат календаря
   DateTime _selectedDay = DateTime.now(); // Выбранный день
   DateTime _focusedDay = DateTime.now(); // День, на который сделан фокус
+  late ScheduleBloc _bloc;
+  List<Lesson> _selectedLessons(DateTime day) {
+    final state = _bloc.state;
+    if (state is ScheduleLoaded) {
+      return state.schedule[day] ?? [];
+    }
+    return [];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return content();
+    _bloc = BlocProvider.of<ScheduleBloc>(context);
+    return BlocBuilder<ScheduleBloc, ScheduleState>(builder: content);
   }
 
-  Widget content() {
-    return TableCalendar(
-      rowHeight: 47, // Высота строки
-      focusedDay: _selectedDay, // День, на который сделан фокус
-      firstDay: DateTime(2023, 1, 1), // Первый день
-      lastDay: DateTime(2030, 1, 1), // Последний день
+  Widget content(BuildContext context, ScheduleState state) {
+    return TableCalendar<Lesson>(
+      rowHeight: 68, // Высота строки
+      focusedDay: _focusedDay, // День, на который сделан фокус
+      firstDay: DateTime(2024), // Первый день
+      lastDay: DateTime(2030), // Последний день
+      locale: 'ru_RU',
+      daysOfWeekVisible: false, // Спрятать стандартный ряд дней недели
       calendarFormat: _format, // Формат календаря
       onFormatChanged: (CalendarFormat format) {
         setState(() {
@@ -34,130 +49,318 @@ class _CalendarState extends State<Calendar> {
         });
       }, // Изменение формата календаря
       startingDayOfWeek: StartingDayOfWeek.monday, // Первый день недели
-      daysOfWeekVisible: true, // Видимость дней недели
-      onDaySelected: (DateTime selectDay, DateTime focusDay) {
+      onDaySelected: (DateTime selectedDay, DateTime focusedDay) {
         setState(() {
-          _selectedDay = selectDay;
-          _focusedDay = focusDay;
+          _selectedDay = selectedDay;
+          _focusedDay = focusedDay;
         });
-        BlocProvider.of<ScheduleBloc>(context).add(SelectDay(selectDay));
+        _bloc.add(
+          ChangeSelectedDay(selectedDay: DateUtils.dateOnly(selectedDay)),
+        );
       },
       selectedDayPredicate: (DateTime date) {
         return isSameDay(_selectedDay, date);
       }, // Проверка, является ли день выбранным
-      calendarStyle: CalendarStyle(
-        isTodayHighlighted: true, // Выделение сегодняшнего дня
-        defaultDecoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ), // Декорация дня по умолчанию
-        selectedDecoration: const BoxDecoration(
-          color: Color(0xaaEF9800),
-          shape: BoxShape.circle,
-        ), // Декорация выбранного дня
-        todayDecoration: const BoxDecoration(
-          color: Color(0xFFD1D1D1),
-          shape: BoxShape.circle,
-        ),
-        selectedTextStyle: const TextStyle(
-            color: Color(0xFFF8F8F8)), // Стиль текста выбранного дня
-        todayTextStyle: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .onPrimaryContainer), // Декорация сегодняшнего дня
-        defaultTextStyle: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .onPrimaryContainer), // Стиль текста дня по умолчанию
-        weekendTextStyle: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .onPrimaryContainer), // Стиль текста выходного дня
-        weekendDecoration: BoxDecoration(
-          shape: BoxShape.circle,
-        ), // Декорация выходного дня
-      ),
+
+      // MARK: стиль заголовка календаря
       headerStyle: HeaderStyle(
-        formatButtonVisible: true,
         formatButtonShowsNext: false,
         formatButtonDecoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: BorderRadius.circular(5.0),
+          border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+          borderRadius: BorderRadius.circular(20),
         ),
-        formatButtonTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        formatButtonTextStyle:
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+        titleTextStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
       availableCalendarFormats: const {
         CalendarFormat.month: 'Месяц',
         CalendarFormat.twoWeeks: '2 недели',
         CalendarFormat.week: 'Неделя',
       },
+      weekNumbersVisible: true,
+
+      calendarBuilders: CalendarBuilders(
+        weekNumberBuilder: _weekNumberBuilder,
+        defaultBuilder: _defaultBuilder,
+        selectedBuilder: _selectedBuilder,
+        todayBuilder: _todayBuilder,
+        outsideBuilder: _defaultBuilder,
+      ),
     );
   }
-}
 
-class CustomCalendarBuilder extends CalendarBuilders {
-  Widget buildDefaultCell({
-    required BuildContext context,
-    required DateTime date,
-    required List<dynamic> events,
-    bool isSelected = false,
-    bool isToday = false,
-    bool isInSelectedRange = false,
-    bool isInRange = false,
-    bool isInCurrentMonth = true,
-  }) {
-    final defaultDecoration = BoxDecoration(
-      shape: BoxShape.circle,
-      color: const Color(0xFFEFAC00).withOpacity(0.56),
-    );
+  // MARK: билдеры
+  // номер недели
+  Widget? _weekNumberBuilder(BuildContext context, int weekNumber) {
+    final studyWeekNumber = weekNumber -
+        _firstStudyWeekStart.difference(DateTime(2024)).inDays ~/ 7;
+    return studyWeekNumber > 0
+        ? Center(
+            child: Text(
+              '$studyWeekNumber',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onPrimaryContainer
+                    .withAlpha(studyWeekNumber.isEven ? 216 : 140),
+              ),
+            ),
+          )
+        : const SizedBox();
+  }
 
-    final selectedDecoration = BoxDecoration(
-      color: const Color(0xFFEFAC00).withOpacity(0.17),
-      shape: BoxShape.circle,
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0xFFEFAC00).withOpacity(0.17),
-          blurRadius: 5,
-        ),
-      ],
-    );
-
-    return Container(
-      constraints: const BoxConstraints(
-        minWidth: 50,
-        minHeight: 50,
-      ),
-      child: Stack(
+  // сегодняшний день
+  Widget? _todayBuilder(
+    BuildContext context,
+    DateTime day,
+    DateTime focusedDay,
+  ) =>
+      Stack(
         alignment: Alignment.center,
         children: [
-          if (isSelected)
+          if (day.day == 1 ||
+              day.add(const Duration(days: 1)).day ==
+                  1)
             Container(
-              decoration: selectedDecoration,
+              height: 68,
+              width: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF545448).withAlpha(day.day == 1 ? 255 : 0),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
             ),
           Container(
-            decoration: defaultDecoration,
-            child: Center(
-              child: Text(
-                date.day.toString(),
-                style: isSelected
-                    ? const TextStyle(color: Color(0xFF191919))
-                    : const TextStyle(color: Color(0xFF191919)),
+            height: 66,
+            width: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+              child: Column(
+                children: [
+                  Container(
+                    height: 32,
+                    width: 32,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF454648),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    DateFormat('EE', 'ru_RU').format(day),
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      color: Theme.of(context).colorScheme.onBackground,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  if (_bloc.state is ScheduleLoaded)
+                    Wrap(
+                      children: List.generate(
+                        _selectedLessons(day).length,
+                        (index) => Container(
+                          height: 2,
+                          width: 2,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _selectedLessons(day)[index].getColor(),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
-          if (date.weekday == DateTime.saturday)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Icon(
-                Icons.circle,
-                size: 8,
-                color: const Color(0xFFEFAC00).withOpacity(0.56),
+        ],
+      );
+  // выбранный день
+  Widget? _selectedBuilder(
+    BuildContext context,
+    DateTime day,
+    DateTime focusedDay,
+  ) =>
+      Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            height: 70,
+            width: 44,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF545448).withAlpha(day.day == 1 ? 255 : 0),
+                  Colors.transparent,
+                ],
               ),
             ),
+          ),
+          Container(
+            height: 66,
+            width: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+              child: Column(
+                children: [
+                  Container(
+                    height: 32,
+                    width: 32,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC48F05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    DateFormat('EE', 'ru_RU').format(day),
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      color: Theme.of(context).colorScheme.onBackground,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  if (_bloc.state is ScheduleLoaded)
+                    Wrap(
+                      children: List.generate(
+                        _selectedLessons(day).length,
+                        (index) => Container(
+                          height: 2,
+                          width: 2,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _selectedLessons(day)[index].getColor(),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
         ],
-      ),
-    );
-  }
+      );
+
+  //остальные дни
+  Widget? _defaultBuilder(
+    BuildContext context,
+    DateTime day,
+    DateTime focusedDay,
+  ) =>
+      Stack(
+        alignment: Alignment.center,
+        children: [
+          if (day.day == 1 ||
+              day.add(const Duration(days: 1)).day ==
+                  1)
+            Container(
+              height: 70,
+              width: 44,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF545448).withAlpha(day.day == 1 ? 255 : 0),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          Container(
+            height: 66,
+            width: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+              child: Column(
+                children: [
+                  Container(
+                    height: 32,
+                    width: 32,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    DateFormat('EE', 'ru_RU').format(day),
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                      color: Theme.of(context).colorScheme.onBackground,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  if (_bloc.state is ScheduleLoaded)
+                    Wrap(
+                      children: List.generate(
+                        _selectedLessons(day).length,
+                        (index) => Container(
+                          height: 2,
+                          width: 2,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _selectedLessons(day)[index].getColor(),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+
+  // Загрузчик событий дня
 }
