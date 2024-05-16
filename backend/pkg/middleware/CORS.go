@@ -11,7 +11,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		origin := c.GetHeader("Origin")
 		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "*, Authorization")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		// Проверка на предварительный запрос с методом OPTIONS.
