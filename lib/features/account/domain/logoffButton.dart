@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iqj/features/welcome/presentation/welcome.dart'; 
 
 void showExitDialog(BuildContext context) {
   final Widget okButton = TextButton(
@@ -67,20 +68,19 @@ class _LogoffButtonState extends State<LogoffButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 45.0), // задайте нужное значение отступа
+      padding: const EdgeInsets.only(bottom: 45.0),
       child: Container(
         height: 60,
         width: 189,
         child: TextButton(
           style: ElevatedButton.styleFrom(
-            //alignment: Alignment.center,
             backgroundColor: const Color(0xFFC1554E),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(35),
             ),
           ),
           onPressed: () {
-            showExitDialog(context);
+            Navigator.pushReplacementNamed(context, 'welcome'); 
           },
           child: const Text(
             "Выйти",
