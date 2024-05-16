@@ -6,15 +6,15 @@ import 'package:iqj/features/schedule/domain/lesson.dart';
 
 class LessonCard extends StatelessWidget {
   final Lesson lesson;
-  final int index;
   final bool isCompact;
-  const LessonCard(this.lesson, this.index, this.isCompact, {super.key});
+  const LessonCard(this.lesson, this.isCompact, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: Theme.of(context).colorScheme.onInverseSurface,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
         child: Column(
@@ -47,8 +47,7 @@ class LessonCard extends StatelessWidget {
                               height: 7,
                               width: 7,
                               decoration: BoxDecoration(
-                                color: _lessonColor[lesson.type] ??
-                                    const Color(0xFF8E959B),
+                                color: lesson.getColor(),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -64,7 +63,7 @@ class LessonCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${index + 1} пара",
+                          "${lesson.order} пара",
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
@@ -72,7 +71,7 @@ class LessonCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          _lessonTime[index],
+                          _lessonTime[lesson.order - 1],
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w400,
@@ -88,10 +87,11 @@ class LessonCard extends StatelessWidget {
                   ? []
                   : [
                       Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .inverseSurface
-                              .withAlpha(144)),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .inverseSurface
+                            .withAlpha(144),
+                      ),
                       // MARK: Нижние строки
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -113,7 +113,8 @@ class LessonCard extends StatelessWidget {
                                 TextSpan(
                                   text: lesson.groups[0],
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             ),
@@ -142,9 +143,10 @@ class LessonCard extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(
-                                  text: lesson.classroom,
+                                  text: lesson.location,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             ),
@@ -168,8 +170,10 @@ class EmptyLessonCard extends StatelessWidget {
     return Card(
       color: Theme.of(context).colorScheme.onInverseSurface,
       surfaceTintColor: Colors.transparent,
+      borderOnForeground: false,
+      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
         child: Stack(
           children: [
             Text(
@@ -200,7 +204,6 @@ class EmptyLessonCard extends StatelessWidget {
 }
 
 // Список времени, доступ по индексу пары
-// Так действительно проще
 final List<String> _lessonTime = [
   '9:00 - 10:30',
   '10:40 - 12:10',
@@ -209,14 +212,3 @@ final List<String> _lessonTime = [
   '16:20 - 17:50',
   '18:00 - 19:30',
 ];
-
-// Цвета, которые используем для пар
-final Map<String, Color> _lessonColor = {
-  'Лекция': const Color(0xFF7749F8),
-  'Практика': const Color(0xFFAC8EFF),
-  'Лабораторная': const Color(0xFFEF9800),
-  'Зачет': const Color(0xFF87D07F),
-  'Консультация': const Color(0xFF0584FE),
-  'Экзамен': const Color(0xFFFF7070),
-  'Курсовая': const Color(0xFFFF8EFA),
-};

@@ -10,14 +10,21 @@ import (
 
 const (
 	DefaultRoute = "/"
-	NewsRoute    = "/news"
-	//NewsSearch			= "/news_search"
-	AdvertisementsRoute = "/ad"
-	LessonsRoute        = "/lessons"
-	SignInRoute         = "/sign-in"
-	SignUpRoute         = "/sign-up"
-	WebSignInRoute      = "/web_sign-in"
-	UpdateRoleRoute     = "/update_role"
+
+	NewsRoute  = "/news"
+	NewsSearch = "/news_search"
+	NewsTags   = "/news_tags"
+	NewsDate   = "/news_date"
+
+	AdvertisementsRoute    = "/ad"
+	AllAdvertisementsRoute = "/ad_all"
+
+	LessonsRoute = "/lessons"
+
+	SignInRoute     = "/sign-in"
+	SignUpRoute     = "/sign-up"
+	WebSignInRoute  = "/web_sign-in"
+	UpdateRoleRoute = "/update_role"
 
 	AuthGroupRoute = "/auth"
 
@@ -51,9 +58,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
 	r.GET(NewsRoute, h.HandleNews)
-	//r.GET(NewsSearch,h.HandleSearchNews)
+	r.GET(NewsSearch, h.HandleSearchNews)
+	r.GET(NewsTags, h.HandleSearchNewsByTags)
+	r.GET(NewsDate, h.HandleSearchNewsByDate)
 
 	r.GET(AdvertisementsRoute, h.HandleGetAdvertisement)
+	r.GET(AllAdvertisementsRoute, h.HandleGetAllAdvertisements)
 
 	r.GET(LessonsRoute, h.Lessons)
 
@@ -63,9 +73,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		authGroup.POST(NewsRoute, h.HandleAddNews)
 		authGroup.PUT(NewsRoute, h.HandleUpdateNews)
+		authGroup.DELETE(NewsRoute, h.HandleDeleteNews)
 
 		authGroup.POST(AdvertisementsRoute, h.HandlePostAdvertisement)
 		authGroup.PUT(AdvertisementsRoute, h.HandleUpdateAdvertisements)
+		authGroup.DELETE(AdvertisementsRoute, h.HandleDeleteAdvertisement)
 
 		authGroup.PUT(UpdateRoleRoute, h.HandleUpdateUserRole)
 
@@ -73,7 +85,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		firebaseGroup := authGroup.Group(FirebaseGroupRoute)
 		{
 			firebaseGroup.GET(FirebaseUserRoute, h.HandleListUsers)
+			firebaseGroup.POST(FirebaseUserRoute, h.HandleCreateFirebaseUser)
 			firebaseGroup.PUT(FirebaseUserRoute, h.HandleUpdateFirebaseUser)
+			firebaseGroup.DELETE(FirebaseUserRoute, h.HandleDeleteFirebaseUser)
 		}
 	}
 

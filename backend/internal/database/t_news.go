@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -121,12 +122,126 @@ func (nt *NewsTable) GetAll() (*[]News, error) {
 	return &newsSlice, nil
 }
 
-// func (nt *NewsTable) GetNewsByHeader(text []byte)(*[]News,error){
-// 	selectQuery := `
-// 		SELECT news_id, header, link, image_links, tags, publication_time
-// 		FROM news ORDER BY publication_time DESC LIMIT $1 OFFSET $2
-// 	`
-// }
+// GetNewsByHeader возвращает новости которые начинаються с определенного слова
+
+func (nt *NewsTable) GetNewsByHeader(word string) (*[]News, error) {
+	selectQuery := `
+	SELECT news_id, header, link, image_links, tags, publication_time
+	FROM news
+	WHERE header LIKE '%' || $1 || '%'
+	ORDER BY publication_time DESC
+	`
+	// query := `SELECT suggestion FROM suggestions WHERE suggestion LIKE $1 || '%'`
+	rows, err := nt.db.Query(selectQuery, word)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetLatest: %v", err)
+	}
+	defer rows.Close()
+
+	var resultNewsArr []News
+
+	// for rows.Next() {
+	// 	var resultNews News
+	// 	err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.Author, &resultNews.PublicationTime)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("News.GetLatest: %v", err)
+	// 	}
+	// 	resultNewsArr = append(resultNewsArr, resultNews)
+	// }
+	for rows.Next() {
+		var resultNews News
+		// Удалите &resultNews.Author из списка аргументов
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetLatest: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
+	// Вернем срез с последними новостными блоками и nil
+	return &resultNewsArr, nil
+}
+
+// GetNewsByTags возвращает новости которые имеют определенный тег
+
+func (nt *NewsTable) GetNewsByTags(words string) (*[]News, error) {
+	// Разделяем входную строку на массив слов
+	wordList := strings.Split(words, " ")
+	// Формируем параметр для SQL запроса в виде массива
+	wordParam := pq.Array(wordList)
+
+	selectQuery := `
+	SELECT news_id, header, link, image_links, tags, publication_time
+	FROM news
+	WHERE tags && $1
+	ORDER BY publication_time DESC
+	`
+	rows, err := nt.db.Query(selectQuery, wordParam)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetByTags: %v", err)
+	}
+	defer rows.Close()
+
+	var resultNewsArr []News
+
+	for rows.Next() {
+		var resultNews News
+		// Убедитесь, что количество аргументов в rows.Scan соответствует количеству выбранных столбцов
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetByTags: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
+	return &resultNewsArr, nil
+}
+
+//// GetNewsByDate возвращает новости которые имеют определенную дату с 1 числа по 2
+
+func (nt *NewsTable) GetNewsByDate(startDateSTR, endDateSTR string) (*[]News, error) {
+	layout := "2006-01-02T15:04:05Z" // Формат строки даты-времени
+
+	startDate, err := time.Parse(layout, startDateSTR)
+	if err != nil {
+		// Обработка ошибки
+		fmt.Println("Ошибка при разборе строки даты-времени:", err)
+	}
+	endDate, err := time.Parse(layout, endDateSTR)
+	if err != nil {
+		// Обработка ошибки
+		fmt.Println("Ошибка при разборе строки даты-времени:", err)
+	}
+	// Подготовим запрос на получение новостных блоков между двумя датами
+	selectQuery := `
+	  SELECT news_id, header, link, image_links, tags, news_author_name, publication_time
+	  FROM news
+	  WHERE publication_time >= $1 AND publication_time <= $2
+	  ORDER BY publication_time DESC
+	`
+
+	// Выполним запрос и получим строки
+	rows, err := nt.db.Query(selectQuery, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("News.GetNewsByDate: %v", err)
+	}
+	defer rows.Close()
+
+	// Создадим срез для хранения новостных блоков
+	var resultNewsArr []News
+	// Пройдемся по всем строкам и заполним структуру News
+	for rows.Next() {
+		var resultNews News
+		err := rows.Scan(&resultNews.Id, &resultNews.Header, &resultNews.Link, pq.Array(&resultNews.ImageLinks), pq.Array(&resultNews.Tags), &resultNews.Author, &resultNews.PublicationTime)
+		if err != nil {
+			return nil, fmt.Errorf("News.GetNewsByDate: %v", err)
+		}
+		resultNewsArr = append(resultNewsArr, resultNews)
+	}
+
+	// Вернем срез с новостными блоками и nil
+	return &resultNewsArr, nil
+}
 
 // Остальные методы не изменились и остаются теми же
 
@@ -222,7 +337,11 @@ func (nt *NewsTable) Update(n News) error {
 	if n.isDefault() {
 		return errors.New("News.Update: wrong data! provided *News is empty")
 	}
-
+	formattedDate, err := time.Parse("02.01.2006", n.PublicationTime)
+	if err != nil {
+		return err
+	}
+	n.PublicationTime = formattedDate.Format("2006-01-02 15:04:05")
 	// Подготовим запрос на обновление новости по ID
 	updateQuery := `
 		UPDATE news
@@ -231,13 +350,13 @@ func (nt *NewsTable) Update(n News) error {
 			image_links = $3,
 			tags = $4,
 			is_for_students = $5,
-			news_author_name = $6
+			news_author_name = $6,
 			publication_time = $7
 		WHERE news_id = $8
 	`
 
 	// Выполним запрос
-	_, err := nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime, n.Id)
+	_, err = nt.db.Exec(updateQuery, n.Header, n.Content, pq.Array(n.ImageLinks), pq.Array(n.Tags), n.IsForStudents, n.Author, n.PublicationTime, n.Id)
 	if err != nil {
 		return fmt.Errorf("News.Update: %v", err)
 	}

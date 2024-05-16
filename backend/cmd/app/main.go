@@ -1,6 +1,8 @@
 package main
 
 import (
+	//"iqj/config"
+
 	"iqj/config"
 	"iqj/internal/api/handler"
 	"iqj/internal/database"
@@ -34,4 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// if err := handlers.sInitRoutes().Run(":8443"); err != nil {
+	// 	log.Fatal(err)
+	// }
 }
