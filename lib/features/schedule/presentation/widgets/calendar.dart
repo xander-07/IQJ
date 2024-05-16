@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iqj/features/schedule/domain/lesson.dart';
 import 'package:iqj/features/schedule/presentation/bloc/schedule_bloc.dart';
 import 'package:iqj/features/schedule/presentation/bloc/schedule_event.dart';
+import 'package:iqj/features/schedule/presentation/bloc/schedule_state.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Calendar extends StatefulWidget {
@@ -12,39 +14,52 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
+  final _firstStudyWeekStart = DateTime(2024, 2, 5);
   CalendarFormat _format = CalendarFormat.month; // Формат календаря
   DateTime _selectedDay = DateTime.now(); // Выбранный день
   DateTime _focusedDay = DateTime.now(); // День, на который сделан фокус
+  late ScheduleBloc _bloc;
 
   @override
   Widget build(BuildContext context) {
+    _bloc = BlocProvider.of<ScheduleBloc>(context);
     return content();
   }
 
   Widget content() {
-    return TableCalendar(
+    return TableCalendar<Lesson>(
       rowHeight: 47, // Высота строки
       focusedDay: _focusedDay, // День, на который сделан фокус
       firstDay: DateTime(2024), // Первый день
       lastDay: DateTime(2030), // Последний день
       calendarFormat: _format, // Формат календаря
+      locale: 'ru_RU',
       onFormatChanged: (CalendarFormat format) {
         setState(() {
           _format = format;
         });
       }, // Изменение формата календаря
       startingDayOfWeek: StartingDayOfWeek.monday, // Первый день недели
-      daysOfWeekVisible: true, // Видимость дней недели
       onDaySelected: (DateTime selectedDay, DateTime focusedDay) {
         setState(() {
           _selectedDay = selectedDay;
           _focusedDay = focusedDay;
         });
-        BlocProvider.of<ScheduleBloc>(context).add(ChangeSelectedDay(selectedDay: DateUtils.dateOnly(selectedDay)));
+        _bloc.add(
+          ChangeSelectedDay(selectedDay: DateUtils.dateOnly(selectedDay)),
+        );
       },
       selectedDayPredicate: (DateTime date) {
         return isSameDay(_selectedDay, date);
       }, // Проверка, является ли день выбранным
+
+      eventLoader: (day) {
+        if (_bloc.state is ScheduleLoaded) {
+          return (_bloc.state as ScheduleLoaded).schedule[day] ?? [];
+        }
+        return [];
+      },
+
       // MARK: cтиль календаря
       calendarStyle: CalendarStyle(
         selectedDecoration: const BoxDecoration(
@@ -70,21 +85,50 @@ class _CalendarState extends State<Calendar> {
       ),
       // MARK: стиль заголовка календаря
       headerStyle: HeaderStyle(
-        formatButtonVisible: true,
         formatButtonShowsNext: false,
         formatButtonDecoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: BorderRadius.circular(5.0),
+          border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+          borderRadius: BorderRadius.circular(20),
         ),
-        formatButtonTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        formatButtonTextStyle:
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+        titleTextStyle:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
       availableCalendarFormats: const {
         CalendarFormat.month: 'Месяц',
         CalendarFormat.twoWeeks: '2 недели',
         CalendarFormat.week: 'Неделя',
       },
+      weekNumbersVisible: true,
+      // MARK: Билдеры календаря
+      calendarBuilders: CalendarBuilders(
+        // номер недели
+        weekNumberBuilder: (context, weekNumber) {
+          final studyWeekNumber = weekNumber -
+              _firstStudyWeekStart.difference(DateTime(2024)).inDays ~/ 7;
+          return studyWeekNumber > 0
+              ? Center(
+                  child: Text(
+                    '$studyWeekNumber',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer
+                          .withAlpha(140),
+                    ),
+                  ),
+                )
+              : const SizedBox();
+        },
+        // обычный день
+        defaultBuilder: (context, day, focusedDay) {
+          return null;
+        },
+        // выбранный день
+        selectedBuilder: (context, day, focusedDay) => null,
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:iqj/features/account/presentation/screens/account_screen.dart';
-import 'package:iqj/features/auth/data/auth_gate.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
@@ -8,20 +10,17 @@ import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
+import 'package:iqj/features/registration/presentation/reg_screen.dart';
+import 'package:iqj/features/registration/presentation/successful_reg_screen.dart';
 import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
 import 'package:iqj/features/services/presentation/screens/about_screen.dart';
 import 'package:iqj/features/services/presentation/screens/services_screen.dart';
 import 'package:iqj/features/welcome/presentation/welcome.dart';
+import 'package:iqj/firebase_options.dart';
 import 'package:iqj/theme/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:iqj/features/registration/presentation/reg_screen.dart';
-import 'package:iqj/features/registration/presentation/successful_reg_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:rxdart/rxdart.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +28,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthService(),
-      child: const App(),
+  initializeDateFormatting().then(
+    (_) => runApp(
+      ChangeNotifierProvider(
+        create: (context) => AuthService(),
+        child: const App(),
+      ),
     ),
   );
 
@@ -50,16 +51,14 @@ Future<void> main() async {
   String? token = await messaging.getToken();
   //print("RegToken HERERERERRERE: " + token!);
   final _messageStreamController = BehaviorSubject<RemoteMessage>();
-   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-   _messageStreamController.sink.add(message);
- });
-
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _messageStreamController.sink.add(message);
+  });
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
- await Firebase.initializeApp();
+  await Firebase.initializeApp();
 }
-
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -106,7 +105,8 @@ class _AppState extends State<App> {
         'messenger': (context) =>
             const MessengerScreen(), // главна страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
-        'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
+        'page_person': (context) =>
+            const Page_person(), // это страница с профилем(переход из чатов)
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),

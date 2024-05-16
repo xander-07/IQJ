@@ -22,12 +22,15 @@ class Lesson {
       teacher: json['class_teacher_name'] as String,
       groups: json['class_group_ids'] as List<String>? ?? [''],
       order: json['class_count'] as int,
-      type: _types[json['class_type'] as String]?? 'Другое',
+      type: _types[json['class_type'] as String] ?? 'Другое',
     );
   }
 }
 
 Map<String, String> _types = {
-  'ЛК' : 'Лекция',
-  'ПР' : 'Практика',
+  'ЛК': 'Лекция',
+  'ПР': 'Практика',
+  'ПР\n\nПР': 'Практика',
+  'ЛАБ': 'Лабораторная',
+  'ЛАБ\n\nЛАБ': 'Лабораторная',
 };

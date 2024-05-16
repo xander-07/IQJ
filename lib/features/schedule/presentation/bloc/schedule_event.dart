@@ -23,9 +23,7 @@ class LoadSchedule extends ScheduleEvent {
 class ChangeSelectedDay extends ScheduleEvent {
   final DateTime selectedDay;
 
-  ChangeSelectedDay({required this.selectedDay}){
-      print('selected day $selectedDay');
-  }
+  const ChangeSelectedDay({required this.selectedDay});
 
   @override
   List<Object> get props => [selectedDay];

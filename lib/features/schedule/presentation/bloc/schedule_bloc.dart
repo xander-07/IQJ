@@ -15,9 +15,6 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     emit(ScheduleLoading());
     try {
       final schedule = await fetchSchedule(event.criterion, event.target);
-      schedule.forEach((key, value) {
-        print("$key : $value\n");
-      },);
       emit(ScheduleLoaded(schedule: schedule, selectedDay: DateTime.now()));
     } catch (e) {
       emit(ScheduleError(message: e.toString()));

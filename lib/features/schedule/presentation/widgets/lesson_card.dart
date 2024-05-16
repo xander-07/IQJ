@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:iqj/features/schedule/domain/lesson.dart';
 
 // TODO: Добавить отображение нескольких групп
@@ -14,6 +15,7 @@ class LessonCard extends StatelessWidget {
     return Card(
       color: Theme.of(context).colorScheme.onInverseSurface,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
         child: Column(
@@ -170,8 +172,10 @@ class EmptyLessonCard extends StatelessWidget {
     return Card(
       color: Theme.of(context).colorScheme.onInverseSurface,
       surfaceTintColor: Colors.transparent,
+      borderOnForeground: false,
+      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
         child: Stack(
           children: [
             Text(
@@ -202,7 +206,6 @@ class EmptyLessonCard extends StatelessWidget {
 }
 
 // Список времени, доступ по индексу пары
-// Так действительно проще
 final List<String> _lessonTime = [
   '9:00 - 10:30',
   '10:40 - 12:10',

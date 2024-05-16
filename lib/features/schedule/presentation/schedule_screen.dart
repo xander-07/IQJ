@@ -1,3 +1,6 @@
+// Увеличивай счетчик каждый раз, когда все ломается:
+// 3
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iqj/features/schedule/presentation/bloc/schedule_bloc.dart';
@@ -37,12 +40,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ],
       ),
       body: BlocProvider<ScheduleBloc>(
+        // TODO: Добавить выбор группы
         create: (context) => ScheduleBloc()..add(const LoadSchedule(criterion: 'group', target: 'ЭФБО-03-23')),
-        child: ListView(
-          children: const <Widget>[
-            Calendar(),
-            Lessons(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: ListView(
+            children: const <Widget>[
+              Calendar(),
+              Lessons(),
+            ],
+          ),
         ),
       ),
     );
