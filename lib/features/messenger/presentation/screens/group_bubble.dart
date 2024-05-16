@@ -160,7 +160,8 @@ class _ChatBubble extends State<GroupBubble> {
                       children: [
                         Row(
                           children: [
-                            Text(
+                            Expanded(
+                            child: Text(
                               widget.chatTitle,
                               style: TextStyle(
                                 color: Theme.of(context)
@@ -169,6 +170,7 @@ class _ChatBubble extends State<GroupBubble> {
                                 fontSize: 20,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                            ),
                             ),
                             if (volume)
                               const Icon(Icons.volume_off)

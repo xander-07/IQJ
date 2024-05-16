@@ -273,6 +273,16 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
               .map<Widget>((doc) => _buildUserListItem(doc))
               .toList(),
         );
+        // return ListView.builder(
+        //   itemCount: snapshot.data!.docs.length,
+        //   itemBuilder: (context, index) {
+        //     return Column(
+        //       children: snapshot.data!.docs
+        //           .map<Widget>((doc) => _buildUserListItem(doc))
+        //           .toList(),
+        //     );
+        //   },
+        // );
       },
     );
   }

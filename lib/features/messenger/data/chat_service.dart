@@ -26,7 +26,10 @@ class ChatService extends ChangeNotifier {
       senderEmail: currentUserEmail,
       receiverId: receiverId,
       timestamp: timestamp,
-      message: message,
+      message: message, 
+      isEdited: false,
+      messagePictures: List.empty(),
+      messageFiles: List.empty(),
     );
 
     // make chatroom
@@ -393,6 +396,10 @@ class ChatService extends ChangeNotifier {
       senderEmail: currentUserEmail,
       timestamp: timestamp,
       message: message,
+      isReadBy: List.empty(),
+      isEdited: false,
+      messagePictures: List.empty(),
+      messageFiles: List.empty(),
     );
 
     // add to db
