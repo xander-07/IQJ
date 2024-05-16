@@ -1,19 +1,32 @@
-// Абстрактный класс для состояний, будет расширен по потребности
-import 'package:iqj/features/schedule/domain/day.dart';
+import 'package:equatable/equatable.dart';
+import 'package:iqj/features/schedule/domain/lesson.dart';
 
-abstract class ScheduleState {}
+abstract class ScheduleState extends Equatable {
+  const ScheduleState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class ScheduleInitial extends ScheduleState {}
 
 class ScheduleLoading extends ScheduleState {}
 
-class ScheduleLoadingFailed extends ScheduleState {
-  final Object except;
-  ScheduleLoadingFailed({required this.except});
+class ScheduleLoaded extends ScheduleState {
+  final Map<DateTime, List<Lesson>> schedule;
+  final DateTime selectedDay;
+
+  const ScheduleLoaded({required this.schedule, required this.selectedDay});
+
+  @override
+  List<Object> get props => [schedule, selectedDay];
 }
 
-class ScheduleLoaded extends ScheduleState {
-  final Day activeDay; // выбранный в данный момент день
+class ScheduleError extends ScheduleState {
+  final String message;
 
-  ScheduleLoaded({required this.activeDay});
+  const ScheduleError({required this.message});
+
+  @override
+  List<Object> get props => [message];
 }
