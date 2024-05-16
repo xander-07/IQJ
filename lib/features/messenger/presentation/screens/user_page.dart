@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_member_button.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
+import 'package:iqj/features/messenger/presentation/chat_member_button.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});

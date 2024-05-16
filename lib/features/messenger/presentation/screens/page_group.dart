@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_member_button.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
+import 'package:iqj/features/messenger/presentation/chat_member_button.dart';
 
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
@@ -347,14 +348,19 @@ class _GroupPage extends State<GroupPage> {
             icon: Icon(Icons.more_vert),
             onPressed: () {
               showModalBottomSheet(
+                  backgroundColor: Theme.of(context).colorScheme.background,
                   context: context,
                   builder: (BuildContext context) {
                     return Container(
-                      color: Theme.of(context).colorScheme.background,
+                      //color: Theme.of(context).colorScheme.background,
                       height: 260,
-                      // decoration: BoxDecoration(
-                      //   borderRadius: BorderRadius.only(topLeft:Radius.circular(12),topRight: Radius.circular(12)),
-                      // ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12)),
+                        //color: Theme.of(context).colorScheme.background,
+                      ),
+                      margin: const EdgeInsets.all(18),
                       child: Column(
                         children: [
                           create_button_for_change_state(
@@ -700,37 +706,34 @@ Widget _buildThumbnailImage(String image_url, double size) {
       child: SizedBox(
         width: size,
         height: size,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32), // было 32
-          child: Image.network(
-            image_url,
-            fit: BoxFit.fill,
-            height: 200,
-            errorBuilder: (
-              BuildContext context,
-              Object exception,
-              StackTrace? stackTrace,
-            ) {
-              // return CircleAvatar(
-              //   radius: 6,
-              //   backgroundColor:
-              //       Theme.of(context).colorScheme.tertiaryContainer,
-              //   child: const Text('G'),
-              // );
-              return Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  color: Theme.of(context).colorScheme.tertiaryContainer,
-                ),
-                child: Text(
-                  'G',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+        child: InstaImageViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.network(
+              image_url,
+              fit: BoxFit.fill,
+              height: size,
+              width: size,
+              errorBuilder: (
+                BuildContext context,
+                Object exception,
+                StackTrace? stackTrace,
+              ) {
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
                   ),
-                ),
-              );
-            },
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -743,20 +746,22 @@ Widget _buildThumbnailImage(String image_url, double size) {
 Widget create_button_for_change_state(
     IconData icon, String text, BuildContext context) {
   return ElevatedButton(
-      onPressed: () => {},
-      style: ButtonStyle(
-        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
-        backgroundColor: MaterialStatePropertyAll(
-          Theme.of(context).colorScheme.background,
-        ),
-        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-        shape: MaterialStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    onPressed: () => {},
+    style: ButtonStyle(
+      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+      surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+      backgroundColor: MaterialStatePropertyAll(
+        Colors.transparent,
+      ),
+      shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+      shape: MaterialStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
+    ),
+    child: Container(
+      height: 42,
       child: Row(
         children: [
           SizedBox(
@@ -767,14 +772,16 @@ Widget create_button_for_change_state(
             width: 20,
           ),
           Text(
-            "Закрепить в списке чатов",
+            text,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryContainer,
               fontSize: 18,
             ),
           ),
         ],
-      ));
+      ),
+    ),
+  );
 }
 
 Widget _buildSquer(String image_url, double size) {

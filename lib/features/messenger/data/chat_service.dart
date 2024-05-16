@@ -15,12 +15,10 @@ class ChatService extends ChangeNotifier {
   ////////////// ЛИЧНЫЕ СООБЩЕНИЯ ///////////////
   // Send message
   Future<void> sendMessage(String receiverId, String message) async {
-    // get info
     final String currentUserId = _auth.currentUser!.uid;
     final String currentUserEmail = _auth.currentUser!.email.toString();
     final Timestamp timestamp = Timestamp.now();
 
-    // create msg
     final Message newMessage = Message(
       senderId: currentUserId,
       senderEmail: currentUserEmail,
@@ -32,12 +30,10 @@ class ChatService extends ChangeNotifier {
       messageFiles: List.empty(),
     );
 
-    // make chatroom
     final List<String> ids = [currentUserId, receiverId];
     ids.sort();
     final String chatRoomId = ids.join("_");
 
-    // add to db
     await _firestore
         .collection('direct_messages')
         .doc(chatRoomId)
@@ -222,7 +218,7 @@ class ChatService extends ChangeNotifier {
   }
 
   ////////////// ГРУППОВЫЕ СООБЩЕНИЯ ///////////////
-  // Generate random group chat ID
+  ///
   String generateRandomGroupId() {
     final Random random = Random();
     const String chars =
@@ -231,14 +227,12 @@ class ChatService extends ChangeNotifier {
         .join();
   }
 
-  // Create group chat with a random ID
   Future<String> createGroupChat(
       List<String> memberIds, String groupName) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String groupChatId = generateRandomGroupId();
 
     try {
-      // Initialize group chat data
       Map<String, dynamic> usersData = {
         currentUserId: {
           'joinDate': DateTime.now(),
@@ -247,14 +241,13 @@ class ChatService extends ChangeNotifier {
         },
       };
 
-      // Iterate over selectedMap and add selected users to the group chat
       for (String uid in memberIds) {
         String userEmail = await getUserEmail(uid);
 
         usersData[uid] = {
           'joinDate': DateTime.now(),
           'email': userEmail,
-          'role': 'member', // Default role for selected members
+          'role': 'member', 
         };
       }
 
@@ -315,31 +308,15 @@ class ChatService extends ChangeNotifier {
 
   Future<String> getUserRoleInGroup(String groupId, String userId) async {
     print(userId);
-    // Fetch the group data from Firestore
     DocumentSnapshot groupSnapshot =
         await _firestore.collection('groups').doc(groupId).get();
-
-    // Extract the users map from the group data
     Map<String, dynamic>? usersData =
         groupSnapshot.data() as Map<String, dynamic>?;
-
-    //print(usersData);
-
-    // Check if usersData is not null and contains the user's UID
     if (usersData!.containsKey('users')) {
-      // Extract the 'users' map from usersData
       Map<String, dynamic>? usersMap =
           usersData['users'] as Map<String, dynamic>?;
-      print(usersMap);
-
-      // Extract the user data from usersMap using the user ID
       Map<String, dynamic>? userData =
           usersMap![userId] as Map<String, dynamic>?;
-      print('userdata');
-      print(userData);
-
-      // Check if userData is not null and contains the role key
-      // Retrieve the user role from userData and return it
       String userRole = userData!['role'].toString();
       return userRole;
     }
@@ -348,49 +325,35 @@ class ChatService extends ChangeNotifier {
 
   Future<bool> isUserInGroup(String userId, String groupId) async {
     try {
-      // Query Firestore to get the group document
       DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance
           .collection('groups')
           .doc(groupId)
           .get();
-
-      // Extract the 'users' map from the document data
       Map<String, dynamic>? usersData =
           groupSnapshot.data() as Map<String, dynamic>?;
-
-      // Check if usersData is not null and contains the user's UID
       if (usersData != null && usersData.containsKey('users')) {
-        // Extract the 'users' map from usersData
         Map<String, dynamic>? usersMap =
             usersData['users'] as Map<String, dynamic>?;
-
-        // Check if the user's UID exists in the 'users' map
         if (usersMap != null && usersMap.containsKey(userId)) {
-          return true; // User is in the group
+          return true; 
         }
       }
-
-      // User is not in the group
       return false;
     } catch (e) {
-      // Handle any potential errors (e.g., Firestore query errors)
       print('Error checking user in group: $e');
-      return false; // Assume user is not in the group in case of an error
+      return false;
     }
   }
 
   Future<void> setGroupName(String groupId, String name) async {
-    // Надо тестить
     await _firestore.collection('groups').doc(groupId).update({'name': name});
   }
 
   Future<void> sendMessageToGroup(String groupChatId, String message) async {
-    // get info
     final String currentUserId = _auth.currentUser!.uid;
     final String currentUserEmail = _auth.currentUser!.email.toString();
     final Timestamp timestamp = Timestamp.now();
 
-    // create msg
     final GroupMessage newMessage = GroupMessage(
       senderId: currentUserId,
       senderEmail: currentUserEmail,
@@ -402,7 +365,6 @@ class ChatService extends ChangeNotifier {
       messageFiles: List.empty(),
     );
 
-    // add to db
     await _firestore
         .collection('groups')
         .doc(groupChatId)
@@ -413,7 +375,7 @@ class ChatService extends ChangeNotifier {
   Stream<QuerySnapshot> getGroupMessages(String groupId) {
     return _firestore
         .collection('groups')
-        .doc(groupId) // Use groupId here
+        .doc(groupId)
         .collection('messages')
         .orderBy('timestamp', descending: false)
         .snapshots();
@@ -448,7 +410,7 @@ class ChatService extends ChangeNotifier {
         groupSnapshot.data() as Map<String, dynamic>?;
 
     if (!groupSnapshot.exists) {
-      return 0; // Group document doesn't exist or is empty
+      return 0; 
     }
 
     Map<String, dynamic>? usersDataReal =
@@ -459,7 +421,7 @@ class ChatService extends ChangeNotifier {
     }
 
     return usersDataReal
-        .length; // Return the number of entries in the users map
+        .length; 
   }
 
   Future<List<Map<String, dynamic>>> getUsersInGroup(String groupId) async {
@@ -470,7 +432,6 @@ class ChatService extends ChangeNotifier {
           .get();
 
       if (!groupSnapshot.exists) {
-        // Group document doesn't exist
         return [];
       }
 
@@ -489,7 +450,6 @@ class ChatService extends ChangeNotifier {
 
       return usersList;
     } catch (e) {
-      // Error fetching users data
       print("Error fetching users in group: $e");
       return [];
     }

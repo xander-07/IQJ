@@ -5,9 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/group_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/highlight_chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/group_bubble.dart';
+import 'package:iqj/features/messenger/presentation/highlight_chat_bubble.dart';
 
 class MessengerScreen extends StatefulWidget {
   const MessengerScreen({super.key});
@@ -408,7 +408,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                   ChatBubble(
                     imageUrl: userMap['picture'].toString(),
                     chatTitle: userMap['email'].toString(),
-                    secondary: 'text',
+                    secondary: '',
                     uid: userMap['uid'].toString(),
                     phone: userMap['phone'].toString(),
                   )
@@ -460,6 +460,7 @@ class _MessengerBloc extends State<MessengerScreen> {
               groupDoc.data() as Map<String, dynamic>;
           String groupId = groupDoc.id;
           String groupName = groupData['name'].toString();
+          String groupPic = groupData['picture'].toString();
 
           chatList.add(
             FutureBuilder<String>(
@@ -477,7 +478,7 @@ class _MessengerBloc extends State<MessengerScreen> {
                 }
 
                 return GroupBubble(
-                  imageUrl: '',
+                  imageUrl: groupPic,
                   chatTitle: groupName,
                   secondary: lastMessage,
                   id: groupId,

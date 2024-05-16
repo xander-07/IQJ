@@ -8,9 +8,9 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
-import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
+import 'package:iqj/features/messenger/presentation/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/file_chat.dart/file_chat.dart';
-import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
+import 'package:iqj/features/messenger/presentation/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
 //import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 //import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
@@ -522,13 +522,14 @@ class _ChatsListState extends State<ChatsList> {
                       : Container(),
                   Row(
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          //emojiPickerSet();
-                          //FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        icon: Icon(Icons.insert_emoticon),
-                      ),
+                      // Заменить на стикеры
+                      // IconButton(
+                      //   onPressed: () {
+                      //     //emojiPickerSet();
+                      //     //FocusManager.instance.primaryFocus?.unfocus();
+                      //   },
+                      //   icon: Icon(Icons.insert_emoticon),
+                      // ),
                       Expanded(
                         child: TextField(
                           controller: _msgController,

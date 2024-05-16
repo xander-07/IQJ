@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 import 'package:iqj/features/messenger/presentation/chat_bubble_for_group.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
 import 'package:iqj/features/news/admin/special_news_add_button.dart';
 import 'package:intl/intl.dart';
 
@@ -225,7 +225,9 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
               padding: EdgeInsets.only(bottom: 12),
             ),
             userMap.length == 0
-                ? _buildUserList()
+                ? Expanded(
+                  child: _buildUserList()
+                )
                 : ElevatedButton(
                     onPressed: () => {},
                     style: ButtonStyle(
@@ -268,21 +270,13 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
             child: CircularProgressIndicator(),
           );
         }
-        return Column(
-          children: snapshot.data!.docs
-              .map<Widget>((doc) => _buildUserListItem(doc))
-              .toList(),
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final DocumentSnapshot document = snapshot.data!.docs[index];
+            return _buildUserListItem(document);
+          },
         );
-        // return ListView.builder(
-        //   itemCount: snapshot.data!.docs.length,
-        //   itemBuilder: (context, index) {
-        //     return Column(
-        //       children: snapshot.data!.docs
-        //           .map<Widget>((doc) => _buildUserListItem(doc))
-        //           .toList(),
-        //     );
-        //   },
-        // );
       },
     );
   }

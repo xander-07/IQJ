@@ -4,8 +4,8 @@ import 'package:iqj/features/auth/data/auth_gate.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
-import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
-import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/chats_loaded_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/group_chat_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/page_group.dart';
@@ -36,7 +36,7 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthService(),
-      child: const App(),
+      child: const App(), 
     ),
   );
 

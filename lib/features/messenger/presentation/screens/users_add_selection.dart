@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
 import 'package:iqj/features/news/admin/special_news_add_button.dart';
 import 'package:intl/intl.dart';
 
@@ -149,7 +149,9 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
             Padding(
               padding: EdgeInsets.only(bottom: 12),
             ),
-            _buildUserList(),
+            Expanded(
+              child: _buildUserList(),
+            ),
           ],
         ),
       ),
@@ -168,50 +170,51 @@ class _AddToGroupScreen extends State<AddToGroupScreen> {
             child: CircularProgressIndicator(),
           );
         }
-        return Column(
-          children: snapshot.data!.docs
-              .map<Widget>((doc) => _buildUserListItem(doc))
-              .toList(),
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final DocumentSnapshot document = snapshot.data!.docs[index];
+            return _buildUserListItem(document);
+          },
         );
       },
     );
   }
 
   Widget _buildUserListItem(DocumentSnapshot document) {
-  final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-  return FutureBuilder<bool>(
-    future: _chatService.isUserInGroup(data['uid'] as String, groupId),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return SizedBox();
-      } else if (snapshot.hasError) {
-        return SizedBox();
-      } else {
-        bool isMember = snapshot.data ?? false;
-        if (_auth.currentUser!.email != data['email'] && !isMember) {
-          return ChatBubbleSelection(
-            imageUrl: data['picture'].toString(),
-            chatTitle: data['email'].toString(),
-            uid: data['uid'].toString(),
-            selected: selectedMap.containsKey(data['uid'])
-                ? selectedMap[data['uid']]!
-                : false,
-            onSelectionChanged: (uid, selected) {
-              setState(() {
-                if (selected) {
-                  selectedMap[uid] = true;
-                } else {
-                  selectedMap.remove(uid);
-                }
-              });
-            },
-          );
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    return FutureBuilder<bool>(
+      future: _chatService.isUserInGroup(data['uid'] as String, groupId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox();
+        } else if (snapshot.hasError) {
+          return SizedBox();
         } else {
-          return Container(); 
+          bool isMember = snapshot.data ?? false;
+          if (_auth.currentUser!.email != data['email'] && !isMember) {
+            return ChatBubbleSelection(
+              imageUrl: data['picture'].toString(),
+              chatTitle: data['email'].toString(),
+              uid: data['uid'].toString(),
+              selected: selectedMap.containsKey(data['uid'])
+                  ? selectedMap[data['uid']]!
+                  : false,
+              onSelectionChanged: (uid, selected) {
+                setState(() {
+                  if (selected) {
+                    selectedMap[uid] = true;
+                  } else {
+                    selectedMap.remove(uid);
+                  }
+                });
+              },
+            );
+          } else {
+            return Container();
+          }
         }
-      }
-    },
-  );
-}
-
+      },
+    );
+  }
 }
