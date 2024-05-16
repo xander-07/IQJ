@@ -19,6 +19,14 @@ class _CalendarState extends State<Calendar> {
   DateTime _selectedDay = DateTime.now(); // Выбранный день
   DateTime _focusedDay = DateTime.now(); // День, на который сделан фокус
   late ScheduleBloc _bloc;
+  List<Lesson> _selectedLessons(DateTime day) {
+    final state = _bloc.state;
+    if (state is ScheduleLoaded) {
+      return state.schedule[day] ?? [];
+    }
+    return [];
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +60,7 @@ class _CalendarState extends State<Calendar> {
       selectedDayPredicate: (DateTime date) {
         return isSameDay(_selectedDay, date);
       }, // Проверка, является ли день выбранным
-
-      eventLoader: (day) {
-        if (_bloc.state is ScheduleLoaded) {
-          return (_bloc.state as ScheduleLoaded).schedule[day] ?? [];
-        }
-        return [];
-      },
-
+      eventLoader: (day) => _selectedLessons(day),
       // MARK: cтиль календаря
       calendarStyle: CalendarStyle(
         selectedDecoration: const BoxDecoration(
@@ -101,34 +102,53 @@ class _CalendarState extends State<Calendar> {
         CalendarFormat.week: 'Неделя',
       },
       weekNumbersVisible: true,
-      // MARK: Билдеры календаря
+
       calendarBuilders: CalendarBuilders(
-        // номер недели
-        weekNumberBuilder: (context, weekNumber) {
-          final studyWeekNumber = weekNumber -
-              _firstStudyWeekStart.difference(DateTime(2024)).inDays ~/ 7;
-          return studyWeekNumber > 0
-              ? Center(
-                  child: Text(
-                    '$studyWeekNumber',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onPrimaryContainer
-                          .withAlpha(140),
-                    ),
-                  ),
-                )
-              : const SizedBox();
-        },
-        // обычный день
-        defaultBuilder: (context, day, focusedDay) {
-          return null;
-        },
-        // выбранный день
-        selectedBuilder: (context, day, focusedDay) => null,
+        weekNumberBuilder: _weekNumberBuilder,
+        defaultBuilder: _defaultBuilder,
+        selectedBuilder: _selectedBuilder,
       ),
     );
   }
+
+  // MARK: билдеры
+  // номер недели
+  Widget? _weekNumberBuilder(BuildContext context, int weekNumber) {
+    final studyWeekNumber = weekNumber -
+        _firstStudyWeekStart.difference(DateTime(2024)).inDays ~/ 7;
+    return studyWeekNumber > 0
+        ? Center(
+            child: Text(
+              '$studyWeekNumber',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onPrimaryContainer
+                    .withAlpha(140),
+              ),
+            ),
+          )
+        : const SizedBox();
+  }
+
+  // выбранный день
+  Widget? _selectedBuilder(
+    BuildContext context,
+    DateTime day,
+    DateTime focusedDay,
+  ) {
+    return null;
+  }
+
+  //остальные дни
+  Widget? _defaultBuilder(
+    BuildContext context,
+    DateTime day,
+    DateTime focusedDay,
+  ) {
+    return null;
+  }
+
+  // Загрузчик событий дня
 }

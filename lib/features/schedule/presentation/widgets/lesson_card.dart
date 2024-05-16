@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:iqj/features/schedule/domain/lesson.dart';
 
 // TODO: Добавить отображение нескольких групп
@@ -48,8 +47,7 @@ class LessonCard extends StatelessWidget {
                               height: 7,
                               width: 7,
                               decoration: BoxDecoration(
-                                color: _lessonColor[lesson.type] ??
-                                    const Color(0xFF8E959B),
+                                color: lesson.getColor(),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -214,14 +212,3 @@ final List<String> _lessonTime = [
   '16:20 - 17:50',
   '18:00 - 19:30',
 ];
-
-// Цвета, которые используем для пар
-final Map<String, Color> _lessonColor = {
-  'Лекция': const Color(0xFF7749F8),
-  'Практика': const Color(0xFFAC8EFF),
-  'Лабораторная': const Color(0xFFEF9800),
-  'Зачет': const Color(0xFF87D07F),
-  'Консультация': const Color(0xFF0584FE),
-  'Экзамен': const Color(0xFFFF7070),
-  'Курсовая': const Color(0xFFFF8EFA),
-};
