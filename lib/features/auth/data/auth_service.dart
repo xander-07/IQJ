@@ -15,10 +15,10 @@ class AuthService extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      _firestore.collection('users').doc(userCredential.user!.uid).set({
-        'uid': userCredential.user!.uid,
-        'email': userCredential.user!.email,
-      });
+      // _firestore.collection('users').doc(userCredential.user!.uid).set({
+      //   'uid': userCredential.user!.uid,
+      //   'email': userCredential.user!.email,
+      // });
 
       // Использовать это в методе для регистрации когда он понадобится (написать тоже нужно)
       // _firestore.collection('users').doc(userCredential.user!.uid).set({

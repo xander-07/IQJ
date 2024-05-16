@@ -47,7 +47,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
               if (snapshot.hasError) {
                 return const Text('Ошибка при получении \n данных пользователя');
               } else if (snapshot.hasData) {
-                name = snapshot.data?['display_name'] as String;
+                name = snapshot.data?['name'] as String;
                 email = snapshot.data?['email'] as String;
                 // password = snapshot.data?['password'] as String;
                 return Container(
