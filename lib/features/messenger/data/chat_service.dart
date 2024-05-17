@@ -157,6 +157,31 @@ class ChatService extends ChangeNotifier {
     }
   }
 
+  Future<List<String>> getLinksFromChat(String userId, String otherId) async {
+  final List<String> ids = [userId, otherId];
+  ids.sort();
+  final String chatroomId = ids.join("_");
+
+  final querySnapshot = await _firestore
+      .collection('direct_messages')
+      .doc(chatroomId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .get();
+
+  final List<String> links = [];
+
+  for (var doc in querySnapshot.docs) {
+    final message = doc.data()['message'].toString();
+    if (isStringLink(message)) {
+      links.add(message);
+    }
+  }
+
+  return links;
+}
+
+
   Future<String> getLastMessage(String userId, String otherId) async {
     final List<String> ids = [userId, otherId];
     ids.sort();

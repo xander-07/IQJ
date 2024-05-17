@@ -92,8 +92,16 @@ class _UserPage extends State<UserPage> {
     return await chatService.getUserRoleInGroup(uid, uids);
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    final ChatService _chatService = ChatService();
+
+    List<String>media = _chatService.getLinksFromChat(
+          _auth.currentUser!.uid, uid) as List<String>;
+    print(media);
+
     TextEditingController groupNameChangeController =
         TextEditingController(text: user_name);
     return Scaffold(
@@ -466,6 +474,7 @@ class _UserPage extends State<UserPage> {
                 flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
               ],
             ),
+            //flag1? _buildMediaList() : Container(),
             flag2
                 ? _File_in_main_chat(
                     context,
