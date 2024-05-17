@@ -52,14 +52,13 @@ class _EditButtonState extends State<EditButton> {
       //margin: const EdgeInsets.only(left: 5), 
       child: SizedBox(
         width: 158,
-        height: 47,
         child: Align(
           alignment: Alignment.centerLeft,
           child: TextButton(
             style: ElevatedButton.styleFrom(
               alignment: Alignment.center,
               backgroundColor: const Color(0xFFEFAC00),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10,),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(35),
               ),

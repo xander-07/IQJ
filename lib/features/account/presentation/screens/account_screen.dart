@@ -81,20 +81,19 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 50,
+        toolbarHeight: 72,
         scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).colorScheme.background,
-        title: const Padding(
-          padding: EdgeInsets.only(left: 16.0, top: 25),
-          child: Text(
-            'Личный кабинет',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+        title: Text(
+          'Личный кабинет',
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         centerTitle: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.only(right: 12),
+          ),
+        ],
       ),
       // Аватарка пользовтеля, ФИО и почта
       body: Center(
@@ -104,7 +103,7 @@ class _AccountScreenState extends State<AccountScreen> {
           children: [
             const SizedBox(height: 25),
             const Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(width: 16,),
                 ProfilePicture(),
