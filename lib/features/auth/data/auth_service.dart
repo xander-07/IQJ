@@ -15,17 +15,12 @@ class AuthService extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // _firestore.collection('users').doc(userCredential.user!.uid).set({
-      //   'uid': userCredential.user!.uid,
-      //   'email': userCredential.user!.email,
-      // });
-
       // Использовать это в методе для регистрации когда он понадобится (написать тоже нужно)
       // _firestore.collection('users').doc(userCredential.user!.uid).set({
       //   'uid': userCredential.user!.uid,
       //   'email': userCredential.user!.email,
       // }), SetOptions(merge: true);
-
+      updateLastOnline();
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -48,7 +43,9 @@ class AuthService extends ChangeNotifier {
         'patronymic': 'Иванович',
         'position': 'Генеральный секретарь ЦК IQJ',
         'institute': 'ИПТИП',
-        'role': 'user',
+        'role': 'student',
+        'picture':
+            'https://cdn.discordapp.com/attachments/1227328511396810853/1239910152652587008/image.png?ex=6644a3d0&is=66435250&hm=13e5569c737c9cd06259656916ed42fe39e7be33fdf76f049297dfb3446cc7d8&',
       });
       return userCredential;
     } on FirebaseAuthException catch (e) {
@@ -58,5 +55,38 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signOut() async {
     return await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> updateLastOnline() async {
+    try {
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        String uid = user.uid;
+        Timestamp timestamp = Timestamp.now();
+        await _firestore.collection('users').doc(uid).update({
+          'lastOnline': timestamp,
+        });
+      }
+    } catch (e) {
+      print('Error updating last online: $e');
+    }
+  }
+
+  Future<bool> isUserOnline(String uid) async {
+    try {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(uid).get();
+      if (snapshot.exists && snapshot.data() != null) {
+        Timestamp lastOnline = snapshot['lastOnline'] as Timestamp;
+        DateTime lastOnlineDateTime = lastOnline.toDate();
+        Duration difference = DateTime.now().difference(lastOnlineDateTime);
+        if (difference.inMinutes <= 5) {
+          return true;
+        }
+      }
+    } catch (e) {
+      print('Error checking user online status: $e');
+    }
+    return false;
   }
 }

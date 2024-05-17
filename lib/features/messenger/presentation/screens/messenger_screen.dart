@@ -1,8 +1,13 @@
+//import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/highlight_chat_bubble.dart';
+import 'package:intl/intl.dart';
+import 'package:iqj/features/messenger/data/chat_service.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/group_bubble.dart';
+import 'package:iqj/features/messenger/presentation/highlight_chat_bubble.dart';
 
 class MessengerScreen extends StatefulWidget {
   const MessengerScreen({super.key});
@@ -14,7 +19,8 @@ class MessengerScreen extends StatefulWidget {
 class _MessengerBloc extends State<MessengerScreen> {
   bool _isSearch = false;
 
-  final FirebaseAuth _auth =  FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ChatService chatService = ChatService();
 
   void searchfilter() {
     setState(() {
@@ -25,31 +31,121 @@ class _MessengerBloc extends State<MessengerScreen> {
   bool _isntSearch_chat = true;
   TextEditingController SearchPickerController = TextEditingController();
 
-    Map<String,dynamic>userMap={
+  Map<String, dynamic> userMap = {};
+  Map<String, dynamic> groupMap = {};
 
-    };
+  void onSearch() async {
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-    void onSearch() async {
-      FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-      await _firestore
+    await _firestore
         .collection('users')
-        .where("email",isEqualTo: SearchPickerController.text)
+        .where("email", isEqualTo: SearchPickerController.text)
         .get()
-        .then( (value){
-          setState(() {
-            try{
-              userMap = value.docs[0].data();
-            }catch(e){
-              userMap = {};
-            }
- 
-            _isntSearch_chat = false;
-            print(userMap);
-            print(userMap['email']);
-          });
-        });
-    }
+        .then((value) {
+      setState(() {
+        try {
+          userMap = value.docs[0].data();
+        } catch (e) {
+          userMap = {};
+        }
+
+        _isntSearch_chat = false;
+        print(userMap);
+        print(userMap['email']);
+      });
+    });
+
+    await _firestore
+        .collection('groups')
+        .where("name", isEqualTo: SearchPickerController.text)
+        .get()
+        .then((value) {
+      setState(() {
+        try {
+          groupMap = value.docs[0].data();
+        } catch (e) {
+          groupMap = {};
+        }
+
+        _isntSearch_chat = false;
+        print(groupMap);
+        print(groupMap['name']);
+      });
+    });
+  }
+
+  bool flag1 = true;
+  bool flag2 = false;
+  bool flag3 = false;
+  bool flag4 = false;
+  bool flag5 = false;
+  bool flag6 = false;
+
+  void change_flag1() {
+    setState(() {
+      flag1 = true;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag2() {
+    setState(() {
+      flag1 = false;
+      flag2 = true;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag3() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = true;
+      flag4 = false;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag4() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = true;
+      flag5 = false;
+      flag6 = false;
+    });
+  }
+
+  void change_flag5() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = true;
+      flag6 = false;
+    });
+  }
+
+  void change_flag6() {
+    setState(() {
+      flag1 = false;
+      flag2 = false;
+      flag3 = false;
+      flag4 = false;
+      flag5 = false;
+      flag6 = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +159,13 @@ class _MessengerBloc extends State<MessengerScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            Navigator.of(context).pushNamed('creategroup');
+            //Navigator.of(context).pushNamed('creategroup');
+            Navigator.of(context).pushNamed(
+              'creategroup',
+              arguments: {
+                'selected': false,
+              },
+            );
           },
           icon: const Icon(Icons.edit),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -180,66 +282,109 @@ class _MessengerBloc extends State<MessengerScreen> {
               children: <Widget>[
                 const Padding(padding: EdgeInsets.only(right: 12)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag1();
+                  },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag1) ? MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag1) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   child: const Text('Все'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag2();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag2) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag2) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Группы'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag3();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag3) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag3) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Студенты'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag4();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag4) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag4) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Преподаватели'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag5();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag5) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag5) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Руководство'),
                 ),
                 const Padding(padding: EdgeInsets.only(right: 6)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    change_flag6();
+                  },
                   style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
+                    backgroundColor: (flag6) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primaryContainer,
+                    ) : MaterialStatePropertyAll(Colors.transparent),
+                    foregroundColor: (flag6) ? MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    )
+                    : MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.onSurface,
                     ),
-                    //backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primaryContainer),
                   ),
                   child: const Text('Прочее'),
                 ),
@@ -251,41 +396,33 @@ class _MessengerBloc extends State<MessengerScreen> {
             child: ListView(
               children: [
                 // Чат текущей пары
-                const HighlightChatBubble(
-                    imageUrl:
-                        'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
-                    chatTitle: 'GroupName',
-                    secondary: 'secondaryText',),
-                _isntSearch_chat? _buildUserList() : ((userMap.length!=0)
-                  ?ChatBubble(imageUrl: userMap['picture'].toString(), 
-                  chatTitle: userMap['email'].toString(),
-                   secondary: 'text', 
-                   uid: userMap['uid'].toString())
-                  :Align(
-                    alignment:Alignment.center,
-                    child: Text("чат не найден"))),
-                // ignore: unnecessary_null_comparison
-                // Чат обычный
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Денис',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Стас',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'АPI',
-                //     secondary: 'secondaryText',),
-                // ChatBubble(
-                //     imageUrl:
-                //         'https://static.wikia.nocookie.net/half-life/images/0/00/Gordonhl1.png/revision/latest/scale-to-width/360?cb=20230625151406&path-prefix=en',
-                //     chatTitle: 'Gewin',
-                //     secondary: 'secondaryText',),
+                // const HighlightChatBubble(
+                //   imageUrl:
+                //       'https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg',
+                //   chatTitle: 'GroupName',
+                //   secondary: 'secondaryText',
+                // ),
+                if (_isntSearch_chat)
+                  _chatsBuilder()
+                else if (userMap.isNotEmpty)
+                  ChatBubble(
+                    imageUrl: userMap['picture'].toString(),
+                    chatTitle: userMap['email'].toString(),
+                    secondary: '',
+                    uid: userMap['uid'].toString(),
+                    phone: userMap['phone'].toString(),
+                  )
+                else if (groupMap.isNotEmpty)
+                  GroupBubble(
+                    imageUrl: groupMap['picture'].toString(),
+                    chatTitle: groupMap['name'].toString(),
+                    secondary: '',
+                    id: groupMap['id'].toString(),
+                  )
+                else
+                  Align(
+                    child: Text("Чатов не найдено."),
+                  )
               ],
             ),
           ),
@@ -294,83 +431,105 @@ class _MessengerBloc extends State<MessengerScreen> {
     );
   }
 
+  Widget _chatsBuilder() {
+    return FutureBuilder(
+      future: Future.wait([
+        FirebaseFirestore.instance.collection('users').get(),
+        FirebaseFirestore.instance.collection('groups').get(),
+      ]),
+      builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Text('Error fetching chats');
+        }
 
-  Widget _buildUserList(){
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError){
-          return const Text('err');
+        List<Widget> chatList = [];
+
+        // Load direct messages
+        if (flag1 || flag3 || flag4 || flag5 || flag6) {
+        chatList.addAll(snapshot.data![0].docs
+            .map<Widget>((doc) => _buildChatListItem(doc)));
         }
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return const Center(
-            child: CircularProgressIndicator(),
+
+        // Load group chats using getLastGroupMessage function
+        if (flag1 || flag2 || flag6)
+        snapshot.data![1].docs.forEach((groupDoc) {
+          final Map<String, dynamic> groupData =
+              groupDoc.data() as Map<String, dynamic>;
+          String groupId = groupDoc.id;
+          String groupName = groupData['name'].toString();
+          String groupPic = groupData['picture'].toString();
+
+          chatList.add(
+            FutureBuilder<String>(
+              future: chatService.getLastGroupMessage(groupId),
+              initialData:
+                  'Loading...', // Initial value while waiting for the future
+              builder: (context, AsyncSnapshot<String> messageSnapshot) {
+                String lastMessage = messageSnapshot.data ?? '';
+
+                if (messageSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (messageSnapshot.hasError) {
+                  return Text('Error fetching last message');
+                }
+
+                return GroupBubble(
+                  imageUrl: groupPic,
+                  chatTitle: groupName,
+                  secondary: lastMessage,
+                  id: groupId,
+                );
+              },
+            ),
           );
-        }
+        });
+
         return Column(
-          children: 
-            snapshot.data!.docs
-            .map<Widget>((doc) => _buildUserListItem(doc))
-            .toList(),
+          children: chatList,
         );
       },
-      );
+    );
   }
 
-  Widget _buildGroupList(){
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('chatrooms').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError){
-          return const Text('err');
+  Widget _buildChatListItem(DocumentSnapshot document) {
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    final ChatService _chatService = ChatService();
+
+    return FutureBuilder<String>(
+      future: _chatService.getLastMessage(
+          _auth.currentUser!.uid, data['uid'].toString()),
+      initialData: 'Loading...', // Initial value while waiting for the future
+      builder: (context, AsyncSnapshot<String> snapshot) {
+        String lastMessage = snapshot.data ?? '';
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // You can return another loading indicator here
+        } else if (snapshot.hasError) {
+          return Text('Error fetching last message');
         }
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return const Center(
-            child: CircularProgressIndicator(),
+
+        if (_auth.currentUser!.email != data['email']) {
+          return ChatBubble(
+            imageUrl: data['picture'].toString(),
+            chatTitle: data['email'].toString(),
+            secondary: lastMessage,
+            uid: data['uid'].toString(),
+            phone: data['phone'].toString(),
           );
         }
-        return Column(
-          children: 
-            snapshot.data!.docs
-            .map<Widget>((doc) => _buildUserListItem(doc))
-            .toList(),
+
+        return ChatBubble(
+          imageUrl: data['picture'].toString(),
+          chatTitle: 'Заметки',
+          secondary: lastMessage,
+          uid: data['uid'].toString(),
+          phone: data['phone'].toString(),
         );
       },
-      );
-  }
-  
-
-  Widget _buildUserListItem(DocumentSnapshot document){
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    if (_auth.currentUser!.email != data['email']){
-      // return ListTile(
-      //   title: Text(data['email'].toString()),
-      //   onTap: (){
-      //     Navigator.of(context).pushNamed(
-      //       'chatslist',
-      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
-      //     );
-      //   },
-      // );
-      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
-    }
-    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
-  }
-
-  Widget _buildGroupItem(DocumentSnapshot document){
-    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    if (_auth.currentUser!.email != data['email']){
-      // return ListTile(
-      //   title: Text(data['email'].toString()),
-      //   onTap: (){
-      //     Navigator.of(context).pushNamed(
-      //       'chatslist',
-      //         arguments: {'name': data['title'],'url':'e','volume': false,'pin': false},
-      //     );
-      //   },
-      // );
-      return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: data['email'].toString(), secondary: 'text', uid: data['uid'].toString());
-    }
-    return ChatBubble(imageUrl: data['picture'].toString(), chatTitle: 'Заметки', secondary: 'text', uid: data['uid'].toString());
+    );
   }
 }

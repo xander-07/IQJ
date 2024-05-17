@@ -4,8 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble_selection.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_for_group.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
 import 'package:iqj/features/news/admin/special_news_add_button.dart';
 import 'package:intl/intl.dart';
 
@@ -22,20 +23,65 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   TextEditingController SearchPickerController = TextEditingController();
   TextEditingController groupNameController = TextEditingController();
   String groupName = '';
+  String groupId = '';
   Map<String, dynamic> userMap = {};
+  Map<String, bool> selectedMap = {};
+  // Это ломает программу)))
+  // late bool selected = false;
+
+  // @override
+  // void didChangeDependencies() {
+  //   final args = ModalRoute.of(context)?.settings.arguments;
+  //   assert(args != null, "Check args");
+  //   Map<String, dynamic> help = args as Map<String, dynamic>;
+  //   selected = help["selected"] as bool;
+
+  //   setState(() {});
+  //   super.didChangeDependencies();
+  // }
 
   void updateSelectionState(String uid, bool isSelected) {
     setState(() {
       userMap[uid] = isSelected;
     });
-    print(userMap);
   }
 
-  void createGroup() async {
-    List<String> users =
-        userMap.values.map((value) => value.toString()).toList();
+  Future<void> createAndNavigateGroup() async {
+    String groupChatId = await createGroup();
 
-    await _chatService.createGroupChat(users);
+    // // Iterate over the selectedMap and add each user to the group chat
+    // await Future.forEach(selectedMap.keys, (String uid) async {
+    //   // Get the user information from Firestore
+    //   DocumentSnapshot userDoc =
+    //       await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    //   final Map<String, dynamic> data = userDoc.data()! as Map<String, dynamic>;
+
+    //   if (userDoc.exists) {
+    //     String userEmail = data['email'].toString();
+    //     DateTime joinDate = DateTime.now();
+    //     String userRole = 'member'; // Default role
+
+    //     // Add the user to the group chat
+    //     await _chatService.addUserToGroupChat(
+    //         groupChatId, uid, userEmail, userRole, joinDate);
+    //   }
+    // });
+
+    Navigator.of(context).popAndPushNamed(
+      'groupchat',
+      arguments: {
+        'name': groupName,
+        'url': 'no.',
+        'volume': false,
+        'pin': false,
+        'uid': groupChatId,
+      },
+    );
+  }
+
+  Future<String> createGroup() async {
+    List<String> memberIds = selectedMap.keys.toList();
+    return await _chatService.createGroupChat(memberIds, groupName);
   }
 
   void onSearch() async {
@@ -71,18 +117,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            createGroup();
-            Navigator.of(context).pushNamed(
-              'chatslist',
-              arguments: {
-                'name': groupName,
-                'url': 'no.',
-                'volume': false,
-                'pin': false,
-                'uid': _auth.currentUser?.uid
-              },
-            );
-            //Navigator.of(context).pop();
+            createAndNavigateGroup();
           },
           icon: const Icon(Icons.arrow_forward_rounded),
           color: Theme.of(context).colorScheme.onPrimary,
@@ -189,7 +224,33 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
             Padding(
               padding: EdgeInsets.only(bottom: 12),
             ),
-            _buildUserList(),
+            userMap.length == 0
+                ? Expanded(
+                  child: _buildUserList()
+                )
+                : ElevatedButton(
+                    onPressed: () => {},
+                    style: ButtonStyle(
+                      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                      surfaceTintColor:
+                          const MaterialStatePropertyAll(Colors.transparent),
+                      backgroundColor: MaterialStatePropertyAll(
+                        Theme.of(context).colorScheme.background,
+                      ),
+                      shadowColor:
+                          const MaterialStatePropertyAll(Colors.transparent),
+                      shape: MaterialStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    child: ChatBubbleGr(
+                        imageUrl: userMap['picture'].toString(),
+                        chatTitle: userMap['email'].toString(),
+                        secondary: 'text',
+                        uid: userMap['uid'].toString()),
+                  ),
           ],
         ),
       ),
@@ -197,6 +258,7 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
   }
 
   Widget _buildUserList() {
+    print(selectedMap);
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
@@ -208,10 +270,12 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
             child: CircularProgressIndicator(),
           );
         }
-        return Column(
-          children: snapshot.data!.docs
-              .map<Widget>((doc) => _buildUserListItem(doc))
-              .toList(),
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final DocumentSnapshot document = snapshot.data!.docs[index];
+            return _buildUserListItem(document);
+          },
         );
       },
     );
@@ -219,14 +283,27 @@ class _CreateGroupScreen extends State<CreateGroupScreen> {
 
   Widget _buildUserListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+
     if (_auth.currentUser!.email != data['email']) {
       return ChatBubbleSelection(
         imageUrl: data['picture'].toString(),
         chatTitle: data['email'].toString(),
         uid: data['uid'].toString(),
-        selected: true,
+        selected: selectedMap.containsKey(data['uid'])
+            ? selectedMap[data['uid']]!
+            : false,
+        onSelectionChanged: (uid, selected) {
+          setState(() {
+            if (selected) {
+              selectedMap[uid] = true;
+            } else {
+              selectedMap.remove(uid);
+            }
+          });
+        },
       );
     }
+
     return Container();
   }
 }

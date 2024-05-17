@@ -53,6 +53,8 @@ dependencies:
   audioplayers: ^6.0.0
   firebase_messaging: ^14.9.1
   file_picker: ^8.0.3
+  firebase_storage: ^11.7.4
+  insta_image_viewer: ^1.0.4
   # emoji_picker_flutter: ^2.0.0 Это ломает сборку)))
 
 dev_dependencies:

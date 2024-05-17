@@ -5,11 +5,13 @@ class ChatBubble extends StatefulWidget {
   final String chatTitle;
   final String secondary;
   final String uid;
+  final String phone;
   const ChatBubble({
     required this.imageUrl,
     required this.chatTitle,
     required this.secondary,
     required this.uid,
+    required this.phone,
     super.key,
   });
 
@@ -66,6 +68,7 @@ class _ChatBubble extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
     //final String username = "А. Б. Веселухов";
+    String uid = widget.uid;
 
     return Column(
       children: [
@@ -87,39 +90,47 @@ class _ChatBubble extends State<ChatBubble> {
               ),
             ),
             onPressed: () {
-              //String name = widget.chatTitle;
               Navigator.of(context).pushNamed(
-              'chatslist',
-              arguments: {'name': widget.chatTitle,'url':widget.imageUrl,'volume': volume,'pin': push_pin, 'uid':widget.uid},
-          );
+                'chatslist',
+                arguments: {
+                  'name': widget.chatTitle,
+                  'url': widget.imageUrl,
+                  'volume': volume,
+                  'pin': push_pin,
+                  'uid': widget.uid,
+                  'phone': widget.phone,
+                },
+              );
+
+              ;
             },
             onLongPress: () => {
               showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.push_pin_outlined),
-                        title: Text('Закрепить'),
-                        onTap: () {
-                          push_pin_get();
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.volume_off),
-                        title: Text('Без звука'),
-                        onTap: () {
-                          volume_off();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.push_pin_outlined),
+                          title: Text('Закрепить'),
+                          onTap: () {
+                            push_pin_get();
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.volume_off),
+                          title: Text('Без звука'),
+                          onTap: () {
+                            volume_off();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -140,33 +151,38 @@ class _ChatBubble extends State<ChatBubble> {
                 children: [
                   _buildThumbnailImage(),
                   const Padding(padding: EdgeInsets.only(right: 12)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            widget.chatTitle,
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.onPrimaryContainer,
-                              fontSize: 20,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              widget.chatTitle,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontSize: 20,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            volume ? Icon(Icons.volume_off) : Container(),
+                            push_pin
+                                ? Icon(Icons.push_pin_outlined)
+                                : Container(),
+                          ],
+                        ),
+                        Text(
+                          widget.secondary,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.outline,
                           ),
-                          volume? Icon(Icons.volume_off) : Container(),
-                          push_pin? Icon(Icons.push_pin_outlined) : Container(),
-
-                        ],
-                      ),
-                      // Text(
-                      //   "печатает...",
-                      //   style: TextStyle(
-                      //     color: Theme.of(context).colorScheme.primary,
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.w400,
-                      //   ),
-                      // ),
-                    ],
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),
                 ],

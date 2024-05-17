@@ -7,6 +7,7 @@ class User {
   final String phoneNumber;
   final DateTime lastSignInTime;
   final DateTime creationTime;
+  final String role;
   User({
     required this.uid,
     required this.email,
@@ -16,5 +17,6 @@ class User {
     required this.phoneNumber,
     required this.lastSignInTime,
     required this.creationTime,
+    required this.role,
   });
 }

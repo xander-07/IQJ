@@ -8,21 +8,22 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
-import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
+import 'package:iqj/features/messenger/presentation/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/file_chat.dart/file_chat.dart';
-import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
+import 'package:iqj/features/messenger/presentation/group_message.dart';
+import 'package:iqj/features/messenger/presentation/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
 //import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 //import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ChatsList extends StatefulWidget {
-  const ChatsList({super.key});
+class ChatsGroupList extends StatefulWidget {
+  const ChatsGroupList({super.key});
   @override
   State<StatefulWidget> createState() => _ChatsListState();
 }
 
-class _ChatsListState extends State<ChatsList> {
+class _ChatsListState extends State<ChatsGroupList> {
   Widget _buildThumbnailImage(String image_url) {
     try {
       return Container(
@@ -31,7 +32,7 @@ class _ChatsListState extends State<ChatsList> {
           width: 45,
           height: 45,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(12),
             child: Image.network(
               image_url,
               fit: BoxFit.fill,
@@ -41,11 +42,18 @@ class _ChatsListState extends State<ChatsList> {
                 Object exception,
                 StackTrace? stackTrace,
               ) {
-                return CircleAvatar(
-                  radius: 6,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: const Text('A'),
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 );
               },
             ),
@@ -64,6 +72,7 @@ class _ChatsListState extends State<ChatsList> {
   bool pin = false;
   bool _emojiPicking = false;
   File? imageFile;
+  // late Stream<QuerySnapshot> _messagesStream;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -79,6 +88,14 @@ class _ChatsListState extends State<ChatsList> {
     }
   }
 
+  bool file_check = false;
+
+  void checkFIle() {
+    setState(() {
+      file_check = !file_check;
+    });
+  }
+
   selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -86,7 +103,6 @@ class _ChatsListState extends State<ChatsList> {
       setState(() {
         File imageFile = File(result.files.single.path!);
       });
-      
     } else {
       // User canceled the picker
     }
@@ -108,6 +124,7 @@ class _ChatsListState extends State<ChatsList> {
 
     setState(() {});
     super.didChangeDependencies();
+    _updateMemberCount(uid);
   }
 
   final TextEditingController _msgController = TextEditingController();
@@ -116,7 +133,7 @@ class _ChatsListState extends State<ChatsList> {
   DateTime? currentDate;
   ScrollController _scrollController = ScrollController();
 
-  void sendMessage() async {
+ void sendMessage() async {
     if (_msgController.text.isNotEmpty) {
       await _chatService.sendMessage(
         uid,
@@ -124,9 +141,21 @@ class _ChatsListState extends State<ChatsList> {
       );
       _msgController.clear();
     }
+    // if (imageFile != null && imageFile!.existsSync()) {
+    //   await _chatService.getImage(uid, imageFile!);
+    // }
     if (imageFile != null && imageFile!.existsSync()) {
-      await _chatService.sendMessFile(uid, imageFile!);
+      await _chatService.fileUpload(uid, imageFile!);
     }
+  }
+
+  int memberCount = 0;
+
+  Future<void> _updateMemberCount(String groupId) async {
+    int count = await _chatService.getNumberOfUsersInGroup(groupId);
+    setState(() {
+      memberCount = count;
+    });
   }
 
   void emojiPickerSet() {
@@ -135,12 +164,12 @@ class _ChatsListState extends State<ChatsList> {
     });
   }
 
-  Widget _buildMessageList() {
+  String msgPfp = '';
+
+  Widget _buildMessageList(List<DocumentSnapshot<Object?>> documents, String id) {
+    print(id);
     return StreamBuilder(
-      stream: _chatService.getMessages(
-        uid,
-        _firebaseAuth.currentUser!.uid,
-      ),
+      stream: _chatService.getGroupMessages(uid),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -152,26 +181,50 @@ class _ChatsListState extends State<ChatsList> {
         }
 
         List<Widget> messageWidgets = [];
-        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+        DateTime? nextDate;
+        for (int i = snapshot.data!.docs.length - 1; i >= 0; i--) {
           final document = snapshot.data!.docs[i];
           final Map<String, dynamic> data =
               document.data()! as Map<String, dynamic>;
           final messageDate = (data['timestamp'] as Timestamp).toDate();
 
-          if (currentDate == null || messageDate.day != currentDate!.day) {
-            messageWidgets.add(_buildDateWidget(messageDate));
-            currentDate = messageDate;
+          // Check if there's a next message and get its date
+          if (i > 0) {
+            final nextDocument = snapshot.data!.docs[i - 1];
+            final nextData = nextDocument.data()! as Map<String, dynamic>;
+            nextDate = (nextData['timestamp'] as Timestamp).toDate();
           }
 
           messageWidgets.add(_buildMessageListItem(document));
+
+          // Compare the current message's date with the next message's date
+          if (nextDate == null || messageDate.day > nextDate.day) {
+            messageWidgets.add(_buildDateWidget(messageDate));
+          }
         }
+
+        try {
+          final document = snapshot.data!.docs.first;
+          final Map<String, dynamic> data =
+              document.data()! as Map<String, dynamic>;
+          final oldestMessageDate = (data['timestamp'] as Timestamp).toDate();
+          print(oldestMessageDate);
+          if (nextDate != null) {
+            messageWidgets.add(_buildDateWidget(oldestMessageDate));
+          }
+        } catch (e) {
+          print('Exception: $e');
+        }
+
+        // Call _scrollToBottom after messageList is built
+        //_scrollToBottom();
 
         return Align(
           alignment: Alignment.bottomCenter,
           child: ListView.builder(
             padding: EdgeInsets.only(bottom: 8),
             physics: ClampingScrollPhysics(),
-            //reverse: true,
+            reverse: true,
             shrinkWrap: true,
             controller: _scrollController,
             itemCount: messageWidgets.length,
@@ -215,6 +268,30 @@ class _ChatsListState extends State<ChatsList> {
     );
   }
 
+  Widget getPfp(String senderId, DocumentSnapshot document) {
+    final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    return FutureBuilder<String>(
+      future: _chatService.getProfilePicture(senderId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return GroupMessage(
+            message: data['message'].toString(),
+            url: snapshot.data ??
+                '', // Use the retrieved profile picture URL here
+            sender: senderId,
+            senderEmail: data['senderEmail'] as String,
+            compare: _firebaseAuth.currentUser!.uid,
+            time: DateFormat('HH:mm')
+                .format((data['timestamp'] as Timestamp).toDate()),
+          );
+        } else {
+          // Handle loading or error states here
+          return CircularProgressIndicator(); // Or ErrorWidget() as needed
+        }
+      },
+    );
+  }
+
   Widget _buildMessageListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     print(data);
@@ -227,25 +304,18 @@ class _ChatsListState extends State<ChatsList> {
     return Container(
       padding: EdgeInsets.only(left: 12, right: 12),
       alignment: alignment,
-      child: ReceiverMessage(
-        message: data['message'].toString(),
-        //mainAxisAlignment: mainalignment,
-        url: image_url!,
-        receiver: data['senderId'] as String,
-        compare: _firebaseAuth.currentUser!.uid,
-        time: DateFormat('HH:mm')
-            .format((data['timestamp'] as Timestamp).toDate()),
-      ),
+      child: getPfp(data['senderId'] as String, document),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+    // _scrollController = ScrollController();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollToBottom();
+    // });
+    //_messagesStream = _chatService.getGroupMessages(uid);
   }
 
   void _scrollToBottom() {
@@ -299,8 +369,8 @@ class _ChatsListState extends State<ChatsList> {
               padding: const MaterialStatePropertyAll(EdgeInsets.zero),
               surfaceTintColor:
                   const MaterialStatePropertyAll(Colors.transparent),
-              backgroundColor: MaterialStatePropertyAll(
-                Theme.of(context).colorScheme.background,
+              backgroundColor: const MaterialStatePropertyAll(
+                Colors.transparent,
               ),
               shadowColor: const MaterialStatePropertyAll(Colors.transparent),
               shape: MaterialStatePropertyAll(
@@ -311,7 +381,7 @@ class _ChatsListState extends State<ChatsList> {
             ),
             onPressed: () {
               Navigator.of(context).pushNamed(
-                'page_person',
+                'grouppage',
                 arguments: {'name': user_name, 'url': image_url, 'uid': uid},
               );
             },
@@ -344,11 +414,10 @@ class _ChatsListState extends State<ChatsList> {
                         ],
                       ),
                       Text(
-                        "печатает...",
+                        "$memberCount участников",
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -363,15 +432,6 @@ class _ChatsListState extends State<ChatsList> {
             padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.phone,
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
-                  onPressed: () {
-                    // Действие при нажатии на кнопку с телефоном
-                  },
-                ),
                 IconButton(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -423,7 +483,23 @@ class _ChatsListState extends State<ChatsList> {
       body: Column(
         children: [
           Expanded(
-            child: _buildMessageList(),
+            child: StreamBuilder(
+              stream: _chatService.getGroupMessages(uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  // Convert the stream of QuerySnapshot to a list of DocumentSnapshot
+                  final List<DocumentSnapshot> documents =
+                      snapshot.data!.docs.toList();
+                  return _buildMessageList(documents, 'oDkIf#v)CAVDT)l)JMDB3YGY)XN#7Tgk');
+                }
+              },
+            ),
           ),
           Align(
             alignment: Alignment.bottomLeft,
@@ -454,13 +530,14 @@ class _ChatsListState extends State<ChatsList> {
                       : Container(),
                   Row(
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          //emojiPickerSet();
-                          //FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        icon: Icon(Icons.insert_emoticon),
-                      ),
+                      // Заменить на стикеры
+                      // IconButton(
+                      //   onPressed: () {
+                      //     //emojiPickerSet();
+                      //     //FocusManager.instance.primaryFocus?.unfocus();
+                      //   },
+                      //   icon: Icon(Icons.insert_emoticon),
+                      // ),
                       Expanded(
                         child: TextField(
                           controller: _msgController,
@@ -481,29 +558,32 @@ class _ChatsListState extends State<ChatsList> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async{
+                          // sendMessage();
+                          // checkFIle();
                           selectFileImage();
+                          checkFIle();
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
                       IconButton(
                         onPressed: () async {
-                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString(); 
-                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg'); 
-                          //        var uploadTask = storageRef.putFile(_image!); 
-                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL(); 
-  
-                          //        firestore.collection("Driver Details").add({ 
-                          //          "Name": nameController.text, 
-                          //          "Age": ageController.text, 
-                          //          "Driving Licence": dlController.text, 
-                          //          "Address.": adController.text, 
-                          //          "Phone No.": phnController.text, 
-                          //          // Add image reference to document 
-                          //          "Image": downloadUrl.toString()  
-                          //        }); 
-                          sendMessage();
+                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString();
+                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg');
+                          //        var uploadTask = storageRef.putFile(_image!);
+                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL();
 
+                          //        firestore.collection("Driver Details").add({
+                          //          "Name": nameController.text,
+                          //          "Age": ageController.text,
+                          //          "Driving Licence": dlController.text,
+                          //          "Address.": adController.text,
+                          //          "Phone No.": phnController.text,
+                          //          // Add image reference to document
+                          //          "Image": downloadUrl.toString()
+                          //        });
+                          sendMessage();
+                          checkFIle();
                         },
                         icon: Icon(Icons.send),
                       ),
