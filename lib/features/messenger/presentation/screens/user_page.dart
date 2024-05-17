@@ -456,12 +456,108 @@ class _UserPage extends State<UserPage> {
                     ],
                   )),
             ),
+            Wrap(
+              children: [
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+                flag1 ? _buildSquer(image_url ?? "", 105) : Container(),
+              ],
+            ),
+            flag2
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag2
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag2
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag2
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag2
+                ? _File_in_main_chat(
+                    context,
+                    image_url ?? "",
+                    "линейная алгебра и аналитическая геом",
+                    "1,0 MB, 06.05.24 в 12:25")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
+            flag3
+                ? _Link_for_main_chat(
+                    context,
+                    image_url ?? "",
+                    "Подготовка к экзамену",
+                    "№1. Вычислить неопределённый интеграл",
+                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+                : Container(),
           ],
         ),
       ),
     );
   }
 }
+
+
+
 
 Widget _buildThumbnailImage(String image_url, double size) {
   try {
@@ -472,7 +568,7 @@ Widget _buildThumbnailImage(String image_url, double size) {
         height: size,
         child: InstaImageViewer(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(56),
+            borderRadius: BorderRadius.circular(24),
             child: Image.network(
               image_url,
               fit: BoxFit.fill,
@@ -483,11 +579,18 @@ Widget _buildThumbnailImage(String image_url, double size) {
                 Object exception,
                 StackTrace? stackTrace,
               ) {
-                return CircleAvatar(
-                  radius: 6,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: const Text('A'),
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 );
               },
             ),
@@ -537,6 +640,162 @@ Widget create_button_for_change_state(
           ),
         ],
       ),
+    ),
+  );
+}
+
+Widget _buildSquer(String image_url, double size) {
+  try {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+              12), // Используем радиус 12 для получения квадратных углов
+          child: Image.network(
+            image_url,
+            fit: BoxFit.fill,
+            errorBuilder: (
+              BuildContext context,
+              Object exception,
+              StackTrace? stackTrace,
+            ) {
+              return Container(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer, // Вместо CircleAvatar используем обычный контейнер с цветом фона
+                child: const Text('A'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  } catch (e) {
+    return Container();
+  }
+}
+
+Widget _File_in_main_chat(
+    BuildContext context, String image_url, String name, String info) {
+  return ElevatedButton(
+      onPressed: () => {},
+      style: ButtonStyle(
+        padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+        backgroundColor: MaterialStatePropertyAll(
+          Theme.of(context).colorScheme.background,
+        ),
+        shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          _buildSquer(image_url, 40),
+          SizedBox(
+            width: 20,
+          ),
+          Column(
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.download,
+                    size: 12,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    info,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 10,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          )
+        ],
+      ));
+}
+
+Widget _Link_for_main_chat(BuildContext context, String image_url, String name,
+    String info, String link) {
+  return ElevatedButton(
+    onPressed: () => {},
+    style: ButtonStyle(
+      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+      surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
+      backgroundColor: MaterialStatePropertyAll(
+        Theme.of(context).colorScheme.background,
+      ),
+      shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+      shape: MaterialStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    ),
+    child: Row(
+      children: [
+        // SizedBox(width: 20,),
+        _buildSquer(image_url, 40),
+        // SizedBox(width: 20,),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                info,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontSize: 10,
+                ),
+              ),
+              // SizedBox(width: 10,),
+              Text(
+                link,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     ),
   );
 }

@@ -88,6 +88,14 @@ class _ChatsListState extends State<ChatsGroupList> {
     }
   }
 
+  bool file_check = false;
+
+  void checkFIle() {
+    setState(() {
+      file_check = !file_check;
+    });
+  }
+
   selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -125,16 +133,19 @@ class _ChatsListState extends State<ChatsGroupList> {
   DateTime? currentDate;
   ScrollController _scrollController = ScrollController();
 
-  void sendMessage() async {
+ void sendMessage() async {
     if (_msgController.text.isNotEmpty) {
-      await _chatService.sendMessageToGroup(
+      await _chatService.sendMessage(
         uid,
         _msgController.text,
       );
       _msgController.clear();
     }
+    // if (imageFile != null && imageFile!.existsSync()) {
+    //   await _chatService.getImage(uid, imageFile!);
+    // }
     if (imageFile != null && imageFile!.existsSync()) {
-      //await _chatService.sendMessFile(uid, imageFile!);
+      await _chatService.fileUpload(uid, imageFile!);
     }
   }
 
@@ -547,8 +558,11 @@ class _ChatsListState extends State<ChatsGroupList> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async{
+                          // sendMessage();
+                          // checkFIle();
                           selectFileImage();
+                          checkFIle();
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
@@ -569,6 +583,7 @@ class _ChatsListState extends State<ChatsGroupList> {
                           //          "Image": downloadUrl.toString()
                           //        });
                           sendMessage();
+                          checkFIle();
                         },
                         icon: Icon(Icons.send),
                       ),
