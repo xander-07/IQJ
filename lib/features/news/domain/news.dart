@@ -3,8 +3,8 @@ class News {
   final String title;
   // final List<String> thumbnails;
   final String thumbnails;
-  //final List<String> tags; ////////////// РАСКОММЕНТИРОВАТЬ КОГДА АПИ БУДЕТ ГОТОВО
-  final String tags;
+  final List<String> tags; ////////////// РАСКОММЕНТИРОВАТЬ КОГДА АПИ БУДЕТ ГОТОВО
+  //final String tags;
   final DateTime publicationTime;
   final String description;
   final String link;
