@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:iqj/features/account/domain/mailButton.dart';
-import 'package:iqj/features/account/domain/profilePicture.dart';
-import 'package:iqj/features/account/domain/profileInfo.dart';
-import 'package:iqj/features/account/domain/listButton.dart';
 import 'package:iqj/features/account/domain/editButton.dart';
+import 'package:iqj/features/account/domain/listButton.dart';
 import 'package:iqj/features/account/domain/logoffButton.dart';
+import 'package:iqj/features/account/domain/mailButton.dart';
+import 'package:iqj/features/account/domain/profileInfo.dart';
+import 'package:iqj/features/account/domain/profilePicture.dart';
 // import 'package:iqj/main.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -80,77 +79,79 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 40,
+        toolbarHeight: 50,
         scrolledUnderElevation: 0,
-        title: Text(
-          'Личный кабинет',
-          style: Theme.of(context).textTheme.titleLarge,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        title: const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 25),
+          child: Text(
+            'Личный кабинет',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         centerTitle: false,
       ),
-      body:  Center(
+      // Аватарка пользовтеля, ФИО и почта
+      body: Center(
         child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 24),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ProfilePicture(), 
-                  SizedBox(width: 24),
-                  ProfileInfo(),
-                ],
-              ),
-              const Expanded(
-                child: Column(
-                children: [
-                  SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      EditButton(),
-                      MailButton(),
-                    ]
-                  ),
-                ],
-              )
-              ),
-              Expanded(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 25),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 16,),
+                ProfilePicture(),
+                SizedBox(width: 24),
+                ProfileInfo(),
+              ],
+            ),
+            // Кнопка редактирования и почты
+            const Column(
+              children: [
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    EditButton(),
+                    MailButton(),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 11), // расстояние между кнопками и контейнером "Элемент меню"
+            // TODO переделать
+            Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ListView(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(8),
-                      children: const [
-                        ListButton(),
-                        ListButton(),
-                      ],
-                    )
+                    SizedBox(
+                      height: 300, 
+                      child: ListView(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(8),
+                        children: const [
+                          ListButton(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-              ),
-              const Expanded(child: 
-              Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  LogoffButton(),
-                ]
-              ),
-              ),
-              )
-            ],
-          ),
+            ),
+            // кнопка выхода
+            const LogoffButton(),
+          ],
         ),
+      ),
     );
   }
 }

@@ -51,30 +51,40 @@ class _MailButtonState extends State<MailButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 10),
-        child: TextButton(
-          style: ElevatedButton.styleFrom(
-            //alignment: Alignment.center,
-            backgroundColor: const Color.fromARGB(255, 239, 172, 0),
-            padding: const EdgeInsets.all(24),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(60),
+      //margin: const EdgeInsets.only(left: 5), 
+      child: SizedBox(
+        width: 158,
+        height: 47,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            style: ElevatedButton.styleFrom(
+              alignment: Alignment.center,
+              backgroundColor: const Color(0xFFEFAC00),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(35),
+              ),
             ),
-          ),
-          onPressed: () {
-            showMenuDialog(context);
-          },
-          child: const Text(
-            "Почта",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Inter',
-              fontSize: 21,
-              fontWeight: FontWeight.w500,
+            onPressed: () {
+              showMenuDialog(context);
+            },
+            child: const SizedBox(
+              width: 136,
+              child: Text(
+                "Почта",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Inter',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
+      ),
     );
   }
-
 }
