@@ -399,7 +399,7 @@ class __NewsListWidgetState extends State<_NewsListWidget> {
                       );
                     } else if (state is NewsLoadLoaded) {
                       final News news = state.news;
-                      final List<String> tags = news.tags.sublist(1, 3);
+                      final List<String> tags = news.tags.sublist(1);
                       final NewsTags ntags = NewsTags(tags: tags,);
                       return ListView(
                         children: [
@@ -584,13 +584,14 @@ class NewsTags extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Wrap(
+          // mainAxisSize: MainAxisSize.min,
+          // crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
             tags.length,
             (index) => Container(
               margin: const EdgeInsets.only(right: 5),
+              //padding: EdgeInsets.all(10),
               height: 35,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24.0),
