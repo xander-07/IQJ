@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	dbUtils "iqj/pkg/utils"
 
 	"github.com/lib/pq"
 )
@@ -30,30 +31,39 @@ type StudentGroupTable struct {
 
 // GetByID возвращает группу студентов из базы данных по указанному идентификатору.
 func (sgt *StudentGroupTable) GetByID(sg StudentGroup) (*StudentGroup, error) {
-	if sg.isDefault() {
+	if sg.isDefault() { // проверяем пустая ли структура передана
 		return nil, errors.New("StudentGroup.GetByID: wrong data! provided *StudentGroup is empty!")
 	}
 
+	// выполняем sql запрос, возвращающий лишь один *sql.Row
 	row := sgt.db.QueryRow("SELECT grade, institute, student_group_name, student_group_students_ids FROM students_groups WHERE students_group_id = $1", sg.Id)
-	if row.Err() != nil {
+	if row.Err() != nil { // обрабатываем ошибку, которая может возникнуть при выполнении
 		return nil, fmt.Errorf("studentGroupTable.GetByID: %v", row.Err().Error())
 	}
 
+	// сканируем наш row, попутно проверяя есть ли в нем ошибка
 	if err := row.Scan(&sg.Grade, &sg.Institute, &sg.Name, pq.Array(&sg.Students)); err != nil {
 		return nil, fmt.Errorf("studentGroupTable.GetByID: %v", err)
 	}
 
+	// возвращаем указатель на полученные данные
 	return &sg, nil
 }
 
 // GetIdByName возвращает идентификатор группы студентов из базы данных по указанному названию группы.
 func (sgt *StudentGroupTable) GetIdByName(sg StudentGroup) (*StudentGroup, error) {
-	if sg.isDefault() {
+	if sg.isDefault() { // проверяем переданы ли данные в полученную структуру
 		return nil, errors.New("StudentGroup.GetByName: wrong data! provided *StudentGroup is empty!")
 	}
 
+	// выполняем sql запрос, возвращающий лишь один *sql.Row
 	row := sgt.db.QueryRow("SELECT students_group_id FROM student_groups WHERE student_group_name = $1", sg.Name)
-	if err := row.Scan(&sg.Id); err != nil {
+	if err := row.Scan(&sg.Id); err != nil { // сканируем из полученного ряда айди
+		// проверяем является полученная ошибка ошибкой пустого возврата
+		if errors.Is(err, sql.ErrNoRows) {
+			// ошибка, которая будет выводиться, если такой группы нет, необходима обработка
+			return nil, sql.ErrNoRows
+		} // если что то другое, то возвращаем ошибку
 		return nil, fmt.Errorf("StudentGroup.GetByName: %v", err)
 	}
 
@@ -62,15 +72,17 @@ func (sgt *StudentGroupTable) GetIdByName(sg StudentGroup) (*StudentGroup, error
 
 // GetStudent возвращает группу студентов из базы данных по указанному идентификатору студента.
 func (sgt *StudentGroupTable) GetStudent(sg StudentGroup) (*StudentGroup, error) {
-	if sg.isDefault() {
+	if sg.isDefault() { // проверяем является ли структура пустой
 		return nil, errors.New("StudentGroup.GetStudent: wrong data! provided *StudentGroup is empty!")
 	}
 
+	// выполняем sql запрос, возвращающий лишь один *sql.Row
 	row := sgt.db.QueryRow("SELECT sg.grade, sg.institute, sg.student_group_name, sg.student_group_students_ids FROM students_groups sg JOIN students s ON sg.students_group_id = s.student_group_id WHERE s.student_id = $1", sg.Id)
 	if row.Err() != nil {
 		return nil, fmt.Errorf("studentGroupTable.GetStudent: %v", row.Err().Error())
 	}
 
+	// сканируем данные в структуру для возврата, попутно проверяя ошибку
 	if err := row.Scan(&sg.Grade, &sg.Institute, &sg.Name, pq.Array(&sg.Students)); err != nil {
 		return nil, fmt.Errorf("studentGroupTable.GetStudent: %v", err)
 	}
@@ -79,49 +91,59 @@ func (sgt *StudentGroupTable) GetStudent(sg StudentGroup) (*StudentGroup, error)
 }
 
 // GetGroupsByInstituteAndGrade возвращает группы студентов из базы данных по названию института и курсу.
-func (sgt *StudentGroupTable) GetGroupsByInstituteAndGrade(institute string, grade int) ([]*StudentGroup, error) {
-	groups := []*StudentGroup{}
+func (sgt *StudentGroupTable) GetGroupsByInstituteAndGrade(institute string, grade int) (*[]StudentGroup, error) {
+	groups := []StudentGroup{} // создаем массив, который после будем возвращать
 
+	// выполняем запрос, из рядов которого после будем вытаскивать данные в groups
 	rows, err := sgt.db.Query("SELECT students_group_id, student_group_name, student_group_students_ids FROM students_groups WHERE institute = $1 AND grade = $2", institute, grade)
 	if err != nil {
 		return nil, fmt.Errorf("studentGroupTable.GetGroupsByInstituteAndGrade: %v", err)
 	}
-	defer rows.Close()
+	defer rows.Close() // закрываем ряды, чтобы не было утечек и какого-либо непредсказуемого поведения
 
-	for rows.Next() {
-		group := &StudentGroup{}
+	for rows.Next() { // проходимся по всем рядам
+		group := StudentGroup{} // пустая структура, клонами которой, после заполнения, будем заполнять groups
+
+		// вытаскиваем данные, попутно проверяя ошибку
 		if err := rows.Scan(&group.Id, &group.Name, pq.Array(&group.Students)); err != nil {
 			return nil, fmt.Errorf("studentGroupTable.GetGroupsByInstituteAndGrade: %v", err)
 		}
 		groups = append(groups, group)
 	}
 
-	return groups, nil
+	return &groups, nil
 }
 
 // GetGroupsByInstitute возвращает группы студентов из базы данных по названию института.
-func (sgt *StudentGroupTable) GetGroupsByInstitute(sg StudentGroup) ([]*StudentGroup, error) {
-	groups := []*StudentGroup{}
+func (sgt *StudentGroupTable) GetGroupsByInstitute(sg StudentGroup) (*[]StudentGroup, error) {
 
+	// тут все то же самое, что и в GetGroupsByInstituteAndGrade
+
+	groups := []StudentGroup{} // создаем массив групп, который после вернем
+
+	// получаем ряды с данными из бд
 	rows, err := sgt.db.Query("SELECT students_group_id, student_group_name, student_group_students_ids FROM students_groups WHERE institute = $1", sg.Institute)
 	if err != nil {
 		return nil, fmt.Errorf("studentGroupTable.GetGroupsByInstitute: %v", err)
 	}
-	defer rows.Close()
+	defer rows.Close() // закрываем ряды
 
 	for rows.Next() {
-		group := &StudentGroup{}
+		group := StudentGroup{}
 		if err := rows.Scan(&group.Id, &group.Name, pq.Array(&group.Students)); err != nil {
 			return nil, fmt.Errorf("studentGroupTable.GetGroupsByInstitute: %v", err)
 		}
 		groups = append(groups, group)
 	}
 
-	return groups, nil
+	return &groups, nil
 }
 
 // GetGroupsByGrade возвращает группы студентов из базы данных по номеру курса.
 func (sgt *StudentGroupTable) GetGroupsByGrade(sg StudentGroup) ([]*StudentGroup, error) {
+
+	// опять же все то же самое
+
 	groups := []*StudentGroup{}
 
 	rows, err := sgt.db.Query("SELECT students_group_id, student_group_name, student_group_students_ids FROM students_groups WHERE grade = $1", sg.Grade)
@@ -171,27 +193,43 @@ func (sgt *StudentGroupTable) Update(sg StudentGroup) error {
 
 // GetClasses возвращает классы для группы студентов из базы данных.
 func (sgt *StudentGroupTable) GetClassesById(sg StudentGroup) (*[]Class, error) {
-	if sg.isDefault() {
-		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
+	if sg.isDefault() { // проверяем переданную структуру
+		return nil, errors.New("StudentGroup.GetClassesById: wrong data! provided *StudentGroup is empty")
 	}
 
-	rows, err := sgt.db.Query("SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location, class_group_names FROM classes WHERE $1 = ANY(class_group_ids)", sg.Id)
+	// вытаскиваем ряды с данными из бд
+	rows, err := sgt.db.Query(
+		"SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location FROM classes WHERE $1 = ANY(class_group_ids)",
+		sg.Id)
+
 	if err != nil {
-		return nil, fmt.Errorf("StudentGroup.GetClasses: %v", err)
+		return nil, fmt.Errorf("StudentGroup.GetClassesById: %v", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			err = fmt.Errorf("StudentGroup.GetClassesById: error closing rows: %v", cerr)
+		}
+	}()
 
-	var resultClasses []Class
+	var resultClasses []Class // создаем массив, который после будем возвращать
 	for rows.Next() {
 		var resultClass Class
-		if err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location, pq.Array(&resultClass.GroupsNames)); err != nil {
-			return nil, fmt.Errorf("StudentGroup.GetClasses: error scanning row: %v", err)
+
+		// создаем массив, который бд-драйвер сможет заполнить, так как он не умеет работать с []int
+		idsArr := pq.Int32Array{}
+
+		if err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location); err != nil {
+			return nil, fmt.Errorf("StudentGroup.GetClassesById: error scanning row: %v", err)
 		}
+
+		// с помощью функции из utils преобразовываем массив из []int32 в []int, который используется в нашей структуре
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
+
 		resultClasses = append(resultClasses, resultClass)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("StudentGroup.GetClasses: error after scanning rows: %v", err)
+		return nil, fmt.Errorf("StudentGroup.GetClassesById: error after scanning rows: %v", err)
 	}
 
 	return &resultClasses, nil
@@ -199,28 +237,39 @@ func (sgt *StudentGroupTable) GetClassesById(sg StudentGroup) (*[]Class, error) 
 
 // GetClasses возвращает классы для группы студентов из базы данных.
 func (sgt *StudentGroupTable) GetClassesByName(sg StudentGroup) (*[]Class, error) {
-	if sg.isDefault() {
-		return nil, errors.New("StudentGroup.GetClasses: wrong data! provided *StudentGroup is empty")
+
+	// все то же самое, что и в функции выше
+
+	if sg.isDefault() { // проверяем данные в структуре
+		return nil, errors.New("StudentGroup.GetClassesByName: wrong data! provided *StudentGroup is empty")
 	}
 
-	rows, err := sgt.db.Query("SELECT class_id, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location FROM classes WHERE $1 = ANY(class_group_names)", sg.Name)
+	// достаем ряды
+	rows, err := sgt.db.Query("SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, week, weekday, class_name, class_type, class_location FROM classes WHERE $1 = ANY(class_group_names)", sg.Name)
 	if err != nil {
-		return nil, fmt.Errorf("StudentGroup.GetClasses: %v", err)
+		return nil, fmt.Errorf("StudentGroup.GetClassesByName: %v", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			err = fmt.Errorf("StudentGroup.GetClasses: error closing rows: %v", cerr)
+		}
+	}()
 
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		if err := rows.Scan(&resultClass.Id, &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location); err != nil {
-			return nil, fmt.Errorf("StudentGroup.GetClasses: error scanning row: %v", err)
+
+		idsArr := pq.Int32Array{} // опять мучаемся с типами
+
+		if err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location); err != nil {
+			return nil, fmt.Errorf("StudentGroup.GetClassesById: error scanning row: %v", err)
 		}
-		resultClass.Name = sg.Name
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr) // конвертируем в тип, который можем использовать
 		resultClasses = append(resultClasses, resultClass)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("StudentGroup.GetClasses: error after scanning rows: %v", err)
+		return nil, fmt.Errorf("StudentGroup.GetClassesByName: error after scanning rows: %v", err)
 	}
 
 	return &resultClasses, nil

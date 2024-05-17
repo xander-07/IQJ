@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	dbUtils "iqj/pkg/utils"
 
 	"github.com/lib/pq"
 )
@@ -79,40 +80,40 @@ func (ct *ClassTable) GetById(c Class) (*Class, error) {
 		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
 	}
 
-	row := ct.db.QueryRow(`SELECT class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location
+	row := ct.db.QueryRow(`SELECT class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type, class_location
 		FROM classes
 		WHERE class_id = $1`,
 		c.Id)
 
-	err := row.Scan(pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
+	var idsArr pq.Int32Array
+	err := row.Scan(&idsArr, pq.Array(&c.GroupsNames), &c.Teacher, &c.TeacherName, &c.Count, &c.Weekday, &c.Week, &c.Name, &c.Type, &c.Location)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("Class.GetById: %v", err)
 	}
+	c.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
 
 	return &c, nil
 }
 
-//	СКОРО БУДЕТ УДАЛЕНО, ИСПОЛЬЗУЙТЕ GetForTeacher вместо этого, за доп. функционалом обращаться в канал бд
-//
 // GetForWeekByTeacher получает данные парах для преподавателя на конкретную неделю из базы данных.
 // Принимает Class с непустыми полями Id,Week\n
 // Возвращает слайс заполненных *Class, nil при успешном получении.
 //
 // Прим:\n
 // a := Class{Id: 123, Week:123}\n
-// cls, err := ...GetById(a) // err == nil если все хорошо
+// cls, err := ...GetForWeekByTeacher(a) // err == nil если все хорошо
 func (ct *ClassTable) GetForWeekByTeacher(c Class) (*[]Class, error) {
 	if c.isDefault() {
 		return nil, errors.New("Class.GetForWeekByTeacher: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id,  class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, weekday, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2`,
-		c.Id, c.Week)
+		c.Teacher, c.Week)
 	if err != nil {
 		return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
 	}
@@ -121,10 +122,12 @@ func (ct *ClassTable) GetForWeekByTeacher(c Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		var idsArr pq.Int32Array
+		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetForWeekByTeacher: %v", err)
 		}
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
 		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -137,7 +140,7 @@ func (ct *ClassTable) GetForTeacher(c Class) (*[]Class, error) {
 		return nil, errors.New("Class.GetForTeacher: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id,  class_group_names, count ,week, weekday, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, count, week, weekday, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_name = $1`,
 		c.TeacherName)
@@ -149,11 +152,13 @@ func (ct *ClassTable) GetForTeacher(c Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		var idsArr pq.Int32Array
+		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Count, &resultClass.Week, &resultClass.Weekday, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetForTeacher: %v", err)
 		}
-		resultClass.Teacher, resultClass.Week = c.Teacher, c.Week
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
+		resultClass.Teacher, resultClass.TeacherName = c.Teacher, c.TeacherName
 		resultClasses = append(resultClasses, resultClass)
 	}
 
@@ -166,28 +171,30 @@ func (ct *ClassTable) GetForTeacher(c Class) (*[]Class, error) {
 //
 // Прим:\n
 // a := Class{Id: 123, Week:123,Weekday:123}\n
-// cls, err := ...GetById(a) // err == nil если все хорошо
+// cls, err := ...GetForDayByTeacher(a) // err == nil если все хорошо
 func (ct *ClassTable) GetForDayByTeacher(c Class) (*[]Class, error) {
 	if c.isDefault() {
-		return nil, errors.New("Class.GetById: wrong data! provided *Class is empty")
+		return nil, errors.New("Class.GetForDayByTeacher: wrong data! provided *Class is empty")
 	}
 
-	rows, err := ct.db.Query(`SELECT class_id, class_group_names, class_teacher_name, count, class_name, class_type, class_location
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_name, count, class_name, class_type, class_location
 		FROM classes
 		WHERE class_teacher_id = $1 AND week = $2 AND weekday = $3`,
-		c.Id, c.Week, c.Weekday)
+		c.Teacher, c.Week, c.Weekday)
 	if err != nil {
-		return nil, fmt.Errorf("Class.GetById: %v", err)
+		return nil, fmt.Errorf("Class.GetForDayByTeacher: %v", err)
 	}
 	defer rows.Close()
 
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
+		var idsArr pq.Int32Array
+		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type, &resultClass.Location)
 		if err != nil {
-			return nil, fmt.Errorf("Class.GetById: %v", err)
+			return nil, fmt.Errorf("Class.GetForDayByTeacher: %v", err)
 		}
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
 		resultClass.Teacher, resultClass.TeacherName, resultClass.Week, resultClass.Weekday = c.Teacher, c.TeacherName, c.Week, c.Weekday
 		resultClasses = append(resultClasses, resultClass)
 	}
@@ -216,7 +223,7 @@ func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	}
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
-	rows, err := ct.db.Query(`SELECT class_id, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
 		FROM classes
 		WHERE class_location = $1`, c.Location)
 	if err != nil {
@@ -227,11 +234,12 @@ func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	var resultClasses []Class
 	for rows.Next() {
 		var resultClass Class
-		err := rows.Scan(&resultClass.Id, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
+		var idsArr pq.Int32Array
+		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 		}
-
+		resultClass.Groups = dbUtils.ConvertIntegerSlice[int32, int](idsArr)
 		resultClass.Location = c.Location
 		resultClasses = append(resultClasses, resultClass)
 	}
