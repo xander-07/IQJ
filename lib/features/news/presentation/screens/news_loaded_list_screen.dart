@@ -174,9 +174,7 @@ Future<News> getNewsFull(String id) async {
             thumbnails: json['image_link'] == null
                 ? ''
                 : json['image_link'][0] as String,
-            tags: json['tags'] == null
-            ? ''
-            : json['tags'][0] as String,
+            tags: [],
             publicationTime: DateTime.parse(json['publication_time'] as String),
             bookmarked: false,
           ),
@@ -184,6 +182,8 @@ Future<News> getNewsFull(String id) async {
       );
       print(decodedData);
     } else if (decodedData is Map<String, dynamic>) {
+      List<dynamic> dynamicList = decodedData['tags']==null? [] : decodedData['tags'] as List<dynamic>;
+      List<String> stringList = dynamicList.map((item) => item.toString()).toList();
       final News news = News(
         id: decodedData['id'].toString(),
         title: decodedData['header'] as String,
@@ -192,9 +192,7 @@ Future<News> getNewsFull(String id) async {
         thumbnails: decodedData['image_link'] == null
                 ? ''
                 : decodedData['image_link'][0] as String,
-            tags: decodedData['tags'] == null
-            ? ''
-            : decodedData['tags'][0] as String,
+            tags: stringList ,
         link: decodedData['link'] as String,
         description: decodedData['content'] as String,
         bookmarked: false,
@@ -257,7 +255,6 @@ class __NewsListWidgetState extends State<_NewsListWidget> {
       ),
     );
 
-    final NewsTags ntags = NewsTags();
 
     void openCloseTags() {
       setState(() {
@@ -404,6 +401,8 @@ class __NewsListWidgetState extends State<_NewsListWidget> {
                       );
                     } else if (state is NewsLoadLoaded) {
                       final News news = state.news;
+                      final List<String> tags = news.tags.sublist(1, 3);
+                      final NewsTags ntags = NewsTags(tags: tags,);
                       return ListView(
                         children: [
                           Card(
@@ -577,9 +576,11 @@ class __NewsListWidgetState extends State<_NewsListWidget> {
 }
 
 class NewsTags extends StatelessWidget {
+  final List<String>tags;
+
+  const NewsTags({super.key, required this.tags});
   @override
   Widget build(BuildContext context) {
-    final List<String> tags = ["Tag 1", "Tag 2", "Tag 3"];
     return AnimatedSize(
       curve: Curves.easeIn,
       duration: const Duration(milliseconds: 250),
