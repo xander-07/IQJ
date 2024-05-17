@@ -53,13 +53,10 @@ class ReceiverMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isStringLink(String input) {
-      Uri? uri = Uri.tryParse(input);
-      if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
-        return true;
-      } else {
-        return false;
-      }
+    bool isFirebaseStorageLink(String url) {
+      final RegExp firebaseStoragePattern =
+          RegExp(r'https://firebasestorage\.googleapis\.com/v0/b/.+');
+      return firebaseStoragePattern.hasMatch(url);
     }
 
     return LayoutBuilder(
@@ -157,7 +154,7 @@ class ReceiverMessage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          (!isStringLink(message))
+                          (!isFirebaseStorageLink(message))
                               ? Linkify(
                                   text: message,
                                   style: Theme.of(context).textTheme.bodyText1,

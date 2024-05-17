@@ -102,7 +102,6 @@ class _VideoWidgetState extends State<VideoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('sex');
     return FutureBuilder(
       future: _initializeVideoPlayerFuture,
       builder: (context, snapshot) {

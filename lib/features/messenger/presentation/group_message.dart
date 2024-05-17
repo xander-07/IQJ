@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:intl/intl.dart';
 
 // class Message extends StatelessWidget {
@@ -51,6 +52,15 @@ class GroupMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isFirebaseStorageLink(String url) {
+      final RegExp firebaseStoragePattern =
+          RegExp(r'https://firebasestorage\.googleapis\.com/v0/b/.+');
+      return firebaseStoragePattern.hasMatch(url);
+    }
+
+    print(message);
+    print(isFirebaseStorageLink(message));
+
     return LayoutBuilder(
       builder: (context, constraints) {
         double maxWidth = MediaQuery.of(context).size.width * 0.7;
@@ -154,16 +164,20 @@ class GroupMessage extends StatelessWidget {
                                   ),
                                 )
                               : Container(),
-                          Linkify(
-                            text: message,
-                            style: Theme.of(context).textTheme.bodyText1,
-                            linkStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 16,
-                              decorationColor:
-                                  Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
+                          if (!isFirebaseStorageLink(message))
+                            Linkify(
+                              text: message,
+                              style: Theme.of(context).textTheme.bodyText1,
+                              linkStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16,
+                                decorationColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                            )
+                          else
+                            _buildImage(message),
+                          //_buildThumbnailImage(message),
                           SizedBox(height: 4),
                           Align(
                             alignment: Alignment.bottomRight,
@@ -219,6 +233,45 @@ Widget _buildThumbnailImage(String image_url) {
                 child: const Text('A'),
               );
             },
+          ),
+        ),
+      ),
+    );
+  } catch (e) {
+    return Container();
+  }
+}
+
+Widget _buildImage(String image_url) {
+  try {
+    return Container(
+      //padding: EdgeInsets.only(right: 7),
+      child: SizedBox(
+        //width: 250,
+        height: 250,
+        child: // Половина ширины или высоты
+            InstaImageViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image(
+              image: Image.network(
+                image_url,
+                fit: BoxFit.fill,
+                height: 200,
+                errorBuilder: (
+                  BuildContext context,
+                  Object exception,
+                  StackTrace? stackTrace,
+                ) {
+                  return CircleAvatar(
+                    radius: 6,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    child: const Text('A'),
+                  );
+                },
+              ).image,
+            ),
           ),
         ),
       ),

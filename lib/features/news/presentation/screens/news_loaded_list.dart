@@ -51,7 +51,7 @@ class _NewsCard extends State<NewsCard> {
         onPressed: () {
           Navigator.of(context).pushNamed(
             'newslist',
-            arguments: {'id': widget.news.id, 'link': widget.news.link},
+            arguments: {'id': widget.news.id},
           );
         },
         style: ButtonStyle(

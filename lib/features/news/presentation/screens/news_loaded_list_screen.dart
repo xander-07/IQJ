@@ -155,7 +155,7 @@ Future<News> getNewsFull(String id) async {
       scheme: 'https',
       host: 'mireaiqj.ru',
       port: 8443,
-      path: '/news_id',
+      path: '/news',
       queryParameters: {'id': id},
     ),
   );
@@ -167,7 +167,7 @@ Future<News> getNewsFull(String id) async {
       newsList = List<News>.from(
         decodedData.map(
           (json) => News(
-            id: json['id'] as String,
+            id: id,
             title: json['header'] as String,
             link: json['link'] as String,
             description: json['content'].toString(),
@@ -217,20 +217,18 @@ class NewsList extends StatelessWidget {
     final Map<String, String> args =
         ModalRoute.of(context)!.settings.arguments! as Map<String, String>;
     final String newsId = args['id']!;
-    final String newsLink = args['link']!;
 
     return BlocProvider(
       create: (context) => NewsLoadBloc(newsId),
-      child: _NewsListWidget(newsId: newsId, newsLink: newsLink,),
+      child: _NewsListWidget(newsId: newsId),
     );
   }
 }
 
 class _NewsListWidget extends StatefulWidget {
   final String newsId;
-  final String newsLink;
 
-  _NewsListWidget({required this.newsId, required this.newsLink, Key? key}) : super(key: key);
+  _NewsListWidget({required this.newsId, Key? key}) : super(key: key);
 
   @override
   __NewsListWidgetState createState() => __NewsListWidgetState();
@@ -349,7 +347,7 @@ class __NewsListWidgetState extends State<_NewsListWidget> {
                               context,
                               DateFormat('dd.MM.yyyy hh:mm')
                                   .format(news.publicationTime),
-                              widget.newsId, widget.newsLink,
+                              widget.newsId, news.link,
                             );
                           },
                           itemBuilder: (BuildContext context) {

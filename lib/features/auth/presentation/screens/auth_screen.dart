@@ -166,7 +166,7 @@ class _LoginScreenState extends State<AuthScreen> {
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text('Error')));
+                              .showSnackBar(SnackBar(content: Text('Ошибка входа!')));
                         }
                       }
                     },

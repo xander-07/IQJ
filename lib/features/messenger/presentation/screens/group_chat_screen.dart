@@ -72,7 +72,7 @@ class _ChatsListState extends State<ChatsGroupList> {
   bool pin = false;
   bool _emojiPicking = false;
   File? imageFile;
-  // late Stream<QuerySnapshot> _messagesStream;
+  late Stream<QuerySnapshot> _messagesStream;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -88,13 +88,6 @@ class _ChatsListState extends State<ChatsGroupList> {
     }
   }
 
-  bool file_check = false;
-
-  void checkFIle() {
-    setState(() {
-      file_check = !file_check;
-    });
-  }
 
   selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -135,7 +128,7 @@ class _ChatsListState extends State<ChatsGroupList> {
 
  void sendMessage() async {
     if (_msgController.text.isNotEmpty) {
-      await _chatService.sendMessage(
+      await _chatService.sendMessageToGroup(
         uid,
         _msgController.text,
       );
@@ -145,9 +138,10 @@ class _ChatsListState extends State<ChatsGroupList> {
     //   await _chatService.getImage(uid, imageFile!);
     // }
     if (imageFile != null && imageFile!.existsSync()) {
-      await _chatService.fileUpload(uid, imageFile!);
+      await _chatService.groupFileUpload(uid, imageFile!);
     }
   }
+  
 
   int memberCount = 0;
 
@@ -315,7 +309,15 @@ class _ChatsListState extends State<ChatsGroupList> {
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   _scrollToBottom();
     // });
-    //_messagesStream = _chatService.getGroupMessages(uid);
+    // _messagesStream = _chatService.getGroupMessages(uid);
+  }
+
+  bool file_check = false;
+
+  void checkFile() {
+    setState(() {
+      file_check = !file_check;
+    });
   }
 
   void _scrollToBottom() {
@@ -496,7 +498,7 @@ class _ChatsListState extends State<ChatsGroupList> {
                   // Convert the stream of QuerySnapshot to a list of DocumentSnapshot
                   final List<DocumentSnapshot> documents =
                       snapshot.data!.docs.toList();
-                  return _buildMessageList(documents, 'oDkIf#v)CAVDT)l)JMDB3YGY)XN#7Tgk');
+                  return _buildMessageList(documents, uid);
                 }
               },
             ),
@@ -562,7 +564,7 @@ class _ChatsListState extends State<ChatsGroupList> {
                           // sendMessage();
                           // checkFIle();
                           selectFileImage();
-                          checkFIle();
+                          checkFile();
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
@@ -583,7 +585,7 @@ class _ChatsListState extends State<ChatsGroupList> {
                           //          "Image": downloadUrl.toString()
                           //        });
                           sendMessage();
-                          checkFIle();
+                          checkFile();
                         },
                         icon: Icon(Icons.send),
                       ),
