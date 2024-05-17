@@ -155,7 +155,7 @@ Future<News> getNewsFull(String id) async {
       scheme: 'https',
       host: 'mireaiqj.ru',
       port: 8443,
-      path: '/news_id',
+      path: '/news',
       queryParameters: {'id': id},
     ),
   );

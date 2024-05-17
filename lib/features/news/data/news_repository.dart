@@ -11,7 +11,7 @@ Future<List<News>> getNews() async {
       host: 'mireaiqj.ru',
       port: 8443,
       path: '/news',
-      queryParameters: {'offset': '0', 'count': '13'},
+      queryParameters: {'offset': '0', 'count': '20'},
       //TODO сделать offset динамически изменяемым, чтоб получать следующие новости при страницы
     ),
   );
