@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iqj/features/messenger/presentation/screens/chat_bubble.dart';
-import 'package:iqj/features/messenger/presentation/screens/highlight_chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/chat_bubble.dart';
+import 'package:iqj/features/messenger/presentation/highlight_chat_bubble.dart';
 import 'package:iqj/features/services/presentation/screens/about_screen.dart';
 import 'package:iqj/features/services/presentation/screens/services_bubble.dart';
 import 'package:iqj/features/services/presentation/screens/services_card.dart';

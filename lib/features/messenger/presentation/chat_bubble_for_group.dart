@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ChatBubbleSelection extends StatefulWidget {
+class ChatBubbleGr extends StatefulWidget {
   final String imageUrl;
   final String chatTitle;
+  final String secondary;
   final String uid;
-  bool selected;
-  ChatBubbleSelection({
+  const ChatBubbleGr({
     required this.imageUrl,
     required this.chatTitle,
+    required this.secondary,
     required this.uid,
-    required this.selected,
     super.key,
   });
 
   @override
-  State<StatefulWidget> createState() => _ChatBubbleSelection();
+  State<StatefulWidget> createState() => _ChatBubbleGr();
 }
 
-class _ChatBubbleSelection extends State<ChatBubbleSelection> {
+class _ChatBubbleGr extends State<ChatBubbleGr> {
   Widget _buildThumbnailImage() {
     try {
       return SizedBox(
@@ -48,15 +48,26 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
     }
   }
 
-  bool selected = false;
-  void setSelected() {
+  bool volume = false;
+  bool push_pin = false;
+
+  void volume_off() {
     setState(() {
-      selected = !selected;
+      volume = !volume;
+    });
+  }
+
+  void push_pin_get() {
+    setState(() {
+      push_pin = !push_pin;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    //final String username = "А. Б. Веселухов";
+    String uid = widget.uid;
+
     return Column(
       children: [
         Container(
@@ -77,7 +88,35 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
               ),
             ),
             onPressed: () {
-              setSelected();
+              
+            },
+            onLongPress: () => {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.push_pin_outlined),
+                          title: Text('Закрепить'),
+                          onTap: () {
+                            push_pin_get();
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.volume_off),
+                          title: Text('Без звука'),
+                          onTap: () {
+                            volume_off();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -106,18 +145,27 @@ class _ChatBubbleSelection extends State<ChatBubbleSelection> {
                           Text(
                             widget.chatTitle,
                             style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.onPrimaryContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               fontSize: 20,
                             ),
                           ),
-                          selected? Container(
-                            padding: EdgeInsets.only(left: 6),
-                            alignment: Alignment.centerRight,
-                            child: Icon(Icons.check_circle_rounded)) 
-                          : Container(),
+                          volume ? Icon(Icons.volume_off) : Container(),
+                          push_pin
+                              ? Icon(Icons.push_pin_outlined)
+                              : Container(),
                         ],
                       ),
+                      Text(widget.secondary),
+                      // Text(
+                      //   "печатает...",
+                      //   style: TextStyle(
+                      //     color: Theme.of(context).colorScheme.primary,
+                      //     fontSize: 20,
+                      //     fontWeight: FontWeight.w400,
+                      //   ),
+                      // ),
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(right: 12)),

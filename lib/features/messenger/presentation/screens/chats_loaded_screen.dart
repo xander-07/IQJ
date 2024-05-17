@@ -8,21 +8,22 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 //import 'package:flutter_reversed_list/flutter_reversed_list.dart';
-import 'package:iqj/features/messenger/presentation/screens/date_for_load_chats.dart';
+import 'package:iqj/features/messenger/presentation/date_for_load_chats.dart';
 import 'package:iqj/features/messenger/presentation/screens/file_chat.dart/file_chat.dart';
-import 'package:iqj/features/messenger/presentation/screens/struct_of_message.dart';
+import 'package:iqj/features/messenger/presentation/struct_of_message.dart';
 import 'package:flutter/foundation.dart' as foundation;
 //import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 //import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
-class ChatsGroupList extends StatefulWidget {
-  const ChatsGroupList({super.key});
+class ChatsList extends StatefulWidget {
+  const ChatsList({super.key});
   @override
   State<StatefulWidget> createState() => _ChatsListState();
 }
 
-class _ChatsListState extends State<ChatsGroupList> {
+class _ChatsListState extends State<ChatsList> {
   Widget _buildThumbnailImage(String image_url) {
     try {
       return Container(
@@ -59,11 +60,14 @@ class _ChatsListState extends State<ChatsGroupList> {
 
   String? user_name = "..."; // Объявление user_name как поле класса
   String? image_url = "";
+  String userPhone = "";
   String uid = "";
   bool vol = false;
   bool pin = false;
   bool _emojiPicking = false;
   File? imageFile;
+  late Stream<QuerySnapshot> _messagesStream;
+  late ScrollController _scrollController;
 
   selectFileImage() async {
     XFile? file = await ImagePicker().pickImage(
@@ -86,7 +90,6 @@ class _ChatsListState extends State<ChatsGroupList> {
       setState(() {
         File imageFile = File(result.files.single.path!);
       });
-      
     } else {
       // User canceled the picker
     }
@@ -105,6 +108,8 @@ class _ChatsListState extends State<ChatsGroupList> {
     vol = help["volume"] as bool;
     pin = help["pin"] as bool;
     uid = help["uid"] as String;
+    print("GroupID: $uid");
+    userPhone = help["phone"] as String;
 
     setState(() {});
     super.didChangeDependencies();
@@ -114,18 +119,20 @@ class _ChatsListState extends State<ChatsGroupList> {
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   DateTime? currentDate;
-  ScrollController _scrollController = ScrollController();
 
   void sendMessage() async {
     if (_msgController.text.isNotEmpty) {
-      await _chatService.sendMessageToGroup(
+      await _chatService.sendMessage(
         uid,
         _msgController.text,
       );
       _msgController.clear();
     }
+    // if (imageFile != null && imageFile!.existsSync()) {
+    //   await _chatService.getImage(uid, imageFile!);
+    // }
     if (imageFile != null && imageFile!.existsSync()) {
-      await _chatService.sendMessFile(uid, imageFile!);
+      await _chatService.fileUpload(uid, imageFile!);
     }
   }
 
@@ -135,7 +142,15 @@ class _ChatsListState extends State<ChatsGroupList> {
     });
   }
 
-  Widget _buildMessageList() {
+  bool file_check = false;
+
+  void checkFIle() {
+    setState(() {
+      file_check = !file_check;
+    });
+  }
+
+  Widget _buildMessageList(List<DocumentSnapshot<Object?>> documents) {
     return StreamBuilder(
       stream: _chatService.getMessages(
         uid,
@@ -152,26 +167,50 @@ class _ChatsListState extends State<ChatsGroupList> {
         }
 
         List<Widget> messageWidgets = [];
-        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+        DateTime? nextDate;
+        for (int i = snapshot.data!.docs.length - 1; i >= 0; i--) {
           final document = snapshot.data!.docs[i];
           final Map<String, dynamic> data =
               document.data()! as Map<String, dynamic>;
           final messageDate = (data['timestamp'] as Timestamp).toDate();
 
-          if (currentDate == null || messageDate.day != currentDate!.day) {
-            messageWidgets.add(_buildDateWidget(messageDate));
-            currentDate = messageDate;
+          // Check if there's a next message and get its date
+          if (i > 0) {
+            final nextDocument = snapshot.data!.docs[i - 1];
+            final nextData = nextDocument.data()! as Map<String, dynamic>;
+            nextDate = (nextData['timestamp'] as Timestamp).toDate();
           }
 
           messageWidgets.add(_buildMessageListItem(document));
+
+          // Compare the current message's date with the next message's date
+          if (nextDate == null || messageDate.day > nextDate.day) {
+            messageWidgets.add(_buildDateWidget(messageDate));
+          }
         }
+
+        try {
+          final document = snapshot.data!.docs.first;
+          final Map<String, dynamic> data =
+              document.data()! as Map<String, dynamic>;
+          final oldestMessageDate = (data['timestamp'] as Timestamp).toDate();
+          print(oldestMessageDate);
+          if (nextDate != null) {
+            messageWidgets.add(_buildDateWidget(oldestMessageDate));
+          }
+        } catch (e) {
+          print('Exception: $e');
+        }
+
+        // Call _scrollToBottom after messageList is built
+        //_scrollToBottom();
 
         return Align(
           alignment: Alignment.bottomCenter,
           child: ListView.builder(
             padding: EdgeInsets.only(bottom: 8),
             physics: ClampingScrollPhysics(),
-            //reverse: true,
+            reverse: true,
             shrinkWrap: true,
             controller: _scrollController,
             itemCount: messageWidgets.length,
@@ -217,7 +256,7 @@ class _ChatsListState extends State<ChatsGroupList> {
 
   Widget _buildMessageListItem(DocumentSnapshot document) {
     final Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    print(data);
+    //print(data);
     final mainalignment = (data['senderId'] == _firebaseAuth.currentUser!.uid)
         ? MainAxisAlignment.start
         : MainAxisAlignment.end;
@@ -243,19 +282,25 @@ class _ChatsListState extends State<ChatsGroupList> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollToBottom();
+    // });
+    // _scrollToBottom();
+    _messagesStream = _chatService.getMessages(
+      uid,
+      _firebaseAuth.currentUser!.uid,
+    );
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    print("scrolling to bottom");
+    // Scroll to the bottom of the list after the frame has been rendered
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.position.pixels) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   Widget getFileWidget(File file) {
@@ -299,8 +344,8 @@ class _ChatsListState extends State<ChatsGroupList> {
               padding: const MaterialStatePropertyAll(EdgeInsets.zero),
               surfaceTintColor:
                   const MaterialStatePropertyAll(Colors.transparent),
-              backgroundColor: MaterialStatePropertyAll(
-                Theme.of(context).colorScheme.background,
+              backgroundColor: const MaterialStatePropertyAll(
+                Colors.transparent,
               ),
               shadowColor: const MaterialStatePropertyAll(Colors.transparent),
               shape: MaterialStatePropertyAll(
@@ -310,10 +355,13 @@ class _ChatsListState extends State<ChatsGroupList> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(
-                'page_person',
-                arguments: {'name': user_name, 'url': image_url, 'uid': uid},
-              );
+              // Потом сделать страницу пользователя
+              if (uid != _firebaseAuth.currentUser!.uid) {
+                Navigator.of(context).pushNamed(
+                  'userpage',
+                  arguments: {'name': user_name, 'url': image_url, 'uid': uid},
+                );
+              }
             },
             child: Row(
               children: [
@@ -344,10 +392,10 @@ class _ChatsListState extends State<ChatsGroupList> {
                         ],
                       ),
                       Text(
-                        "печатает...",
+                        "был в сети недавно",
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -363,15 +411,19 @@ class _ChatsListState extends State<ChatsGroupList> {
             padding: const EdgeInsets.only(right: 12),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.phone,
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
-                  onPressed: () {
-                    // Действие при нажатии на кнопку с телефоном
-                  },
-                ),
+                if (uid != _firebaseAuth.currentUser!.uid)
+                  IconButton(
+                    icon: Icon(
+                      Icons.phone,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
+                    onPressed: () {
+                      // Действие при нажатии на кнопку с телефоном
+                      launchUrlString("tel://$userPhone");
+                    },
+                  )
+                else
+                  Container(),
                 IconButton(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -423,7 +475,23 @@ class _ChatsListState extends State<ChatsGroupList> {
       body: Column(
         children: [
           Expanded(
-            child: _buildMessageList(),
+            child: StreamBuilder(
+              stream: _messagesStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  // Convert the stream of QuerySnapshot to a list of DocumentSnapshot
+                  final List<DocumentSnapshot> documents =
+                      snapshot.data!.docs.toList();
+                  return _buildMessageList(documents);
+                }
+              },
+            ),
           ),
           Align(
             alignment: Alignment.bottomLeft,
@@ -440,7 +508,7 @@ class _ChatsListState extends State<ChatsGroupList> {
               padding: EdgeInsets.all(6),
               child: Column(
                 children: [
-                  (imageFile != null && imageFile!.existsSync())
+                  (imageFile != null && imageFile!.existsSync() && file_check)
                       ? Container(
                           //height: 100,
                           width: MediaQuery.of(context).size.width,
@@ -454,13 +522,14 @@ class _ChatsListState extends State<ChatsGroupList> {
                       : Container(),
                   Row(
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          //emojiPickerSet();
-                          //FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        icon: Icon(Icons.insert_emoticon),
-                      ),
+                      // Заменить на стикеры
+                      // IconButton(
+                      //   onPressed: () {
+                      //     //emojiPickerSet();
+                      //     //FocusManager.instance.primaryFocus?.unfocus();
+                      //   },
+                      //   icon: Icon(Icons.insert_emoticon),
+                      // ),
                       Expanded(
                         child: TextField(
                           controller: _msgController,
@@ -481,29 +550,31 @@ class _ChatsListState extends State<ChatsGroupList> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           selectFileImage();
+                          checkFIle();
+                          //await _chatService.fileUpload(uid,imageFile!);
                         },
                         icon: Icon(Icons.attach_file_outlined),
                       ),
                       IconButton(
                         onPressed: () async {
-                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString(); 
-                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg'); 
-                          //        var uploadTask = storageRef.putFile(_image!); 
-                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL(); 
-  
-                          //        firestore.collection("Driver Details").add({ 
-                          //          "Name": nameController.text, 
-                          //          "Age": ageController.text, 
-                          //          "Driving Licence": dlController.text, 
-                          //          "Address.": adController.text, 
-                          //          "Phone No.": phnController.text, 
-                          //          // Add image reference to document 
-                          //          "Image": downloadUrl.toString()  
-                          //        }); 
-                          sendMessage();
+                          // var imageName = DateTime.now().millisecondsSinceEpoch.toString();
+                          //        var storageRef = FirebaseStorage.instance.ref().child('driver_images/$imageName.jpg');
+                          //        var uploadTask = storageRef.putFile(_image!);
+                          //        var downloadUrl = await (await uploadTask).ref.getDownloadURL();
 
+                          //        firestore.collection("Driver Details").add({
+                          //          "Name": nameController.text,
+                          //          "Age": ageController.text,
+                          //          "Driving Licence": dlController.text,
+                          //          "Address.": adController.text,
+                          //          "Phone No.": phnController.text,
+                          //          // Add image reference to document
+                          //          "Image": downloadUrl.toString()
+                          //        });
+                          sendMessage();
+                          checkFIle();
                         },
                         icon: Icon(Icons.send),
                       ),
@@ -537,5 +608,11 @@ class _ChatsListState extends State<ChatsGroupList> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

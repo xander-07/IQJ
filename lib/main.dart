@@ -6,11 +6,13 @@ import 'package:iqj/features/account/presentation/screens/account_screen.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/presentation/screens/auth_screen.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
-import 'package:iqj/features/messenger/presentation/chats_loaded_screen.dart';
-import 'package:iqj/features/messenger/presentation/group_chat_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/chats_loaded_screen.dart';
+import 'package:iqj/features/messenger/presentation/screens/group_chat_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/create_group_screen.dart';
 import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
-import 'package:iqj/features/messenger/presentation/screens/page_person.dart';
+import 'package:iqj/features/messenger/presentation/screens/page_group.dart';
+import 'package:iqj/features/messenger/presentation/screens/user_page.dart';
+import 'package:iqj/features/messenger/presentation/screens/users_add_selection.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
 import 'package:iqj/features/registration/presentation/reg_screen.dart';
 import 'package:iqj/features/registration/presentation/successful_reg_screen.dart';
@@ -113,7 +115,9 @@ class _AppState extends State<App> {
             const MessengerScreen(), // главная страница сообщений
         'chatslist': (context) => const ChatsList(), // это страница диолга
         'groupchat': (context) => const ChatsGroupList(), // это страница диолга
-        'page_person': (context) => const Page_person(), // это страница с профилем(переход из чатов)
+        'grouppage': (context) => const GroupPage(), // это страница с профилем(переход из чатов)
+        'userpage' : (context) => const UserPage(),
+        'addtogroup':(context) => const AddToGroupScreen(),  // добавление людей в группу
         'services': (context) => const ServicesScreen(),
         'about': (context) => const AboutScreen(),
         'schedule': (context) => const ScheduleScreen(),

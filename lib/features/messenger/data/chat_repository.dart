@@ -26,6 +26,7 @@ Future<List<User>> getUsers() async {
         phoneNumber: json['phone_bumber'].toString(),
         lastSignInTime: DateTime.parse(json['last_sign_in_time'] as String),
         creationTime: DateTime.parse(json['creation_time'] as String),
+        role: 'idk',
       );
     }).toList();
     return userList;
