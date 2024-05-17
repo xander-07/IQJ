@@ -1,16 +1,17 @@
 package handler
 
 import (
-	"firebase.google.com/go/v4/auth"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/net/context"
-	"google.golang.org/api/iterator"
 	"iqj/internal/api/firebase"
 	"iqj/internal/database"
 	"net/http"
 	"strings"
 	"time"
+
+	"firebase.google.com/go/v4/auth"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/net/context"
+	"google.golang.org/api/iterator"
 )
 
 // Структура для вывода всей информации о пользователе
@@ -218,7 +219,7 @@ func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
 		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
-			fmt.Println("HandleCreateFirebaseUser: Firebase initialization error: %s\n", err)
+			fmt.Printf("HandleCreateFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
 
@@ -301,7 +302,7 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
-			fmt.Println("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+			fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
 
@@ -370,7 +371,7 @@ func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
 		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
-			fmt.Println("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
 
@@ -379,7 +380,7 @@ func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
 		// Удаление данных пользователя из Firestore
 		if _, err := clientFirestore.Collection("users").Doc(uidStr).Delete(context.Background()); err != nil {
 			c.JSON(http.StatusInternalServerError, err)
-			fmt.Println("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
+			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
 
