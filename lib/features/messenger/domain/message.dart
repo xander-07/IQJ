@@ -44,22 +44,22 @@ class Message {
 class GroupMessage {
   final String senderId;
   final String senderEmail;
-  bool isEdited;
+  //bool isEdited;
   final String message;
   final Timestamp timestamp;
-  final List<String> messagePictures;
-  final List<String> messageFiles;
-  List<String>? isReadBy;
+  // final List<String> messagePictures;
+  // final List<String> messageFiles;
+  // List<String>? isReadBy;
 
   GroupMessage(
     {required this.senderId,
       required this.senderEmail,
-      required this.isEdited,
+      //required this.isEdited,
       required this.message,
       required this.timestamp,
-      required this.messagePictures,
-      required this.messageFiles,
-      this.isReadBy
+      // required this.messagePictures,
+      // required this.messageFiles,
+      // this.isReadBy
     }
   );
 
@@ -67,12 +67,12 @@ class GroupMessage {
     return {
       'senderId': senderId,
       'senderEmail': senderEmail,
-      'isEdited': isEdited,
+      //'isEdited': isEdited,
       'message': message,
       'timestamp': timestamp,
-      'pictures': messagePictures,
-      'files': messageFiles,
-      'readBy': isReadBy,
+      // 'pictures': messagePictures,
+      // 'files': messageFiles,
+      // 'readBy': isReadBy,
     };
   }
 }

@@ -24,7 +24,7 @@ class ChatService extends ChangeNotifier {
       senderEmail: currentUserEmail,
       receiverId: receiverId,
       timestamp: timestamp,
-      message: message, 
+      message: message,
       isEdited: false,
       messagePictures: List.empty(),
       messageFiles: List.empty(),
@@ -158,29 +158,28 @@ class ChatService extends ChangeNotifier {
   }
 
   Future<List<String>> getLinksFromChat(String userId, String otherId) async {
-  final List<String> ids = [userId, otherId];
-  ids.sort();
-  final String chatroomId = ids.join("_");
+    final List<String> ids = [userId, otherId];
+    ids.sort();
+    final String chatroomId = ids.join("_");
 
-  final querySnapshot = await _firestore
-      .collection('direct_messages')
-      .doc(chatroomId)
-      .collection('messages')
-      .orderBy('timestamp', descending: true)
-      .get();
+    final querySnapshot = await _firestore
+        .collection('direct_messages')
+        .doc(chatroomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .get();
 
-  final List<String> links = [];
+    final List<String> links = [];
 
-  for (var doc in querySnapshot.docs) {
-    final message = doc.data()['message'].toString();
-    if (isStringLink(message)) {
-      links.add(message);
+    for (var doc in querySnapshot.docs) {
+      final message = doc.data()['message'].toString();
+      if (isStringLink(message)) {
+        links.add(message);
+      }
     }
+
+    return links;
   }
-
-  return links;
-}
-
 
   Future<String> getLastMessage(String userId, String otherId) async {
     final List<String> ids = [userId, otherId];
@@ -198,9 +197,10 @@ class ChatService extends ChangeNotifier {
     final lastMessage = querySnapshot.docs.isNotEmpty
         ? querySnapshot.docs.first.data()['senderEmail'].toString() +
             ": " +
-            (!isStringLink(querySnapshot.docs.first.data()['message'].toString())
-            ? querySnapshot.docs.first.data()['message'].toString()
-            : "[Ссылка]") +
+            (!isStringLink(
+                    querySnapshot.docs.first.data()['message'].toString())
+                ? querySnapshot.docs.first.data()['message'].toString()
+                : "[Ссылка]") +
             " • " +
             _formatTimestamp(
                 querySnapshot.docs.first.data()['timestamp'] as Timestamp)
@@ -272,7 +272,7 @@ class ChatService extends ChangeNotifier {
         usersData[uid] = {
           'joinDate': DateTime.now(),
           'email': userEmail,
-          'role': 'member', 
+          'role': 'member',
         };
       }
 
@@ -360,7 +360,7 @@ class ChatService extends ChangeNotifier {
         Map<String, dynamic>? usersMap =
             usersData['users'] as Map<String, dynamic>?;
         if (usersMap != null && usersMap.containsKey(userId)) {
-          return true; 
+          return true;
         }
       }
       return false;
@@ -384,10 +384,10 @@ class ChatService extends ChangeNotifier {
       senderEmail: currentUserEmail,
       timestamp: timestamp,
       message: message,
-      isReadBy: List.empty(),
-      isEdited: false,
-      messagePictures: List.empty(),
-      messageFiles: List.empty(),
+      // isReadBy: List.empty(),
+      // isEdited: false,
+      // messagePictures: List.empty(),
+      // messageFiles: List.empty(),
     );
 
     await _firestore
@@ -405,7 +405,6 @@ class ChatService extends ChangeNotifier {
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
-
 
   Future<String> getLastGroupMessage(String groupId) async {
     final querySnapshot = await _firestore
@@ -435,7 +434,7 @@ class ChatService extends ChangeNotifier {
         groupSnapshot.data() as Map<String, dynamic>?;
 
     if (!groupSnapshot.exists) {
-      return 0; 
+      return 0;
     }
 
     Map<String, dynamic>? usersDataReal =
@@ -445,8 +444,7 @@ class ChatService extends ChangeNotifier {
       return 0;
     }
 
-    return usersDataReal
-        .length; 
+    return usersDataReal.length;
   }
 
   Future<List<Map<String, dynamic>>> getUsersInGroup(String groupId) async {
@@ -478,5 +476,70 @@ class ChatService extends ChangeNotifier {
       print("Error fetching users in group: $e");
       return [];
     }
+  }
+
+  Future groupGetImage(
+    String receiverId,
+    // File imageFile,
+  ) async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? pickedFile;
+
+    pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      if (imageFile != null) {
+        fileUpload(receiverId, imageFile);
+      }
+    }
+  }
+
+  UploadTask groupUploadFile(File image, String filename) {
+    FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+    Reference reference = firebaseStorage.ref().child(filename);
+    UploadTask uploadTask = reference.putFile(image);
+    return uploadTask;
+  }
+
+  Future groupFileUpload(
+    //int typemesage,
+    String groupId,
+    File imageFile,
+    //String chatId,
+    //String preeId,
+  ) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    UploadTask uploadTask = groupUploadFile(imageFile, fileName);
+
+    try {
+      TaskSnapshot snapshot = await uploadTask;
+      String imageUrl = await snapshot.ref.getDownloadURL();
+
+      sendMessageToGroup(groupId, imageUrl);
+    } on FirebaseException catch (e) {
+      sendMessageToGroup(groupId, e.toString());
+      print("ошибочка в отпрвочке картиночик :( ");
+    }
+  }
+
+  Future<List<String>> getLinksFromGroup(String id) async {
+
+    final querySnapshot = await _firestore
+        .collection('groups')
+        .doc(id)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    final List<String> links = [];
+
+    for (var doc in querySnapshot.docs) {
+      final message = doc.data()['message'].toString();
+      if (isStringLink(message)) {
+        links.add(message);
+      }
+    }
+
+    return links;
   }
 }

@@ -7,6 +7,9 @@ import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/messenger/data/chat_service.dart';
 import 'package:iqj/features/messenger/presentation/chat_bubble_selection.dart';
 import 'package:iqj/features/messenger/presentation/chat_member_button.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as html_parser;
+import 'package:url_launcher/url_launcher_string.dart';
 
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
@@ -599,99 +602,93 @@ class _GroupPage extends State<GroupPage> {
                   )),
             ),
             if (flag1) _buildUserList(),
-            Wrap(
-              children: [
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-                flag2 ? _buildSquer(image_url ?? "", 105) : Container(),
-              ],
-            ),
-            flag3
-                ? _File_in_main_chat(
-                    context,
-                    image_url ?? "",
-                    "линейная алгебра и аналитическая геом",
-                    "1,0 MB, 06.05.24 в 12:25")
-                : Container(),
-            flag3
-                ? _File_in_main_chat(
-                    context,
-                    image_url ?? "",
-                    "линейная алгебра и аналитическая геом",
-                    "1,0 MB, 06.05.24 в 12:25")
-                : Container(),
-            flag3
-                ? _File_in_main_chat(
-                    context,
-                    image_url ?? "",
-                    "линейная алгебра и аналитическая геом",
-                    "1,0 MB, 06.05.24 в 12:25")
-                : Container(),
-            flag3
-                ? _File_in_main_chat(
-                    context,
-                    image_url ?? "",
-                    "линейная алгебра и аналитическая геом",
-                    "1,0 MB, 06.05.24 в 12:25")
-                : Container(),
-            flag3
-                ? _File_in_main_chat(
-                    context,
-                    image_url ?? "",
-                    "линейная алгебра и аналитическая геом",
-                    "1,0 MB, 06.05.24 в 12:25")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
-            flag4
-                ? _Link_for_main_chat(
-                    context,
-                    image_url ?? "",
-                    "Подготовка к экзамену",
-                    "№1. Вычислить неопределённый интеграл",
-                    "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
-                : Container(),
+            if (flag2)
+              FutureBuilder<List<String>>(
+                future: chatService.getLinksFromGroup(uid),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error fetching links'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('Медиа не найдено'));
+                  }
+
+                  final List<String> links = snapshot.data!;
+                  final List<Widget> imageWidgets = [];
+
+                  for (var link in links) {
+                    if (isFirebaseStorageLink(link)) {
+                      imageWidgets.add(_buildSquer(link, 128));
+                    }
+                  }
+
+                  return Expanded(
+                    child: ListView(
+                      //padding: EdgeInsets.all(8.0),
+                      children: [
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: imageWidgets,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            // flag3
+            //     ? _File_in_main_chat(
+            //         context,
+            //         image_url ?? "",
+            //         "линейная алгебра и аналитическая геом",
+            //         "1,0 MB, 06.05.24 в 12:25")
+            //     : Container(),
+            if (flag3) Text("Файлов нет."),
+            // flag4
+            //     ? _Link_for_main_chat(
+            //         context,
+            //         image_url ?? "",
+            //         "Подготовка к экзамену",
+            //         "№1. Вычислить неопределённый интеграл",
+            //         "https://valyanskiy.notion.site/73c94ca294724997880b1299ffda8bf6?pvs=4")
+            //     : Container(),
+            if (flag4)
+              Expanded(
+                  child: FutureBuilder<List<String>>(
+                future: chatService.getLinksFromGroup(uid),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error fetching links'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No links found'));
+                  }
+
+                  final List<String> links = snapshot.data!;
+
+                  print(links);
+
+                  return ListView.builder(
+                    itemCount: links.length,
+                    itemBuilder: (context, index) {
+                      final String link = links[index];
+                      print(link);
+                      if (!isFirebaseStorageLink(link)) {
+                        return _Link_for_main_chat(
+                          context,
+                          link,
+                        );
+                      }
+                    },
+                  );
+                },
+              ))
+            else
+              Container(),
+            if (flag5) Text("Голосовых сообщений нет."),
           ],
         ),
       ),
@@ -791,24 +788,34 @@ Widget _buildSquer(String image_url, double size) {
       child: SizedBox(
         width: size,
         height: size,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-              12), // Используем радиус 12 для получения квадратных углов
-          child: Image.network(
-            image_url,
-            fit: BoxFit.fill,
-            errorBuilder: (
-              BuildContext context,
-              Object exception,
-              StackTrace? stackTrace,
-            ) {
-              return Container(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer, // Вместо CircleAvatar используем обычный контейнер с цветом фона
-                child: const Text('A'),
-              );
-            },
+        child: InstaImageViewer(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Image.network(
+              image_url,
+              fit: BoxFit.fill,
+              height: size,
+              width: size,
+              errorBuilder: (
+                BuildContext context,
+                Object exception,
+                StackTrace? stackTrace,
+              ) {
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'G',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -878,64 +885,123 @@ Widget _File_in_main_chat(
       ));
 }
 
-Widget _Link_for_main_chat(BuildContext context, String image_url, String name,
-    String info, String link) {
-  return ElevatedButton(
-    onPressed: () => {},
-    style: ButtonStyle(
-      padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-      surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
-      backgroundColor: MaterialStatePropertyAll(
-        Theme.of(context).colorScheme.background,
-      ),
-      shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-      shape: MaterialStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    ),
-    child: Row(
-      children: [
-        // SizedBox(width: 20,),
-        _buildSquer(image_url, 40),
-        // SizedBox(width: 20,),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontSize: 12,
+Widget _Link_for_main_chat(BuildContext context, String link) {
+  return FutureBuilder<Map<String, String>>(
+    future: fetchTitleDescriptionAndImageUrl(link),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else if (snapshot.hasData) {
+        var data = snapshot.data!;
+        return Container(
+          margin: EdgeInsets.only(right: 6, left: 6),
+          child: ElevatedButton(
+            onPressed: () => {launchUrlString(link)},
+            style: ButtonStyle(
+              padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+              surfaceTintColor:
+                  const MaterialStatePropertyAll(Colors.transparent),
+              backgroundColor: MaterialStatePropertyAll(
+                Theme.of(context).colorScheme.background,
+              ),
+              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+              shape: MaterialStatePropertyAll(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              Text(
-                info,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontSize: 10,
+            ),
+            child: Row(
+              children: [
+                _buildSquer(data['imageUrl'] ?? '', 40),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['title']!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        data['description']!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontSize: 10,
+                        ),
+                      ),
+                      Text(
+                        link,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // SizedBox(width: 10,),
-              Text(
-                link,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 10,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
+        );
+      } else {
+        return Text('No data found');
+      }
+    },
   );
+}
+
+bool isFirebaseStorageLink(String url) {
+  final RegExp firebaseStoragePattern =
+      RegExp(r'https://firebasestorage\.googleapis\.com/v0/b/.+');
+  return firebaseStoragePattern.hasMatch(url);
+}
+
+Future<Map<String, String>> fetchTitleDescriptionAndImageUrl(String url) async {
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    var document = html_parser.parse(response.body);
+
+    // Extract title
+    String title = document.querySelector('title')?.text ?? url;
+
+    // Extract description
+    String description = url;
+    var metaTags = document.getElementsByTagName('meta');
+    for (var meta in metaTags) {
+      if (meta.attributes['name'] == 'description') {
+        description = meta.attributes['content'] ?? url;
+        break;
+      }
+    }
+
+    // Extract image URL
+    String imageUrl = '';
+    for (var meta in metaTags) {
+      if (meta.attributes['property'] == 'og:image') {
+        imageUrl = meta.attributes['content'] ?? '';
+        break;
+      }
+    }
+
+    return {
+      'title': title,
+      'description': description,
+      'imageUrl': imageUrl,
+    };
+  } else {
+    throw Exception('Failed to load website');
+  }
 }
