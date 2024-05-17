@@ -587,6 +587,8 @@ class NewsTags extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         child: Wrap(
+          spacing: 10, // <-- Добавляем отступ между элементами Wrap
+          runSpacing: 10, 
           // mainAxisSize: MainAxisSize.min,
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
