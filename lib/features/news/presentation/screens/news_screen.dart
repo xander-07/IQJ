@@ -9,6 +9,7 @@ import 'package:iqj/features/news/admin/admin_button.dart';
 import 'package:iqj/features/news/data/bookmarks.dart';
 import 'package:iqj/features/news/domain/news.dart';
 import 'package:iqj/features/news/presentation/bloc/news_bloc.dart';
+import 'package:iqj/features/news/presentation/bloc/search_bloc.dart';
 import 'package:iqj/features/news/presentation/bloc/special_news_bloc.dart';
 import 'package:iqj/features/news/presentation/screens/announcement.dart';
 import 'package:iqj/features/news/presentation/screens/news_loaded_list.dart';
@@ -76,6 +77,14 @@ class _NewsBloc extends State<NewsScreen> {
     return false;
   }
 
+  TextEditingController _searchController = TextEditingController();
+  bool flag_search = false;
+  void change_search_flag() {
+    setState(() {
+      flag_search = !flag_search;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //final newsBloc = BlocProvider.of<NewsBloc>(context);
@@ -92,8 +101,8 @@ class _NewsBloc extends State<NewsScreen> {
       //   title: const Text('News'),
       // ),
       floatingActionButton: Container(
-        width: 50.0, // Задаем ширину
-        height: 50.0, // Задаем высоту
+        width: 52.0, // Задаем ширину
+        height: 52.0, // Задаем высоту
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary, // Цвет кнопки
           borderRadius: BorderRadius.circular(10.0),
@@ -123,6 +132,7 @@ class _NewsBloc extends State<NewsScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       hintText: "Поиск по заголовку...",
                       hintFadeDuration: const Duration(milliseconds: 100),
@@ -133,7 +143,7 @@ class _NewsBloc extends State<NewsScreen> {
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 16.0,
-                        height: 5,
+                        height: 4,
                         color: Color.fromRGBO(128, 128, 128, 0.6),
                       ),
                       suffixIcon: SizedBox(
@@ -141,7 +151,9 @@ class _NewsBloc extends State<NewsScreen> {
                           icon: const Icon(
                             Icons.search,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            change_search_flag();
+                          },
                         ),
                       ),
                     ),
@@ -366,7 +378,9 @@ class _NewsBloc extends State<NewsScreen> {
               ),
             ),
           ),
-          Expanded(
+          flag_search 
+          ? SearchNews(_searchController.text)
+          :  Expanded(
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
               onRefresh: () async {
@@ -474,6 +488,100 @@ class _NewsBloc extends State<NewsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SearchNews extends StatelessWidget{
+  String text;
+
+  SearchNews(this.text,{super.key});
+  @override
+  Widget build(BuildContext context) {
+    
+
+    return BlocProvider(
+      create: (context) => SearchBloc(text),
+      child: _SearchWidget(text: text,),
+    );
+  }
+}
+
+
+class _SearchWidget extends StatefulWidget{
+  // final String newsId;
+  // final String newsLink;
+  final  String text;
+
+  _SearchWidget({required this.text, Key? key}) : super(key: key);
+
+
+  @override
+  _SearchState createState() => _SearchState();
+
+}
+
+class _SearchState extends State<_SearchWidget> {
+  late final SearchBloc _bloc;
+  late final Completer _loadCompleter;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = SearchBloc(widget.text);
+    _loadCompleter = Completer();
+    _bloc.add(SearchNewsLoadList(completer: _loadCompleter));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: BlocProvider<SearchBloc>(
+        create: (_) => _bloc,
+        child: BlocBuilder<SearchBloc, SearchNewsState>(
+          builder: (context, state) {
+            if (state is SearchLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is SearchLoaded) {
+              print(state.news);
+              return ListView.builder(
+                        itemCount: state.news.length,
+                        itemBuilder: (context, index) {
+                          final news = state.news[index];
+                          return NewsCard(
+                            news: news,
+                            bookmarked: news.bookmarked,
+                            onBookmarkToggle: () {
+                              if (news.bookmarked) {
+                                news.bookmarked = false;
+                              } else {
+                                news.bookmarked = true;
+                              }
+                              BlocProvider.of<NewsBloc>(context)
+                                  .add(CheckBookmark(news: news));
+                            },
+                          );
+                        },
+                      );
+            } else if (state is SearchFail) {
+              return Center(
+                          child: Text(state.except?.toString() ?? "Error"),
+                        );
+            } else {
+              
+              return Text('aaaaaaaaaaaaaaaa'); 
+            }
+          },
+        ),
       ),
     );
   }

@@ -5,10 +5,10 @@ import 'confirm_special_upload.dart';
 Widget special_news_add_button(BuildContext context, String text,
     String publishFromTime, String publishUntilTime) {
   return Container(
-    width: 150,
-    height: 55,
+    width: 151,
+    height: 54,
     padding: const EdgeInsets.only(left: 90, right: 90),
-    margin: const EdgeInsets.only(top: 20),
+    margin: const EdgeInsets.only(top: 10),
     child: ElevatedButton(
       onPressed: () {
         uploadSpecialDialog(context, text, publishFromTime, publishUntilTime);
@@ -23,7 +23,8 @@ Widget special_news_add_button(BuildContext context, String text,
         'Добавить',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 16,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
       ),
     ),

@@ -3,8 +3,6 @@ module iqj
 go 1.22.2
 
 require (
-	cloud.google.com/go/firestore v1.15.0
-	firebase.google.com/go v3.13.0+incompatible
 	firebase.google.com/go/v4 v4.14.0
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -13,6 +11,7 @@ require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.22.0
+	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	golang.org/x/net v0.24.0
 	google.golang.org/api v0.177.0
 )
@@ -22,6 +21,7 @@ require (
 	cloud.google.com/go/auth v0.3.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
+	cloud.google.com/go/firestore v1.15.0 // indirect
 	cloud.google.com/go/iam v1.1.7 // indirect
 	cloud.google.com/go/longrunning v0.5.5 // indirect
 	cloud.google.com/go/storage v1.40.0 // indirect

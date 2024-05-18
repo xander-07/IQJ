@@ -14,12 +14,18 @@ class _ProfilePictureState extends State<ProfilePicture> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 120,
+      width: 120,
       //alignment: Alignment.center,
       child: ClipRRect(
+        
         borderRadius: BorderRadius.circular(2.0),
         child: Container(
-          padding: EdgeInsets.all(2), // Border width
-          decoration: BoxDecoration(color: const Color(0xFFEFAC00), shape: BoxShape.circle),
+          padding: EdgeInsets.all(1), // Border width
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(width: 1.0, color: Color(0xFFEFAC00)),
+          ),
           child: ClipOval(
             child: SizedBox.fromSize(
               size: Size.fromRadius(72), // Image radius

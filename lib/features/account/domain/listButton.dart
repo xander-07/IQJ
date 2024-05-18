@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ListButton extends StatefulWidget {
-   const ListButton({super.key});
+  const ListButton({super.key});
 
   @override
   _ListButtonState createState() => _ListButtonState();
@@ -19,7 +19,6 @@ void showMenuDialog(BuildContext context) {
       ),
     ),
     onPressed: () {
-      
     },
   );
 
@@ -51,29 +50,147 @@ class _ListButtonState extends State<ListButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left:10, right: 10),
-        child: TextButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black26,
-            minimumSize: const Size.fromHeight(100),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+    return Column(
+      children: [
+        // Первый контейнер
+        Container(
+          height: 77,
+          width: 323,
+          margin: const EdgeInsets.only(left:10, right: 10),
+          child: TextButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFE8E8E8)
+                  : const Color(0xFF2C2D2F),
+              minimumSize: const Size.fromHeight(100),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-          onPressed: () {
-            showMenuDialog(context);
-          },
-          child: const Text(
-            "Элемент меню",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Inter',
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
+            onPressed: () {
+              showMenuDialog(context);
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Text(
+                  "Журнал успеваемости",
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
+                    fontFamily: 'Inter',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
+        const SizedBox(height: 11,),
+        Container(
+          height: 77,
+          width: 323,
+          margin: const EdgeInsets.only(left:10, right: 10),
+          child: TextButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFE8E8E8)
+                  : const Color(0xFF2C2D2F),
+              minimumSize: const Size.fromHeight(100),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              showMenuDialog(context);
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color:Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Text(
+                  "Объявления",
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
+                    fontFamily: 'Inter',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 11,),
+        Container(
+          height: 77,
+          width: 323,
+          margin: const EdgeInsets.only(left:10, right: 10),
+          child: TextButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).brightness == Brightness.light
+                  ? const Color(0xFFE8E8E8)
+                  : const Color(0xFF2C2D2F),
+              minimumSize: const Size.fromHeight(100),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              showMenuDialog(context);
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color:Theme.of(context).brightness == Brightness.light
+                     ? const Color(0xFFFAE4AB)  
+                     : const Color(0xFF594512),
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Text(
+                  "Что-то ещё",
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.light
+                    ?const Color(0xFF000000)
+                    : Colors.white,
+                    fontFamily: 'Inter',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ), 
+      ],
     );
   }
 }

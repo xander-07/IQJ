@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iqj/features/news/data/news_repository.dart';
 import 'package:iqj/features/news/domain/news.dart';
+import 'package:iqj/features/news/presentation/screens/news_loaded_list_screen.dart';
 
 abstract class NewsLoadEvent {}
 
