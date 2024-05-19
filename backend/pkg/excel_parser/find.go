@@ -2,8 +2,8 @@ package excel_parser
 
 import (
 	"iqj/internal/database"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // Получение критерия, значения и таблицы, возвращение массива уроков
@@ -103,7 +103,7 @@ func find(table [][]string, id int) (int, error) {
 			if strings.Contains(table[i][j], "\n\n") {
 				//Создаем еще одну пару и заполняем ее
 				var row1 database.Class
-				row1.Id = id+1
+				row1.Id = id + 1
 				row1.Groups = row.Groups
 				row1.GroupsNames = row.GroupsNames
 				row1.Count = row.Count
@@ -120,7 +120,7 @@ func find(table [][]string, id int) (int, error) {
 				row.Type = class_types[0]
 				row1.Type = class_types[1]
 				row.Teacher = teacherid
-				row.Teacher = teacherid+1
+				row.Teacher = teacherid + 1
 				row.TeacherName = teacher_names[0]
 				row1.TeacherName = teacher_names[1]
 				row.Location = classrooms[0]
@@ -163,22 +163,6 @@ func find(table [][]string, id int) (int, error) {
 			row.Name = table[i][j]
 			row.Type = table[i][j+1]
 			row.Location = table[i][j+3]
-			// функция проверки на массив нулей, для избежания занесения в бд массива вида [0,0,0] (это вызывает ошибку sql)
-			// теперь еще и учителя меняет с 0 на 123
-			func() {
-				c := 0 // счетчик элементов с нулями
-				for _, v := range row.Groups {
-					if v == 0 {
-						c++
-					}
-				}
-				if c == len(row.Groups) {
-					row.Groups = []int{1, 2, 3, 4}
-				}
-				if row.Teacher == 0 {
-					row.Teacher = 123
-				}
-			}()
 
 			groupids = nil
 			groups = nil
