@@ -1,7 +1,8 @@
 package excel_parser
 
-import (
+import (	
 	"iqj/internal/database"
+	"database/sql"
 	"strconv"
 	"strings"
 )
@@ -15,7 +16,7 @@ func find(table [][]string, id int) (int, error) {
 	//Срез названий групп
 	var groups []string
 	//Итераторы ID
-	var groupid, teacherid int
+	var teacherid int
 
 	//Проход по всем строкам таблицы от 3 (начало расписания) до 88 (конец таблицы)
 	for i := 3; i < 88; i++ {
@@ -57,12 +58,16 @@ func find(table [][]string, id int) (int, error) {
 			}
 			//Поиск ID группы из БД
 			group.Name = table[1][j]
-			_, err := database.Database.StudentGroup.GetIdByName(group) // TODO: сделать группу вместо заглушки
-			if err != nil {
-				group.Id = 0
-			}
+			newgroup, err := database.Database.StudentGroup.GetIdByName(group)
+			//Если группы нет в базе, то её ID = 0
+			if err == sql.ErrNoRows{
+				newgroup = &database.StudentGroup{Id: 0}
+			//При иной ошибке возвращаем ее
+			} else if err != nil {
+				return id, err
+			} 			
 			//Добавление группы и её ID в списки
-			groupids = append(groupids, groupid)
+			groupids = append(groupids, newgroup.Id)
 			groups = append(groups, table[1][j])
 			var teacher_iter int
 			//Изменение итератора по учителю в соответствии с положением пары в группе
@@ -80,12 +85,16 @@ func find(table [][]string, id int) (int, error) {
 			for m+2+iter < len(table[i]) && table[i][m+2] == table[i][m+2+teacher_iter] && table[i][m] == table[i][m+teacher_iter] {
 				//Поиск ID группы из БД
 				group.Name = table[1][m+teacher_iter]
-				_, err := database.Database.StudentGroup.GetIdByName(group)
-				if err != nil {
-					group.Id = 0
-				}
+				newgroup, err = database.Database.StudentGroup.GetIdByName(group)
+				//Если группы нет в базе, то её ID = 0
+				if err == sql.ErrNoRows{
+					newgroup = &database.StudentGroup{Id: 0}
+				//При иной ошибке возвращаем ее
+				} else if err != nil {
+					return id, err
+				} 	
 				//Добавление группы и её ID в списки
-				groupids = append(groupids, groupid)
+				groupids = append(groupids, newgroup.Id)			
 				groups = append(groups, table[1][m+teacher_iter])
 				m += teacher_iter
 				//Изменение итератора
@@ -120,28 +129,11 @@ func find(table [][]string, id int) (int, error) {
 				row.Type = class_types[0]
 				row1.Type = class_types[1]
 				row.Teacher = teacherid
-				row.Teacher = teacherid + 1
+				row1.Teacher = teacherid + 1
 				row.TeacherName = teacher_names[0]
 				row1.TeacherName = teacher_names[1]
 				row.Location = classrooms[0]
 				row1.Location = classrooms[1]
-				// функция проверки на массив нулей, для избежания занесения в бд массива вида [0,0,0] (это вызывает ошибку sql)
-				c := 0
-				for _, v := range row.Groups {
-					if v == 0 {
-						c++
-					}
-				}
-				if c == len(row.Groups) {
-					row.Groups = []int{1, 2, 3, 4}
-					row1.Groups = []int{1, 2, 3, 4}
-				}
-				if row.Teacher == 0 {
-					row.Teacher = 123
-				}
-				if row1.Teacher == 0 {
-					row1.Teacher = 123
-				}
 				//Изменение итераторов
 				if iter == 5 {
 					iter = 10
@@ -155,7 +147,13 @@ func find(table [][]string, id int) (int, error) {
 				groupids = nil
 				groups = nil
 				err = database.Database.Class.Add(row)
+				if err != nil {
+					return id, err
+				}
 				err = database.Database.Class.Add(row1)
+				if err != nil {
+					return id, err
+				}
 				continue
 			}
 			row.Teacher = teacherid
@@ -163,7 +161,7 @@ func find(table [][]string, id int) (int, error) {
 			row.Name = table[i][j]
 			row.Type = table[i][j+1]
 			row.Location = table[i][j+3]
-
+			
 			groupids = nil
 			groups = nil
 			//Добавление пары в БД
