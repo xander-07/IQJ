@@ -223,7 +223,7 @@ func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	}
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
-	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week class_name, class_type
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week, class_name, class_type
 		FROM classes
 		WHERE class_location = $1`, c.Location)
 	if err != nil {
