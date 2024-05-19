@@ -223,7 +223,7 @@ func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	}
 
 	// Выполняем SQL-запрос для выборки классов по местоположению
-	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, class_name, class_type
+	rows, err := ct.db.Query(`SELECT class_id, class_group_ids, class_group_names, class_teacher_id, class_teacher_name, count, weekday, week class_name, class_type
 		FROM classes
 		WHERE class_location = $1`, c.Location)
 	if err != nil {
@@ -235,7 +235,7 @@ func (ct *ClassTable) GetByLocation(c Class) (*[]Class, error) {
 	for rows.Next() {
 		var resultClass Class
 		var idsArr pq.Int32Array
-		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Name, &resultClass.Type)
+		err := rows.Scan(&resultClass.Id, &idsArr, pq.Array(&resultClass.GroupsNames), &resultClass.Teacher, &resultClass.TeacherName, &resultClass.Count, &resultClass.Weekday, &resultClass.Week, &resultClass.Name, &resultClass.Type)
 		if err != nil {
 			return nil, fmt.Errorf("Class.GetByLocation: %v", err)
 		}
