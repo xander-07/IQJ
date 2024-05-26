@@ -18,8 +18,7 @@ import 'package:iqj/features/news/presentation/screens/search/search_date.dart';
 import 'package:iqj/features/news/presentation/screens/search/search_tags.dart';
 
 class NewsScreen extends StatefulWidget {
-  final String jwt;
-  const NewsScreen({super.key, required this.jwt});
+  const NewsScreen({super.key});
 
   @override
   State<NewsScreen> createState() => _NewsBloc();

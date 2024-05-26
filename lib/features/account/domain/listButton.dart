@@ -55,7 +55,6 @@ class _ListButtonState extends State<ListButton> {
         // Первый контейнер
         Container(
           height: 77,
-          width: 323,
           margin: const EdgeInsets.only(left:10, right: 10),
           child: TextButton(
             style: ElevatedButton.styleFrom(
@@ -101,7 +100,6 @@ class _ListButtonState extends State<ListButton> {
         const SizedBox(height: 11,),
         Container(
           height: 77,
-          width: 323,
           margin: const EdgeInsets.only(left:10, right: 10),
           child: TextButton(
             style: ElevatedButton.styleFrom(
@@ -147,7 +145,6 @@ class _ListButtonState extends State<ListButton> {
         const SizedBox(height: 11,),
         Container(
           height: 77,
-          width: 323,
           margin: const EdgeInsets.only(left:10, right: 10),
           child: TextButton(
             style: ElevatedButton.styleFrom(

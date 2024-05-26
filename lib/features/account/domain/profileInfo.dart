@@ -13,6 +13,8 @@ class _ProfileInfoState extends State<ProfileInfo> {
   Color boxFillColor = const Color(0xFFF6F6F6);
 
   String name = '';
+  String surname = '';
+  String patronymic = '';
   String email = '';
   String password = '';
 
@@ -48,11 +50,14 @@ class _ProfileInfoState extends State<ProfileInfo> {
                 return const Text('Ошибка при получении \n данных пользователя');
               } else if (snapshot.hasData) {
                 name = snapshot.data?['name'] as String;
+                surname = snapshot.data?['surname'] as String;
+                patronymic = snapshot.data?['patronymic'] as String;
                 email = snapshot.data?['email'] as String;
                 // password = snapshot.data?['password'] as String;
                 return Container(
                   alignment: Alignment.bottomLeft,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         name,
@@ -60,7 +65,31 @@ class _ProfileInfoState extends State<ProfileInfo> {
                           color: Theme.of(context).brightness == Brightness.light
                                 ? const Color(0xFF000000)
                                 : Colors.white,
-                          fontSize: 20,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                          height: 1,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        surname,
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.light
+                                ? const Color(0xFF000000)
+                                : Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                          height: 1,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        patronymic,
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.light
+                                ? const Color(0xFF000000)
+                                : Colors.white,
+                          fontSize: 24,
                           fontWeight: FontWeight.w500,
                           height: 1,
                         ),

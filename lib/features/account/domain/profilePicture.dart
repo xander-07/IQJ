@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:iqj/features/messenger/data/chat_service.dart';
 
 class ProfilePicture extends StatefulWidget {
-   const ProfilePicture({super.key});
+  const ProfilePicture({super.key});
 
   @override
   _ProfilePictureState createState() => _ProfilePictureState();
@@ -10,6 +12,8 @@ class ProfilePicture extends StatefulWidget {
 class _ProfilePictureState extends State<ProfilePicture> {
   Color boxFillColor = const Color(0xFFF6F6F6);
   bool isError = false;
+  ChatService chatService = ChatService();
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +22,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
       width: 120,
       //alignment: Alignment.center,
       child: ClipRRect(
-        
         borderRadius: BorderRadius.circular(2.0),
         child: Container(
           padding: EdgeInsets.all(1), // Border width
@@ -27,9 +30,28 @@ class _ProfilePictureState extends State<ProfilePicture> {
             border: Border.all(width: 1.0, color: Color(0xFFEFAC00)),
           ),
           child: ClipOval(
-            child: SizedBox.fromSize(
-              size: Size.fromRadius(72), // Image radius
-              child: Image.network('https://gas-kvas.com/grafic/uploads/posts/2023-10/1696557271_gas-kvas-com-p-kartinki-vulkan-9.jpg', fit: BoxFit.cover),
+            child: FutureBuilder<String>(
+              future: chatService.getProfilePicture(auth.currentUser!.uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Icon(Icons.error);
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Icon(Icons.account_circle, size: 72);
+                } else {
+                  return SizedBox.fromSize(
+                    size: Size.fromRadius(72), // Image radius
+                    child: Image.network(
+                      snapshot.data!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error);
+                      },
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ),

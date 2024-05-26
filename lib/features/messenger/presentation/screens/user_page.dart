@@ -553,7 +553,7 @@ Widget _buildThumbnailImage(String image_url, double size) {
         height: size,
         child: InstaImageViewer(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(128),
             child: Image.network(
               image_url,
               fit: BoxFit.fill,
