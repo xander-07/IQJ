@@ -37,13 +37,13 @@ func WithJWTAuth(c *gin.Context) {
 		return
 	}
 
-	userId, err := ParseToken(tokenstring[1])
+	uid, err := ParseToken(tokenstring[1])
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 		return
 	}
 	// Записываем id в контекст, чтобы в дальнейшем использовать в других функциях
-	c.Set("userId", userId)
+	c.Set("uid", uid)
 }
 
 // Создание токена

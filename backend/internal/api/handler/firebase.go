@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"iqj/internal/api/firebase"
-	"iqj/internal/database"
 	"net/http"
 	"strings"
 	"time"
@@ -44,35 +43,42 @@ type User struct {
 
 // Вывод всех пользователей из firebase
 func (h *Handler) HandleListUsers(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandleUpdateNews:", ok)
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleListUsers:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		fmt.Println("HandleUpdateNews:", err)
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
 		return
 	}
 
-	if user.Role == "moderator" {
-		// Инициализация клиента для вывода uid, ФИО, должности, почты, института и номера телефона
-		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
-			return
-		}
+	defer clientFirestore.Close()
 
-		defer clientFirestore.Close()
+	docRef := clientFirestore.Collection("users").Doc(uid)
 
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	if role == "administrator" {
 		iterFirestore := clientFirestore.Collection("users").Documents(context.Background())
 		var userList []UserInfo
 		for {
@@ -167,25 +173,42 @@ func buildFullName(data map[string]interface{}) string {
 }
 
 func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
+		c.String(http.StatusUnauthorized, "Uid not found")
 		fmt.Println("HandleCreateFirebaseUser:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleCreateFirebaseUser: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		fmt.Println("HandleCreateFirebaseUser:", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleCreateFirebaseUser:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var userFirebase User
 
 		err := c.BindJSON(&userFirebase)
@@ -198,7 +221,7 @@ func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
 		clientAuth, err := firebase.InitFirebase().Auth(context.Background())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
-			fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
+			fmt.Printf("HandleCreateFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
 
@@ -251,25 +274,42 @@ func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
 }
 
 func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
+		c.String(http.StatusUnauthorized, "Uid not found")
 		fmt.Println("HandleUpdateFirebaseUser:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		fmt.Println("HandleUpdateFirebaseUser:", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var userFirebase User
 
 		err := c.BindJSON(&userFirebase)
@@ -334,25 +374,42 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 }
 
 func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandleUpdateNews:", ok)
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleDeleteFirebaseUser:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		fmt.Println("HandleUpdateNews:", err)
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleDeleteFirebaseUser:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleDeleteFirebaseUser:", err)
+		return
+	}
+
+	if role == "administrator" {
 		uidStr := c.Query("uid")
 
 		clientAuth, err := firebase.InitFirebase().Auth(context.Background())
