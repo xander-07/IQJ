@@ -13,7 +13,7 @@ import (
 // Структура для параметров JWT
 type tokenclaims struct {
 	jwt.MapClaims
-	Uid string `json:"uid"`
+	UserId int `json:"user_id"`
 }
 
 // Если с токеном все хорошо,вызовется функция, которая находится внутри.
@@ -47,13 +47,13 @@ func WithJWTAuth(c *gin.Context) {
 }
 
 // Создание токена
-func GenerateJWT(uid string) (string, error) {
+func GenerateJWT(id int) (string, error) {
 	claims := &tokenclaims{
 		jwt.MapClaims{
 			"ExpiresAt": time.Now().Add(4344 * time.Hour).Unix(), // Через сколько токен станет недействительный
 			"IssuedAr":  time.Now().Unix(),                       // Время, когда был создан токен
 		},
-		uid,
+		id,
 	}
 	// Создание токена с параметрами записанными в claims и id пользователя
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -62,7 +62,7 @@ func GenerateJWT(uid string) (string, error) {
 }
 
 // Парсинг токена и получение id пользователя
-func ParseToken(tokenstring string) (string, error) {
+func ParseToken(tokenstring string) (int, error) {
 	//Парсим токен, взяв из заголовка только токен
 	token, err := jwt.ParseWithClaims(tokenstring, &tokenclaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Проверяем метод подписи токена
@@ -73,18 +73,18 @@ func ParseToken(tokenstring string) (string, error) {
 	})
 
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	// Проверяем что токен действителен
 	if !token.Valid {
-		return "", err
+		return 0, err
 	}
 
 	claims, ok := token.Claims.(*tokenclaims)
 	if !ok {
-		return "", err
+		return 0, err
 	}
 
-	return claims.Uid, nil
+	return claims.UserId, nil
 }
