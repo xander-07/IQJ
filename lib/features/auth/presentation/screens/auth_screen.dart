@@ -56,6 +56,7 @@ void showChpwdDialog(BuildContext context) {
 }
 
 class _LoginScreenState extends State<AuthScreen> {
+  String jwt = 'hello';
   String email = '';
 
   void _handlerEmailChanged(String emailadress) {
@@ -164,29 +165,31 @@ class _LoginScreenState extends State<AuthScreen> {
                           // Получаем UID после успешного входа
                           final user = authService.getCurrentUser(); 
                           final uid = user?.uid; // Используйте ? для безопасности, если getCurrentUser() может вернуть null
-                          String jwt = 'hello';
+                          
 
                           if (uid != null) {
-                            // Используйте UID
                             final response = await post_uid(uid);
                             if (response.statusCode == 200) {
                               final data = jsonDecode(response.body); 
                               jwt = data['token'].toString();
                               print(jwt);
+                              
+                              // Передавайте jwt через конструктор:
+                              // Navigator.pushReplacement(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => HomeScreen(jwt: jwt), // Передача jwt
+                              //   ),
+                              // );
+                              // Navigator.of(context).pushNamed(
+                              //   '/',
+                              //   arguments: jwt,
+                              // );
                             }
-                          
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) {
-                          //       return const HomeScreen();
-                          //     },
-                          //   ),
-                          // );
-                          Navigator.of(context).pushNamed(
-                            '/',
-                            arguments: jwt,
-                          );
+                            Navigator.of(context).pushNamed(
+                                '/',
+                                arguments: jwt,
+                              );
                           }
                         } catch (e) {
                           ScaffoldMessenger.of(context)
