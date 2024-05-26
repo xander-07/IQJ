@@ -9,6 +9,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  String jwt = '';
+
+  @override
+  void didChangeDependencies() {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    assert(args != null, "Check args");
+    jwt = args.toString();
+    // user_name =
+    //     help["name"] as String?; // Присваивание значения переменной user_name
+    // image_url = help["url"] as String?;
+    // vol = help["volume"] as bool;
+    // pin = help["pin"] as bool;
+    // uid = help["uid"] as String;
+    // print("GroupID: $uid");
+    // userPhone = help["phone"] as String;
+
+    setState(() {});
+    super.didChangeDependencies();
+  }
+
   int _currentPage = 0;
   @override
   Widget build(BuildContext context) {
