@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:iqj/features/auth/data/auth_service.dart';
 import 'package:iqj/features/auth/domain/emailField.dart';
 import 'package:iqj/features/auth/domain/passwordField.dart';
+import 'package:iqj/features/auth/repo.dart';
 import 'package:iqj/features/homescreen/presentation/homescreen.dart';
 import 'package:iqj/main.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +56,7 @@ void showChpwdDialog(BuildContext context) {
 }
 
 class _LoginScreenState extends State<AuthScreen> {
+  String jwt = 'hello';
   String email = '';
 
   void _handlerEmailChanged(String emailadress) {
@@ -156,20 +161,43 @@ class _LoginScreenState extends State<AuthScreen> {
                             _controllerEmail.text,
                             _controllerPassword.text,
                           );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const HomeScreen();
-                              },
-                            ),
-                          );
+
+                          // Получаем UID после успешного входа
+                          final user = authService.getCurrentUser(); 
+                          final uid = user?.uid; // Используйте ? для безопасности, если getCurrentUser() может вернуть null
+                          
+
+                          if (uid != null) {
+                            final response = await post_uid(uid);
+                            if (response.statusCode == 200) {
+                              final data = jsonDecode(response.body); 
+                              jwt = data['token'].toString();
+                              print(jwt);
+                              
+                              // Передавайте jwt через конструктор:
+                              // Navigator.pushReplacement(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => HomeScreen(jwt: jwt), // Передача jwt
+                              //   ),
+                              // );
+                              // Navigator.of(context).pushNamed(
+                              //   '/',
+                              //   arguments: jwt,
+                              // );
+                            }
+                            Navigator.of(context).pushNamed(
+                                '/',
+                                arguments: jwt,
+                              );
+                          }
                         } catch (e) {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text('Ошибка входа!')));
                         }
                       }
                     },
+
                     child: const Text(
                       "Войти",
                       style: TextStyle(
