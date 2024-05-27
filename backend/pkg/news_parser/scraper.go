@@ -32,7 +32,7 @@ func ScrapTick() {
 
 // Главная функция, которая вызывает парсеры блочной и полной новости.
 func Scraper() {
-	x := scraper("https://www.mirea.ru/news/index.php?set_filter=Y&arrFilter_ff%5BTAGS%5D=%D1%81%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D0%BA%D0%B0%D0%BC")
+	x := scraper("https://www.mirea.ru/news/")
 	scraper2(x)
 }
 
@@ -53,10 +53,10 @@ func scraper(url string) []NewsBlock {
 	})
 
 	// Переключение на следующую страницу
-	//c.OnHTML(".bx-pag-next a", func(e *colly.HTMLElement) {
-	//	nextPage := e.Request.AbsoluteURL(e.Attr("href"))
-	//	c.Visit(nextPage)
-	//})
+	c.OnHTML(".bx-pag-next a", func(e *colly.HTMLElement) {
+		nextPage := e.Request.AbsoluteURL(e.Attr("href"))
+		c.Visit(nextPage)
+	})
 
 	c.Visit(url)
 	return newsblarr
