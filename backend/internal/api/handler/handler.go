@@ -28,8 +28,9 @@ const (
 
 	AuthGroupRoute = "/auth"
 
-	FirebaseGroupRoute = "/firebase"
-	FirebaseUserRoute  = "/user"
+	FirebaseGroupRoute       = "/firebase"
+	FirebaseYourProfileRoute = "/profile"
+	FirebaseUserRoute        = "/user"
 )
 
 type Handler struct {
@@ -84,6 +85,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// Группа функций для работы с Firebase
 		firebaseGroup := authGroup.Group(FirebaseGroupRoute)
 		{
+			firebaseGroup.GET(FirebaseYourProfileRoute, h.HandleGetFirebaseUserByUid)
+			firebaseGroup.PUT(FirebaseYourProfileRoute, h.HandleUpdateYourFirebaseProfile)
+
 			firebaseGroup.GET(FirebaseUserRoute, h.HandleListUsers)
 			firebaseGroup.POST(FirebaseUserRoute, h.HandleCreateFirebaseUser)
 			firebaseGroup.PUT(FirebaseUserRoute, h.HandleUpdateFirebaseUser)

@@ -17,8 +17,6 @@ import (
 type UserInfo struct {
 	UID            string `json:"uid"`
 	Email          string `json:"email"`
-	PasswordHash   string `json:"password_hash"`
-	PasswordSalt   string `json:"password_salt"`
 	DisplayName    string `json:"display_name"`
 	PhoneNumber    string `json:"phone_number"`
 	LastSignInTime string `json:"last_sign_in_time"`
@@ -132,8 +130,6 @@ func (h *Handler) HandleListUsers(c *gin.Context) {
 			}
 
 			// Добавление информации о пользовательской аутентификации к данным пользователя
-			userList[i].PasswordHash = userAuth.PasswordHash
-			userList[i].PasswordSalt = userAuth.PasswordSalt
 			userList[i].LastSignInTime = time.Unix(userAuth.UserMetadata.LastLogInTimestamp/1000, 0).Format("2006-01-02 15:04:05")
 			userList[i].CreationTime = time.Unix(userAuth.UserMetadata.CreationTimestamp/1000, 0).Format("2006-01-02 15:04:05")
 
@@ -170,6 +166,64 @@ func buildFullName(data map[string]interface{}) string {
 	}
 
 	return fullName
+}
+
+// Вывод пользователя из firebase по uid
+func (h *Handler) HandleGetFirebaseUserByUid(c *gin.Context) {
+	uidToConv, ok := c.Get("uid")
+	if !ok {
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleGetUser:", ok)
+		return
+	}
+
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleGetUser: Firebase initialization error: %s\n", err)
+		return
+	}
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleGetUser:", err)
+		return
+	}
+
+	data := doc.Data()
+	var userInfo UserInfo
+	userInfo.UID = uid
+	userInfo.DisplayName = buildFullName(data)
+	userInfo.Position = getStringFromData(data, "position")
+	userInfo.Email = getStringFromData(data, "email")
+	userInfo.Institute = getStringFromData(data, "institute")
+	userInfo.PhoneNumber = getStringFromData(data, "phone")
+	userInfo.Role = getStringFromData(data, "role")
+	userInfo.Picture = getStringFromData(data, "picture")
+
+	clientAuth, err := firebase.InitFirebase().Auth(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleGetUser: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	userAuth, err := clientAuth.GetUser(context.Background(), uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleGetUser: error getting user: %s\n", err)
+		return
+	}
+
+	userInfo.LastSignInTime = time.Unix(userAuth.UserMetadata.LastLogInTimestamp/1000, 0).Format("2006-01-02 15:04:05")
+	userInfo.CreationTime = time.Unix(userAuth.UserMetadata.CreationTimestamp/1000, 0).Format("2006-01-02 15:04:05")
+
+	c.JSON(http.StatusOK, userInfo)
 }
 
 func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
@@ -353,6 +407,92 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusForbidden, "There are not enough rights for this action")
 	}
+}
+
+func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
+	uidToConv, ok := c.Get("uid")
+	if !ok {
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleUpdateFirebaseUser:", ok)
+		return
+	}
+
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+	var userFirebase User
+
+	err = c.BindJSON(&userFirebase)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+
+	clientAuth, err := firebase.InitFirebase().Auth(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	params := (&auth.UserToUpdate{}).
+		Email(userFirebase.Email).
+		Password(userFirebase.Password).
+		PhoneNumber(userFirebase.PhoneNumber).
+		DisplayName(userFirebase.DisplayName)
+
+	u, err := clientAuth.UpdateUser(context.Background(), uid, params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleUpdateFirebaseUser:", err)
+		return
+	}
+
+	fullName := strings.Fields(userFirebase.DisplayName)
+
+	_, err = clientFirestore.Collection("users").Doc(u.UID).Set(context.Background(), map[string]interface{}{
+		"email":      userFirebase.Email,
+		"institute":  userFirebase.Institute,
+		"name":       fullName[1],
+		"patronymic": fullName[2],
+		"phone":      userFirebase.PhoneNumber,
+		"position":   userFirebase.Position,
+		"role":       role,
+		"surname":    fullName[0],
+		"uid":        uid,
+		"picture":    userFirebase.Picture,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, userFirebase)
 }
 
 func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
