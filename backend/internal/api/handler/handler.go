@@ -21,15 +21,16 @@ const (
 
 	LessonsRoute = "/lessons"
 
-	SignInRoute     = "/sign-in"
-	SignUpRoute     = "/sign-up"
-	WebSignInRoute  = "/web_sign-in"
-	UpdateRoleRoute = "/update_role"
+	SignInRoute       = "/sign-in"
+	RefreshTokenRoute = "/refresh"
+	WebSignInRoute    = "/web_sign-in"
+	UpdateRoleRoute   = "/update_role"
 
 	AuthGroupRoute = "/auth"
 
-	FirebaseGroupRoute = "/firebase"
-	FirebaseUserRoute  = "/user"
+	FirebaseGroupRoute       = "/firebase"
+	FirebaseYourProfileRoute = "/profile"
+	FirebaseUserRoute        = "/user"
 )
 
 type Handler struct {
@@ -53,7 +54,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// Вызов хэндлеров исходя из запроса.
 	r.GET(DefaultRoute, h.Hello)
 
-	r.POST(SignUpRoute, h.HandleSignUp)
+	r.POST(RefreshTokenRoute, middleware.RefreshTokens)
 	r.POST(SignInRoute, h.HandleSignIn)
 	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
@@ -84,6 +85,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// Группа функций для работы с Firebase
 		firebaseGroup := authGroup.Group(FirebaseGroupRoute)
 		{
+			firebaseGroup.GET(FirebaseYourProfileRoute, h.HandleGetFirebaseUserByUid)
+			firebaseGroup.PUT(FirebaseYourProfileRoute, h.HandleUpdateYourFirebaseProfile)
+
 			firebaseGroup.GET(FirebaseUserRoute, h.HandleListUsers)
 			firebaseGroup.POST(FirebaseUserRoute, h.HandleCreateFirebaseUser)
 			firebaseGroup.PUT(FirebaseUserRoute, h.HandleUpdateFirebaseUser)

@@ -2,16 +2,18 @@ package middleware
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"iqj/config"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 // Структура для параметров JWT
-type tokenclaims struct {
+type tokenClaims struct {
 	jwt.MapClaims
 	Uid string `json:"uid"`
 }
@@ -37,34 +39,64 @@ func WithJWTAuth(c *gin.Context) {
 		return
 	}
 
-	userId, err := ParseToken(tokenstring[1])
+	uid, err := ParseToken(tokenstring[1])
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 		return
 	}
-	// Записываем id в контекст, чтобы в дальнейшем использовать в других функциях
-	c.Set("userId", userId)
+	// Записываем uid в контекст, чтобы в дальнейшем использовать в других функциях
+	c.Set("uid", uid)
 }
 
 // Создание токена
 func GenerateJWT(uid string) (string, error) {
-	claims := &tokenclaims{
+	claims := &tokenClaims{
 		jwt.MapClaims{
 			"ExpiresAt": time.Now().Add(4344 * time.Hour).Unix(), // Через сколько токен станет недействительный
 			"IssuedAr":  time.Now().Unix(),                       // Время, когда был создан токен
 		},
 		uid,
 	}
-	// Создание токена с параметрами записанными в claims и id пользователя
+	// Создание токена с параметрами записанными в claims и uid пользователя
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(config.SigningKey))
 }
 
-// Парсинг токена и получение id пользователя
+// Создание access токена
+func GenerateAccessToken(uid string) (string, error) {
+	claims := &tokenClaims{
+		jwt.MapClaims{
+			"ExpiresAt": time.Now().Add(1 * time.Hour).Unix(), // Через сколько токен станет недействительный
+			"IssuedAr":  time.Now().Unix(),                    // Время, когда был создан токен
+		},
+		uid,
+	}
+	// Создание токена с параметрами записанными в claims и uid пользователя
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(config.SigningKey))
+}
+
+// Создание refresh токена
+func GenerateRefreshToken(uid string) (string, error) {
+	claims := &tokenClaims{
+		jwt.MapClaims{
+			"ExpiresAt": time.Now().Add(724 * time.Hour).Unix(), // Через сколько токен станет недействительный
+			"IssuedAr":  time.Now().Unix(),                      // Время, когда был создан токен
+		},
+		uid,
+	}
+	// Создание токена с параметрами записанными в claims и uid пользователя
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(config.SigningKey))
+}
+
+// Парсинг токена и получение uid пользователя
 func ParseToken(tokenstring string) (string, error) {
 	//Парсим токен, взяв из заголовка только токен
-	token, err := jwt.ParseWithClaims(tokenstring, &tokenclaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenstring, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Проверяем метод подписи токена
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -81,10 +113,53 @@ func ParseToken(tokenstring string) (string, error) {
 		return "", err
 	}
 
-	claims, ok := token.Claims.(*tokenclaims)
+	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
 		return "", err
 	}
 
+	if time.Now().Unix() > int64(claims.MapClaims["ExpiresAt"].(float64)) {
+		return "Token has expired", errors.New("Token has expired")
+	}
+
 	return claims.Uid, nil
+}
+
+func RefreshTokens(c *gin.Context) {
+	var requestBody struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	err := c.BindJSON(&requestBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleWebSignIn:", err)
+		return
+	}
+
+	uid, err := ParseToken(requestBody.RefreshToken)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	refreshToken, err := GenerateRefreshToken(uid)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	accessToken, err := GenerateAccessToken(uid)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
 }
