@@ -173,7 +173,7 @@ func (h *Handler) HandleGetFirebaseUserByUid(c *gin.Context) {
 	uidToConv, ok := c.Get("uid")
 	if !ok {
 		c.String(http.StatusUnauthorized, "Uid not found")
-		fmt.Println("HandleGetUser:", ok)
+		fmt.Println("HandleGetFirebaseUserByUid:", ok)
 		return
 	}
 
@@ -182,7 +182,7 @@ func (h *Handler) HandleGetFirebaseUserByUid(c *gin.Context) {
 	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleGetUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleGetFirebaseUserByUid: Firebase initialization error: %s\n", err)
 		return
 	}
 	defer clientFirestore.Close()
@@ -191,7 +191,7 @@ func (h *Handler) HandleGetFirebaseUserByUid(c *gin.Context) {
 	doc, err := docRef.Get(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleGetUser:", err)
+		fmt.Println("HandleGetFirebaseUserByUid:", err)
 		return
 	}
 
@@ -209,14 +209,14 @@ func (h *Handler) HandleGetFirebaseUserByUid(c *gin.Context) {
 	clientAuth, err := firebase.InitFirebase().Auth(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleGetUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleGetFirebaseUserByUid: Firebase initialization error: %s\n", err)
 		return
 	}
 
 	userAuth, err := clientAuth.GetUser(context.Background(), uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleGetUser: error getting user: %s\n", err)
+		fmt.Printf("HandleGetFirebaseUserByUid: error getting user: %s\n", err)
 		return
 	}
 
@@ -413,7 +413,7 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	uidToConv, ok := c.Get("uid")
 	if !ok {
 		c.String(http.StatusUnauthorized, "Uid not found")
-		fmt.Println("HandleUpdateFirebaseUser:", ok)
+		fmt.Println("HandleUpdateYourFirebaseProfile:", ok)
 		return
 	}
 
@@ -422,7 +422,7 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleUpdateYourFirebaseProfile: Firebase initialization error: %s\n", err)
 		return
 	}
 
@@ -433,7 +433,7 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	doc, err := docRef.Get(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleUpdateFirebaseUser:", err)
+		fmt.Println("HandleUpdateYourFirebaseProfile:", err)
 		return
 	}
 
@@ -441,7 +441,7 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	role, ok := data["role"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleUpdateFirebaseUser:", err)
+		fmt.Println("HandleUpdateYourFirebaseProfile:", err)
 		return
 	}
 	var userFirebase User
@@ -449,14 +449,14 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	err = c.BindJSON(&userFirebase)
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
-		fmt.Println("HandleUpdateFirebaseUser:", err)
+		fmt.Println("HandleUpdateYourFirebaseProfile:", err)
 		return
 	}
 
 	clientAuth, err := firebase.InitFirebase().Auth(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleUpdateYourFirebaseProfile: Firebase initialization error: %s\n", err)
 		return
 	}
 
@@ -469,11 +469,14 @@ func (h *Handler) HandleUpdateYourFirebaseProfile(c *gin.Context) {
 	u, err := clientAuth.UpdateUser(context.Background(), uid, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleUpdateFirebaseUser:", err)
+		fmt.Println("HandleUpdateYourFirebaseProfile:", err)
 		return
 	}
 
 	fullName := strings.Fields(userFirebase.DisplayName)
+
+	userFirebase.UID = uid
+	userFirebase.Role = role
 
 	_, err = clientFirestore.Collection("users").Doc(u.UID).Set(context.Background(), map[string]interface{}{
 		"email":      userFirebase.Email,
