@@ -2,6 +2,8 @@ package handler
 
 import (
 	"fmt"
+	"golang.org/x/net/context"
+	"iqj/internal/api/firebase"
 	"iqj/internal/database"
 	"net/http"
 	"strconv"
@@ -192,22 +194,42 @@ func (h *Handler) HandleGetNewsById(c *gin.Context, id int) {
 // POST /auth/news
 
 func (h *Handler) HandleAddNews(c *gin.Context) {
-	userIdToConv, exists := c.Get("userId")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandleAddNews:", exists)
+	uidToConv, ok := c.Get("uid")
+	if !ok {
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleAddNews:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
-	var userDB database.UserData
-	userDB.Id = int64(userId)
-	user, err := database.Database.UserData.GetRoleById(userDB)
+
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleAddNews: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		fmt.Println("HandleAddNews:", err)
 		return
 	}
-	if user.Role == "moderator" {
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleAddNews:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var news database.News
 		err := c.BindJSON(&news)
 		if err != nil {
@@ -216,16 +238,15 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			return
 		}
 
-		var user2 database.User
-		var user3 *database.User
-		user2.Id = int64(userId)
-		user3, err = database.Database.User.GetById(user2)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+		data := doc.Data()
+		email, ok := data["email"].(string)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, err)
 			fmt.Println("HandleAddNews:", err)
 			return
 		}
-		news.Author = user3.Email
+
+		news.Author = email
 
 		news.IsForStudents = false
 		for i := range news.Tags {
@@ -234,10 +255,10 @@ func (h *Handler) HandleAddNews(c *gin.Context) {
 			}
 		}
 
-		ok := database.Database.News.Add(news)
-		if ok != nil {
-			c.JSON(http.StatusInternalServerError, ok.Error())
-			fmt.Println("HandleAddNews:", ok)
+		err = database.Database.News.Add(news)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			fmt.Println("HandleAddNews:", err)
 			return
 		}
 		c.JSON(http.StatusOK, news)
@@ -266,25 +287,42 @@ func (h *Handler) HandleGetAllNews(c *gin.Context) {
 // Использование с PUT: /auth/news
 
 func (h *Handler) HandleUpdateNews(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
+		c.String(http.StatusUnauthorized, "Uid not found")
 		fmt.Println("HandleUpdateNews:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleUpdateNews: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		fmt.Println("HandleUpdateNews:", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleUpdateNews:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var news database.News
 
 		err := c.BindJSON(&news)
@@ -313,25 +351,42 @@ func (h *Handler) HandleUpdateNews(c *gin.Context) {
 // Например, при DELETE /auth/news?id=13 удалит новость с id = 13.
 
 func (h *Handler) HandleDeleteNews(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
+		c.String(http.StatusUnauthorized, "Uid not found")
 		fmt.Println("HandleDeleteNews:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleDeleteNews: Firebase initialization error: %s\n", err)
+		return
+	}
+
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		fmt.Println("HandleDeleteNews:", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleDeleteNews:", err)
+		return
+	}
+
+	if role == "administrator" {
 		idStr := c.Query("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
