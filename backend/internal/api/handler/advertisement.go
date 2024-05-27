@@ -2,10 +2,13 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"golang.org/x/net/context"
+	"iqj/internal/api/firebase"
 	"iqj/internal/database"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Выдает массив с объявлениями, у которых срок годности
@@ -34,25 +37,42 @@ func (h *Handler) HandleGetAdvertisement(c *gin.Context) {
 // создает в бд переданное объявление.
 // POST /api/ad
 func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandlePostAdvertisement:", ok)
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleListUsers:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		fmt.Println("HandlePostAdvertisement:", err)
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var advertisement database.Advertisement
 
 		err := c.BindJSON(&advertisement)
@@ -88,25 +108,42 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 // обновляет в бд объявление с переданным id.
 // PUT /api/ad
 func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandleUpdateAdvertisement:", ok)
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleListUsers:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById( // у этого юзера будет роль, все хорошо -> user.Role
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		fmt.Println("HandleUpdateAdvertisement:", err)
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	if role == "administrator" {
 		var advertisement database.Advertisement
 
 		err := c.BindJSON(&advertisement)
@@ -134,36 +171,52 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 // Используется функция GetAllAds, которая получает срез всех объявлений в бд.
 // Использование с GET: /ad_all
 func (h *Handler) HandleGetAllAdvertisements(c *gin.Context) {
-
-	allads, err := database.Database.Advertisement.GetAll()
+	allAds, err := database.Database.Advertisement.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		fmt.Println("HandleGetAllAdvertisements:", err)
 		return
 	}
-	c.JSON(http.StatusOK, allads)
+	c.JSON(http.StatusOK, allAds)
 }
 
 func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
-	userIdToConv, ok := c.Get("userId")
+	uidToConv, ok := c.Get("uid")
 	if !ok {
-		c.String(http.StatusUnauthorized, "User ID not found")
-		fmt.Println("HandleDeleteAdvertisement:", ok)
+		c.String(http.StatusUnauthorized, "Uid not found")
+		fmt.Println("HandleListUsers:", ok)
 		return
 	}
-	userId := userIdToConv.(int)
 
-	user, err := database.Database.UserData.GetRoleById(
-		database.UserData{
-			Id: int64(userId),
-		})
+	uid := uidToConv.(string)
+
+	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		fmt.Println("HandleDeleteAdvertisement:", err)
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
 		return
 	}
 
-	if user.Role == "moderator" {
+	defer clientFirestore.Close()
+
+	docRef := clientFirestore.Collection("users").Doc(uid)
+
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	data := doc.Data()
+	role, ok := data["role"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, err)
+		fmt.Println("HandleListUsers:", err)
+		return
+	}
+
+	if role == "administrator" {
 		idStr := c.Query("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
