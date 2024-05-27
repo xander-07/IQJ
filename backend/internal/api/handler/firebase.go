@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"golang.org/x/net/context"
 	"iqj/internal/api/firebase"
 	"net/http"
 	"strings"
@@ -9,7 +10,6 @@ import (
 
 	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 )
 
@@ -239,15 +239,6 @@ func (h *Handler) HandleCreateFirebaseUser(c *gin.Context) {
 			return
 		}
 
-		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			fmt.Printf("HandleCreateFirebaseUser: Firebase initialization error: %s\n", err)
-			return
-		}
-
-		defer clientFirestore.Close()
-
 		fullName := strings.Fields(userFirebase.DisplayName)
 
 		_, err = clientFirestore.Collection("users").Doc(u.UID).Set(context.Background(), map[string]interface{}{
@@ -339,15 +330,6 @@ func (h *Handler) HandleUpdateFirebaseUser(c *gin.Context) {
 			return
 		}
 
-		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			fmt.Printf("HandleUpdateFirebaseUser: Firebase initialization error: %s\n", err)
-			return
-		}
-
-		defer clientFirestore.Close()
-
 		fullName := strings.Fields(userFirebase.DisplayName)
 
 		_, err = clientFirestore.Collection("users").Doc(u.UID).Set(context.Background(), map[string]interface{}{
@@ -424,15 +406,6 @@ func (h *Handler) HandleDeleteFirebaseUser(c *gin.Context) {
 			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
 			return
 		}
-
-		clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			fmt.Printf("HandleDeleteFirebaseUser: Firebase initialization error: %s\n", err)
-			return
-		}
-
-		defer clientFirestore.Close()
 
 		// Удаление данных пользователя из Firestore
 		if _, err := clientFirestore.Collection("users").Doc(uidStr).Delete(context.Background()); err != nil {

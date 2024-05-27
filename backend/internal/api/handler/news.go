@@ -2,10 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"iqj/internal/database"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Начальная функция по /news , из которой в зависимости от query параметров идет вызов соответствующей ручки

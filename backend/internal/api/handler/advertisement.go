@@ -40,7 +40,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 	uidToConv, ok := c.Get("uid")
 	if !ok {
 		c.String(http.StatusUnauthorized, "Uid not found")
-		fmt.Println("HandleListUsers:", ok)
+		fmt.Println("HandlePostAdvertisement:", ok)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandlePostAdvertisement: Firebase initialization error: %s\n", err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 	doc, err := docRef.Get(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandlePostAdvertisement:", err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (h *Handler) HandlePostAdvertisement(c *gin.Context) {
 	role, ok := data["role"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandlePostAdvertisement:", err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	uidToConv, ok := c.Get("uid")
 	if !ok {
 		c.String(http.StatusUnauthorized, "Uid not found")
-		fmt.Println("HandleListUsers:", ok)
+		fmt.Println("HandleUpdateAdvertisements:", ok)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleUpdateAdvertisements: Firebase initialization error: %s\n", err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	doc, err := docRef.Get(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandleUpdateAdvertisements:", err)
 		return
 	}
 
@@ -139,7 +139,7 @@ func (h *Handler) HandleUpdateAdvertisements(c *gin.Context) {
 	role, ok := data["role"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandleUpdateAdvertisements:", err)
 		return
 	}
 
@@ -184,7 +184,7 @@ func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
 	uidToConv, ok := c.Get("uid")
 	if !ok {
 		c.String(http.StatusUnauthorized, "Uid not found")
-		fmt.Println("HandleListUsers:", ok)
+		fmt.Println("HandleDeleteAdvertisement:", ok)
 		return
 	}
 
@@ -193,7 +193,7 @@ func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
 	clientFirestore, err := firebase.InitFirebase().Firestore(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Printf("HandleListUsers: Firebase initialization error: %s\n", err)
+		fmt.Printf("HandleDeleteAdvertisement: Firebase initialization error: %s\n", err)
 		return
 	}
 
@@ -204,7 +204,7 @@ func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
 	doc, err := docRef.Get(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandleDeleteAdvertisement:", err)
 		return
 	}
 
@@ -212,7 +212,7 @@ func (h *Handler) HandleDeleteAdvertisement(c *gin.Context) {
 	role, ok := data["role"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, err)
-		fmt.Println("HandleListUsers:", err)
+		fmt.Println("HandleDeleteAdvertisement:", err)
 		return
 	}
 
