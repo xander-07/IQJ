@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"iqj/config"
 	"net/http"
 	"strings"
@@ -117,5 +118,48 @@ func ParseToken(tokenstring string) (string, error) {
 		return "", err
 	}
 
+	if time.Now().Unix() > int64(claims.MapClaims["ExpiresAt"].(float64)) {
+		return "Token has expired", errors.New("Token has expired")
+	}
+
 	return claims.Uid, nil
+}
+
+func RefreshTokens(c *gin.Context) {
+	var requestBody struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	err := c.BindJSON(&requestBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		fmt.Println("HandleWebSignIn:", err)
+		return
+	}
+
+	uid, err := ParseToken(requestBody.RefreshToken)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	refreshToken, err := GenerateRefreshToken(uid)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	accessToken, err := GenerateAccessToken(uid)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		fmt.Println("RefreshTokens:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
 }

@@ -21,10 +21,10 @@ const (
 
 	LessonsRoute = "/lessons"
 
-	SignInRoute     = "/sign-in"
-	SignUpRoute     = "/sign-up"
-	WebSignInRoute  = "/web_sign-in"
-	UpdateRoleRoute = "/update_role"
+	SignInRoute       = "/sign-in"
+	RefreshTokenRoute = "/refresh"
+	WebSignInRoute    = "/web_sign-in"
+	UpdateRoleRoute   = "/update_role"
 
 	AuthGroupRoute = "/auth"
 
@@ -54,7 +54,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// Вызов хэндлеров исходя из запроса.
 	r.GET(DefaultRoute, h.Hello)
 
-	r.POST(SignUpRoute, h.HandleSignUp)
+	r.POST(RefreshTokenRoute, middleware.RefreshTokens)
 	r.POST(SignInRoute, h.HandleSignIn)
 	r.POST(WebSignInRoute, h.HandleWebSignIn)
 
