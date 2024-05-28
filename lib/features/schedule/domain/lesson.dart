@@ -22,7 +22,7 @@ class Lesson {
       name: json['class_name'] as String,
       location: json['class_location'] as String,
       teacher: json['class_teacher_name'] as String,
-      groups: json['class_group_ids'] as List<String>? ?? [''],
+      groups: List<String>.from(json['class_group_names'] as List),
       order: json['class_count'] as int,
       type: _types[json['class_type'] as String] ?? 'Другое',
     );
@@ -36,9 +36,7 @@ class Lesson {
 final Map<String, String> _types = {
   'ЛК': 'Лекция',
   'ПР': 'Практика',
-  'ПР\n\nПР': 'Практика',
   'ЛАБ': 'Лабораторная',
-  'ЛАБ\n\nЛАБ': 'Лабораторная',
 };
 
 final Map<String, Color> _lessonColor = {

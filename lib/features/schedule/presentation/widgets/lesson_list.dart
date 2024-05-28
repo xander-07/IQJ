@@ -24,24 +24,9 @@ class _LessonsState extends State<Lessons> {
           return const LinearProgressIndicator();
         } else if (state is ScheduleError) {
           return Text(
-            "Произошла ошибка при загрузке расписания: ${state.message}",
+            "Произошла ошибка: ${state.message}",
           );
         } else if (state is ScheduleLoaded) {
-          // if (state.schedule[state.selectedDay]?.isEmpty ?? true) {
-          //   return const Center(
-          //     child: Text("Выходной"),
-          //   );
-          // }
-          // return Column(
-          //   children: List.generate(
-          //     state.schedule[state.selectedDay]!.length,
-          //     (index) => LessonCard(
-          //       state.schedule[state.selectedDay]![index],
-          //       index,
-          //       false,
-          //     ),
-          //   ),
-          // );
           if (state.selectedDay.weekday == DateTime.sunday) {
             return const Center(
               child: Text('Выходной', style: TextStyle(fontSize: 24)),
