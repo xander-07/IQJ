@@ -27,6 +27,10 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+
   Future<UserCredential> createUserWithEmailAndPassword(
     String email,
     String password,
