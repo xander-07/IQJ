@@ -110,7 +110,7 @@ class _NewsBloc extends State<NewsScreen> {
         ),
         child: IconButton(
           onPressed: () {
-            admin_button(context);
+            admin_button(context,widget.jwt);
           },
           icon: const Icon(Icons.edit),
           color: Theme.of(context).colorScheme.onPrimary,

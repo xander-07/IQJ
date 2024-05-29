@@ -6,7 +6,7 @@ import 'package:iqj/features/news/admin/special_news.dart';
 import 'package:iqj/features/news/presentation/bloc/news_bloc.dart';
 import 'package:iqj/features/news/presentation/screens/search/body_for_date/body.dart';
 
-Future<void> admin_button(BuildContext context) async {
+Future<void> admin_button(BuildContext context,String jwt) async {
   final AlertDialog alert = AlertDialog(
     titlePadding: const EdgeInsets.only(left: 30, top: 24, right: 24),
     title: Column(
@@ -31,7 +31,7 @@ Future<void> admin_button(BuildContext context) async {
           thickness: 1,
           height: 8,
         ),
-        two_button_add_news(context),
+        two_button_add_news(context,jwt),
       ],
     ),
     backgroundColor: Theme.of(context).colorScheme.background,
@@ -47,7 +47,7 @@ Future<void> admin_button(BuildContext context) async {
   );
 }
 
-Widget two_button_add_news(BuildContext context) {
+Widget two_button_add_news(BuildContext context,String token) {
   return Wrap(
     children: [
       Padding(
@@ -104,7 +104,7 @@ Widget two_button_add_news(BuildContext context) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const GeneralNews(),
+                            builder: (context) => GeneralNews(jwt: token,),
                           ),
                         );
                       },

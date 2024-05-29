@@ -10,6 +10,7 @@ void uploadDialog(
   List<String> tags,
   String publicationTime,
   String text,
+  String jwt,
 ) {
   final Widget okButton = TextButton(
     style: ButtonStyle(
@@ -38,7 +39,7 @@ void uploadDialog(
       ),
     ),
     onPressed: () {
-      postGeneralNews(header, link, thumbnails, tags, publicationTime, text);
+      postGeneralNews(header, link, thumbnails, tags, publicationTime, text,jwt);
       Navigator.of(context).pop();
     },
   );

@@ -7,7 +7,8 @@ import 'package:iqj/features/news/admin/general_news_add_button.dart';
 import 'package:iqj/features/news/presentation/screens/search/body_for_tags/body_tags.dart';
 
 class GeneralNews extends StatefulWidget {
-  const GeneralNews({super.key});
+  final String jwt;
+  const GeneralNews({super.key, required this.jwt});
 
   @override
   State<GeneralNews> createState() => _GeneralNews();
@@ -375,6 +376,7 @@ class _GeneralNews extends State<GeneralNews> {
             _tags,
             _publicationTime,
             _text,
+            widget.jwt,
           ),
           const Padding(
             padding: EdgeInsets.only(bottom: 12, top: 12),

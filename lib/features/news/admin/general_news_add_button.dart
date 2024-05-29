@@ -10,6 +10,7 @@ Widget general_news_add_button(
   List<String> tags,
   String publicationTime,
   String text,
+  String jwt,
 ) {
   return Container(
     width: 151,
@@ -19,7 +20,7 @@ Widget general_news_add_button(
     child: ElevatedButton(
       onPressed: () {
         uploadDialog(
-            context, header, link, thumbnails, tags, publicationTime, text);
+            context, header, link, thumbnails, tags, publicationTime, text,jwt);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color.fromRGBO(239, 172, 0, 1),

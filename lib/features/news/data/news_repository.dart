@@ -164,6 +164,20 @@ Future<List<SpecialNews>> getSpecialNews() async {
   }
 }
 
+// {
+//   "header": "Котики собачки",
+//   "text": "11 марта РТУ МИРЭА посетила официальная делегация Корейской Народно-Демократической Республики.",
+//   "link": "",
+//   "image_link": [
+//     "https://celes.club/uploads/posts/2022-10/1666897679_16-celes-club-p-smeshnoi-kot-krasivo-16.jpg"
+//   ],
+//   "tags": [
+//     "сотрудникам"
+//   ],
+//   "author_name": "РТУ МИРЭА",
+//   "publication_time": "29.04.2024"
+// }
+
 Future<http.Response> postGeneralNews(
   String header,
   String link,
@@ -171,6 +185,7 @@ Future<http.Response> postGeneralNews(
   List<String> tags,
   String publicationTime,
   String text,
+  String jwtToken,
 ) {
   return http.post(
     Uri(
@@ -179,6 +194,19 @@ Future<http.Response> postGeneralNews(
       port: 8443,
       path: '/api/news',
     ),
+    headers: {
+      'Authorization': 'Bearer $jwtToken',
+    },
+    body: jsonEncode({
+      "header": header,
+      "text": text,
+      "link": link,
+      "image_link": 
+        thumbnails,
+      "tags": tags,
+      "author_name": "РТУ МИРЭА",
+      "publication_time": publicationTime
+    }),
   );
 }
 
