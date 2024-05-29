@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:iqj/features/account/domain/editButton.dart';
 import 'package:iqj/features/account/domain/listButton.dart';
 import 'package:iqj/features/account/domain/logoffButton.dart';
-import 'package:iqj/features/account/domain/mailButton.dart';
+import 'package:iqj/features/account/domain/profileButtons.dart';
 import 'package:iqj/features/account/domain/profileInfo.dart';
 import 'package:iqj/features/account/domain/profilePicture.dart';
-// import 'package:iqj/main.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -71,10 +71,29 @@ void showExitDialog(BuildContext context) {
 
 class _AccountScreenState extends State<AccountScreen> {
   bool passwordVisible = false;
+  String name = '';
+  String surname = '';
+  String patronymic = '';
+
   @override
   void initState() {
     super.initState();
     passwordVisible = true;
+    getUserData();
+  }
+
+  Future<void> getUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        setState(() {
+          name = doc['name'] as String;
+          surname = doc['surname'] as String;
+          patronymic = doc['patronymic'] as String;
+        });
+      }
+    }
   }
 
   @override
@@ -95,37 +114,30 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
         ],
       ),
-      // Аватарка пользовтеля, ФИО и почта
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 16,),
+                SizedBox(width: 16),
                 ProfilePicture(),
                 SizedBox(width: 24),
-                ProfileInfo(),
-              ],
-            ),
-            // Кнопка редактирования и почты
-            const Column(
-              children: [
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    EditButton(),
-                    MailButton(),
-                  ],
+                Expanded(
+                  child: ProfileInfo(
+                    name: name,
+                    surname: surname,
+                    patronymic: patronymic,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 11), // расстояние между кнопками и контейнером "Элемент меню"
-            // TODO переделать
+            const SizedBox(height: 16,width: 30,),
+            ProfileButtons(name: name, surname: surname, patronymic: patronymic),
+            const SizedBox(height: 11), 
             Expanded(
               child: Center(
                 child: Column(
@@ -133,7 +145,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 300, 
+                      height: 300,
                       child: ListView(
                         shrinkWrap: true,
                         padding: const EdgeInsets.all(8),
@@ -146,7 +158,6 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
               ),
             ),
-            // кнопка выхода
             const LogoffButton(),
           ],
         ),

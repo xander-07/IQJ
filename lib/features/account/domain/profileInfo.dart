@@ -1,9 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:iqj/features/account/domain/mailButton.dart';
+import 'package:iqj/features/account/domain/profileButtons.dart';
+import 'package:iqj/features/account/domain/editbutton.dart';
 
 class ProfileInfo extends StatefulWidget {
-  const ProfileInfo({Key? key}) : super(key: key);
+  final String name;
+  final String surname;
+  final String patronymic;
+
+  const ProfileInfo({
+    Key? key,
+    required this.name,
+    required this.surname,
+    required this.patronymic,
+  }) : super(key: key);
 
   @override
   _ProfileInfoState createState() => _ProfileInfoState();
@@ -12,15 +24,12 @@ class ProfileInfo extends StatefulWidget {
 class _ProfileInfoState extends State<ProfileInfo> {
   Color boxFillColor = const Color(0xFFF6F6F6);
 
-  String name = '';
-  String surname = '';
-  String patronymic = '';
   String email = '';
   String password = '';
 
   User? user;
 
-  Future<Map<String, dynamic>?> getUserDataByUid(String uid) async {
+  Future<Map<String, dynamic>?>? getUserDataByUid(String uid) async {
     try {
       final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (documentSnapshot.exists) {
@@ -36,6 +45,10 @@ class _ProfileInfoState extends State<ProfileInfo> {
 
   @override
   Widget build(BuildContext context) {
+    // name = widget.name;
+    // surname = widget.surname;
+    // patronymic = widget.patronymic;
+
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -49,9 +62,9 @@ class _ProfileInfoState extends State<ProfileInfo> {
               if (snapshot.hasError) {
                 return const Text('Ошибка при получении \n данных пользователя');
               } else if (snapshot.hasData) {
-                name = snapshot.data?['name'] as String;
-                surname = snapshot.data?['surname'] as String;
-                patronymic = snapshot.data?['patronymic'] as String;
+                // name = snapshot.data?['name'] as String;
+                // surname = snapshot.data?['surname'] as String;
+                // patronymic = snapshot.data?['patronymic'] as String;
                 email = snapshot.data?['email'] as String;
                 // password = snapshot.data?['password'] as String;
                 return Container(
@@ -60,7 +73,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name,
+                        widget.name,
                         style: TextStyle(
                           color: Theme.of(context).brightness == Brightness.light
                                 ? const Color(0xFF000000)
@@ -72,7 +85,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                         textAlign: TextAlign.left,
                       ),
                       Text(
-                        surname,
+                        widget.surname,
                         style: TextStyle(
                           color: Theme.of(context).brightness == Brightness.light
                                 ? const Color(0xFF000000)
@@ -84,7 +97,7 @@ class _ProfileInfoState extends State<ProfileInfo> {
                         textAlign: TextAlign.left,
                       ),
                       Text(
-                        patronymic,
+                        widget.patronymic,
                         style: TextStyle(
                           color: Theme.of(context).brightness == Brightness.light
                                 ? const Color(0xFF000000)
@@ -106,6 +119,12 @@ class _ProfileInfoState extends State<ProfileInfo> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const SizedBox(height: 20, width: 20,),
+                      // ProfileButtons(
+                      //   name: name,
+                      //   surname: surname,
+                      //   patronymic: patronymic,
+                      // ),
                     ],
                   ),
                 );

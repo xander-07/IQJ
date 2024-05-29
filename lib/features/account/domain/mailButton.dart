@@ -12,7 +12,7 @@ void showMenuDialog(BuildContext context) {
       ),
     ),
     onPressed: () {
-      
+      Navigator.of(context).pop();
     },
   );
 
