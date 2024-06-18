@@ -6,7 +6,9 @@ import 'package:iqj/features/schedule/domain/lesson.dart';
 final DateTime _startDate = DateTime(2024, 2, 5);
 
 Future<Map<DateTime, List<Lesson>>> fetchSchedule(
-    String criterion, String target) async {
+  String criterion,
+  String target,
+) async {
   final response = await http.get(
     Uri(
       scheme: 'https',
@@ -27,10 +29,13 @@ Future<Map<DateTime, List<Lesson>>> fetchSchedule(
       // Генерируем ключ DateTime для расписания с учётом начального дня
       final weekday = item['class_weekday'] as int;
       final week = item['class_week'] as int;
-      final date =
-          _startDate.add(Duration(days: (week - 1) * 7 + (weekday - 1)));
-
-      (schedule[date] ??= []).add(lesson);
+      DateTime date;
+      for (var i = 0; i <= 8; i++) {
+        date = _startDate
+            .add(Duration(days: (week + 2 * i - 1) * 7 + (weekday - 1))); //ужс
+        print(date);
+        (schedule[date] ??= []).add(lesson);
+      }
     }
 
     return schedule;

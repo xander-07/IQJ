@@ -18,8 +18,10 @@ class Lesson {
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
+    final String className = (json['class_name'] as String).split('н. ').last;
+
     return Lesson(
-      name: json['class_name'] as String,
+      name: className,
       location: json['class_location'] as String,
       teacher: json['class_teacher_name'] as String,
       groups: List<String>.from(json['class_group_names'] as List),
