@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:iqj/features/homescreen/data/homescreen_pages.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/account/presentation/screens/account_screen.dart';
-import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/homescreen/domain/homescreen_page.dart';
+import 'package:iqj/features/messenger/presentation/screens/messenger_screen.dart';
 import 'package:iqj/features/news/presentation/screens/news_screen.dart';
 import 'package:iqj/features/schedule/presentation/schedule_screen.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:iqj/features/services/presentation/screens/services_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,8 +21,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void didChangeDependencies() {
-    final args = ModalRoute.of(context)?.settings.arguments;
-    assert(args != null, "Check args");
+    final args = ModalRoute.of(context)!.settings.arguments ?? 'Check args';
+    // assert(args != null, "Check args");
     setState(() {
       token = args.toString();
     });

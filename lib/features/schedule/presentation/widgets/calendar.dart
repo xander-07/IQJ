@@ -20,13 +20,6 @@ class _CalendarState extends State<Calendar> {
   DateTime _selectedDay = DateTime.now(); // Выбранный день
   DateTime _focusedDay = DateTime.now(); // День, на который сделан фокус
   late ScheduleBloc _bloc;
-  List<Lesson> _selectedLessons(DateTime day) {
-    final state = _bloc.state;
-    if (state is ScheduleLoaded) {
-      return state.schedule[day] ?? [];
-    }
-    return [];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +54,12 @@ class _CalendarState extends State<Calendar> {
       selectedDayPredicate: (DateTime date) {
         return isSameDay(_selectedDay, date);
       }, // Проверка, является ли день выбранным
-
+      eventLoader: (day) {
+        if (state is ScheduleLoaded) {
+          return state.schedule[DateUtils.dateOnly(day)] ?? [];
+        }
+        return [];
+      },
       // MARK: стиль заголовка календаря
       headerStyle: HeaderStyle(
         formatButtonShowsNext: false,
@@ -83,6 +81,7 @@ class _CalendarState extends State<Calendar> {
 
       calendarBuilders: CalendarBuilders(
         weekNumberBuilder: _weekNumberBuilder,
+        markerBuilder: _markerBuilder,
         defaultBuilder: _defaultBuilder,
         selectedBuilder: _selectedBuilder,
         todayBuilder: _todayBuilder,
@@ -114,7 +113,31 @@ class _CalendarState extends State<Calendar> {
         : const SizedBox();
   }
 
-  // сегодняшний день
+  Widget? _markerBuilder(
+    BuildContext context,
+    DateTime date,
+    List<Lesson> lessons,
+  ) {
+    return SizedBox(
+      width: 34,
+      height: 12,
+      child: Wrap(
+        spacing: 2,
+        runSpacing: 2,
+        alignment: WrapAlignment.center,
+        children: List.generate(
+          lessons.length,
+          (index) => Container(
+            height: 5,
+            width: 5,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: lessons[index].getColor()),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // MARK: сегодняшний день
   Widget? _todayBuilder(
     BuildContext context,
     DateTime day,
@@ -123,9 +146,7 @@ class _CalendarState extends State<Calendar> {
       Stack(
         alignment: Alignment.center,
         children: [
-          if (day.day == 1 ||
-              day.add(const Duration(days: 1)).day ==
-                  1)
+          if (day.day == 1 || day.add(const Duration(days: 1)).day == 1)
             Container(
               height: 68,
               width: 42,
@@ -177,27 +198,27 @@ class _CalendarState extends State<Calendar> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  if (_bloc.state is ScheduleLoaded)
-                    Wrap(
-                      children: List.generate(
-                        _selectedLessons(day).length,
-                        (index) => Container(
-                          height: 2,
-                          width: 2,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _selectedLessons(day)[index].getColor(),
-                          ),
-                        ),
-                      ),
-                    ),
+                  // if (_bloc.state is ScheduleLoaded)
+                    // Wrap(
+                    //   children: List.generate(
+                    //     _selectedLessons(day).length,
+                    //     (index) => Container(
+                    //       height: 2,
+                    //       width: 2,
+                    //       decoration: BoxDecoration(
+                    //         shape: BoxShape.circle,
+                    //         color: _selectedLessons(day)[index].getColor(),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                 ],
               ),
             ),
           ),
         ],
       );
-  // выбранный день
+  // MARK: выбранный день
   Widget? _selectedBuilder(
     BuildContext context,
     DateTime day,
@@ -257,28 +278,27 @@ class _CalendarState extends State<Calendar> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  if (_bloc.state is ScheduleLoaded)
-                    Wrap(
-                      children: List.generate(
-                        _selectedLessons(day).length,
-                        (index) => Container(
-                          height: 2,
-                          width: 2,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _selectedLessons(day)[index].getColor(),
-                          ),
-                        ),
-                      ),
-                    ),
+                  // if (_bloc.state is ScheduleLoaded)
+                    // Wrap(
+                    //   children: List.generate(
+                    //     _selectedLessons(day).length,
+                    //     (index) => Container(
+                    //       height: 2,
+                    //       width: 2,
+                    //       decoration: BoxDecoration(
+                    //         shape: BoxShape.circle,
+                    //         color: _selectedLessons(day)[index].getColor(),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                 ],
               ),
             ),
           ),
         ],
       );
-
-  //остальные дни
+  // MARK: остальные дни
   Widget? _defaultBuilder(
     BuildContext context,
     DateTime day,
@@ -287,9 +307,7 @@ class _CalendarState extends State<Calendar> {
       Stack(
         alignment: Alignment.center,
         children: [
-          if (day.day == 1 ||
-              day.add(const Duration(days: 1)).day ==
-                  1)
+          if (day.day == 1 || day.add(const Duration(days: 1)).day == 1)
             Container(
               height: 70,
               width: 44,
@@ -341,20 +359,20 @@ class _CalendarState extends State<Calendar> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  if (_bloc.state is ScheduleLoaded)
-                    Wrap(
-                      children: List.generate(
-                        _selectedLessons(day).length,
-                        (index) => Container(
-                          height: 2,
-                          width: 2,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _selectedLessons(day)[index].getColor(),
-                          ),
-                        ),
-                      ),
-                    ),
+                  // if (_bloc.state is ScheduleLoaded)
+                    // Wrap(
+                    //   children: List.generate(
+                    //     _selectedLessons(day).length,
+                    //     (index) => Container(
+                    //       height: 2,
+                    //       width: 2,
+                    //       decoration: BoxDecoration(
+                    //         shape: BoxShape.circle,
+                    //         color: _selectedLessons(day)[index].getColor(),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                 ],
               ),
             ),

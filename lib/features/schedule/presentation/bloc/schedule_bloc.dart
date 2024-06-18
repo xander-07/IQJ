@@ -6,6 +6,8 @@ import 'package:iqj/features/schedule/presentation/bloc/schedule_state.dart';
  // Функция для парсинга расписания
 
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
+  bool isCompact = false;
+
   ScheduleBloc() : super(ScheduleInitial()) {
     on<LoadSchedule>(_onLoadSchedule);
     on<ChangeSelectedDay>(_onChangeSelectedDay);
@@ -19,6 +21,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     } catch (e) {
       emit(ScheduleError(message: e.toString()));
     }
+  }
+
+  void changeCompact(){
+    isCompact = !isCompact;
   }
 
   void _onChangeSelectedDay(ChangeSelectedDay event, Emitter<ScheduleState> emit) {

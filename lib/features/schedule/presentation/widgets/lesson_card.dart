@@ -16,73 +16,59 @@ class LessonCard extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+        padding: const EdgeInsets.only(left: 11, right: 11, bottom: 11,),
         child: Column(
           children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // MARK: Название пары
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          children: [
-                            Text(
-                              lesson.name,
-                              maxLines: 2,
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    lesson.name,
+                    maxLines: 2,
+                  ),
+                  subtitle: Row(
+                    children: [
+                      Container(
+                        height: 7,
+                        width: 7,
+                        decoration: BoxDecoration(
+                          color: lesson.getColor(),
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              height: 7,
-                              width: 7,
-                              decoration: BoxDecoration(
-                                color: lesson.getColor(),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(lesson.type),
-                          ],
+                      ),
+                      const SizedBox(width: 5),
+                      Text(lesson.type),
+                    ],
+                  ),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "${lesson.order} пара",
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
                         ),
-                      ],
-                    ),
-
-                    // MARK: Время пары
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          "${lesson.order} пара",
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                          ),
+                      ),
+                      Text(
+                        _lessonTime[lesson.order - 1],
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
                         ),
-                        Text(
-                          _lessonTime[lesson.order - 1],
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
+                  titleTextStyle: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ] +
+              // MARK: Компактная часть
               (isCompact
                   ? []
                   : [
@@ -92,7 +78,6 @@ class LessonCard extends StatelessWidget {
                             .inverseSurface
                             .withAlpha(144),
                       ),
-                      // MARK: Нижние строки
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
