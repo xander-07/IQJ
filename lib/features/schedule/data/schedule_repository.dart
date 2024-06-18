@@ -33,7 +33,6 @@ Future<Map<DateTime, List<Lesson>>> fetchSchedule(
       for (var i = 0; i <= 8; i++) {
         date = _startDate
             .add(Duration(days: (week + 2 * i - 1) * 7 + (weekday - 1))); //ужс
-        print(date);
         (schedule[date] ??= []).add(lesson);
       }
     }
