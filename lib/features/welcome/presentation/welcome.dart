@@ -104,44 +104,44 @@ class _WelcomeState extends State<Welcome> {
                     ),
                     const SizedBox(height: 32),
                   if (onLastPage)
-                    SizedBox(
-                      height: 60,
-                      width: 300,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: GestureDetector(
-                          onTap: () {
-                            userWelcomed();
-                            Navigator.pushReplacementNamed(context, 'registration');
-                          },
-                          child: Container(
-                            height: 60,
-                            width: 300,
-                            decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(30)),
-                              ),
-                            child: Align( 
-                              alignment: Alignment.center, 
-                              child: Text(
-                                'Регистрация',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // SizedBox(
+                    //   height: 60,
+                    //   width: 300,
+                    //   child: Align(
+                    //     alignment: Alignment.center,
+                    //     child: GestureDetector(
+                    //       onTap: () {
+                    //         userWelcomed();
+                    //         Navigator.pushReplacementNamed(context, 'registration');
+                    //       },
+                    //       child: Container(
+                    //         height: 60,
+                    //         width: 300,
+                    //         decoration: BoxDecoration(
+                    //             color: Theme.of(context)
+                    //                 .colorScheme
+                    //                 .inversePrimary,
+                    //             borderRadius:
+                    //                 const BorderRadius.all(Radius.circular(30)),
+                    //           ),
+                    //         child: Align( 
+                    //           alignment: Alignment.center, 
+                    //           child: Text(
+                    //             'Регистрация',
+                    //             style: TextStyle(
+                    //               fontFamily: 'Inter',
+                    //               fontSize: 20,
+                    //               fontWeight: FontWeight.w600,
+                    //               color: Theme.of(context)
+                    //                   .colorScheme
+                    //                   .onPrimaryContainer,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   const SizedBox(height: 32),
                   SizedBox(
                     height: 60,

@@ -56,7 +56,7 @@ class _LessonsState extends State<Lessons> {
                   }),
                 )
               : const Center(
-                  child: Text('Нет информации', style: TextStyle(fontSize: 24)),
+                  child: Text('Пар нет.', style: TextStyle(fontSize: 24)),
                 );
         } else {
           return const Text('Unhandled state');

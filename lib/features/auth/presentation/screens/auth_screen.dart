@@ -181,7 +181,7 @@ class _LoginScreenState extends State<AuthScreen> {
                             
                           }
 
-                          Navigator.of(context).pushNamed(
+                          Navigator.of(context).popAndPushNamed(
                             '/',
                             arguments: jwt,
                           );

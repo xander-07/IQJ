@@ -24,7 +24,13 @@ class LessonCard extends StatelessWidget {
                   title: Text(
                     lesson.name,
                     maxLines: 2,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                                    .colorScheme
+                                    .inverseSurface,
+                    ),
                   ),
+                  titleAlignment: ListTileTitleAlignment.top,
                   subtitle: Row(
                     children: [
                       Container(

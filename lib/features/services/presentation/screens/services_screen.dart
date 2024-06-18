@@ -28,88 +28,103 @@ class _ServicesBloc extends State<ServicesScreen> {
         actions: [
           Container(
             padding: const EdgeInsets.only(right: 12),
-            child: Row(
-              children: [
-                PopupMenuButton<String>(
-                  onSelected: (String choice) {
-                    handleMenuSelection(choice, context);
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return {'О программе'}.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.info_outline_rounded,
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(right: 12),
-                            ),
-                            Text(choice),
-                          ],
-                        ),
-                      );
-                    }).toList();
-                  },
-                ),
-              ],
-            ),
+            // child: Row(
+            //   children: [
+            //     PopupMenuButton<String>(
+            //       onSelected: (String choice) {
+            //         handleMenuSelection(choice, context);
+            //       },
+            //       itemBuilder: (BuildContext context) {
+            //         return {'О программе'}.map((String choice) {
+            //           return PopupMenuItem<String>(
+            //             value: choice,
+            //             child: Row(
+            //               children: [
+            //                 const Icon(
+            //                   Icons.info_outline_rounded,
+            //                 ),
+            //                 const Padding(
+            //                   padding: EdgeInsets.only(right: 12),
+            //                 ),
+            //                 Text(choice),
+            //               ],
+            //             ),
+            //           );
+            //         }).toList();
+            //       },
+            //     ),
+            //   ],
+            // ),
           ),
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12, bottom: 12),
-            child: Text(
-              'Популярные',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onBackground,
-                fontWeight: FontWeight.w700,
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12, bottom: 12, top: 12),
+              child: Text(
+                'Скоро здесь будут сервисы!',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onBackground,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
-          Container(
-            height: 120,
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: const <Widget>[
-                Padding(padding: EdgeInsets.only(left: 12)),
-                ServicesCard(
-                  imageUrl:
-                      'https://10.img.avito.st/image/1/1.wxHAnLa4b_j2Na39yofaKrw-bf5-Pe3wtjht-nA1Z_J2.oa9XxNKNWKY4MueY4dmqMFRnPZbONlWIAlX4_voHvrs',
-                  cardTitle: 'Карта корпусов',
-                ),
-                ServicesCard(
-                  imageUrl:
-                      'https://90.img.avito.st/image/1/1.XWTtzra48Y3bZzOI269hXpFs84tTb3OFm2rzj11n-Ydb.vfrRZIloP8OnKy0-eRUAzj1XRZJPysq1-N68BcoQ080',
-                  cardTitle: 'Форум',
-                ),
-                ServicesCard(
-                  imageUrl:
-                      'https://e3.365dm.com/19/09/2048x1152/skynews-drew-scanlon-blinking-white-guy_4786055.jpg',
-                  cardTitle: 'Проверяющие нас люди be like:',
-                ),
-                ServicesCard(
-                  imageUrl:
-                      'https://content.imageresizer.com/images/memes/Soyjak-Pointing-meme-5c15oj.jpg',
-                  cardTitle:
-                      'Фронтеры по сервисам когда увидели что уже всё готово',
-                ),
-                ServicesCard(
-                  imageUrl:
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsZr15qrncD--BpM2Ut7YPBxGNlF1EsIj72qYDCJnmgfrwAHK3ldBpWE1WPlX5sgEGdnI&usqp=CAU',
-                  cardTitle: 'Гайд к хорошему API',
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 12, bottom: 12),
+          //   child: Text(
+          //     'Популярные',
+          //     textAlign: TextAlign.left,
+          //     style: TextStyle(
+          //       fontFamily: 'Inter',
+          //       fontSize: 16,
+          //       color: Theme.of(context).colorScheme.onBackground,
+          //       fontWeight: FontWeight.w700,
+          //     ),
+          //   ),
+          // ),
+          // Container(
+          //   height: 120,
+          //   padding: const EdgeInsets.only(bottom: 12),
+          //   child: ListView(
+          //     scrollDirection: Axis.horizontal,
+          //     children: const <Widget>[
+          //       Padding(padding: EdgeInsets.only(left: 12)),
+          //       ServicesCard(
+          //         imageUrl:
+          //             'https://10.img.avito.st/image/1/1.wxHAnLa4b_j2Na39yofaKrw-bf5-Pe3wtjht-nA1Z_J2.oa9XxNKNWKY4MueY4dmqMFRnPZbONlWIAlX4_voHvrs',
+          //         cardTitle: 'Карта корпусов',
+          //       ),
+          //       ServicesCard(
+          //         imageUrl:
+          //             'https://90.img.avito.st/image/1/1.XWTtzra48Y3bZzOI269hXpFs84tTb3OFm2rzj11n-Ydb.vfrRZIloP8OnKy0-eRUAzj1XRZJPysq1-N68BcoQ080',
+          //         cardTitle: 'Форум',
+          //       ),
+          //       ServicesCard(
+          //         imageUrl:
+          //             'https://e3.365dm.com/19/09/2048x1152/skynews-drew-scanlon-blinking-white-guy_4786055.jpg',
+          //         cardTitle: 'Проверяющие нас люди be like:',
+          //       ),
+          //       ServicesCard(
+          //         imageUrl:
+          //             'https://content.imageresizer.com/images/memes/Soyjak-Pointing-meme-5c15oj.jpg',
+          //         cardTitle:
+          //             'Фронтеры по сервисам когда увидели что уже всё готово',
+          //       ),
+          //       ServicesCard(
+          //         imageUrl:
+          //             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsZr15qrncD--BpM2Ut7YPBxGNlF1EsIj72qYDCJnmgfrwAHK3ldBpWE1WPlX5sgEGdnI&usqp=CAU',
+          //         cardTitle: 'Гайд к хорошему API',
+          //       ),
+          //     ],
+          //   ),
+          // ),
           Expanded(
             child: ListView(
               reverse: true,
@@ -123,7 +138,7 @@ class _ServicesBloc extends State<ServicesScreen> {
           const Padding(padding: EdgeInsets.only(bottom: 12)),
           Center(
             child: Text(
-              'IQJ MIREA версия 0.0.1\nсборка 221803-24042024\nИПТИП/КИП (с) 2024 - Все права защищены.',
+              'версия 0.0.1\nсборка 001845-19062024\nИПТИП/КИП (с) 2024 - Все права защищены.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -142,8 +157,9 @@ class _ServicesBloc extends State<ServicesScreen> {
     BuildContext context,
   ) {
     if (choice == 'О программе') {
-       Navigator.of(context).pushNamed(
-            'about',);
+      Navigator.of(context).pushNamed(
+        'about',
+      );
     }
   }
 }

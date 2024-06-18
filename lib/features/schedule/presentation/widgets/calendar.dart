@@ -175,8 +175,10 @@ class _CalendarState extends State<Calendar> {
                     height: 32,
                     width: 32,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF454648),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant,
                       shape: BoxShape.circle,
                     ),
                     child: Text(

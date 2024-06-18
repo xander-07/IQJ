@@ -34,19 +34,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           actions: [
-            IconButton(
-              onPressed: () => showModalBottomSheet<void>(
-                backgroundColor: Theme.of(context).colorScheme.background,
-                elevation: 0,
-                context: context,
-                builder: (context) => BlocProvider.value(
-                  value: BlocProvider.of<ScheduleBloc>(context),
-                  child: Placeholder(),
-                  // child: const ScheduleBottomSheet(),
-                ),
-              ),
-              icon: const Icon(Icons.more_vert),
-            ),
+            // IconButton(
+            //   onPressed: () => showModalBottomSheet<void>(
+            //     backgroundColor: Theme.of(context).colorScheme.background,
+            //     elevation: 0,
+            //     context: context,
+            //     builder: (context) => BlocProvider.value(
+            //       value: BlocProvider.of<ScheduleBloc>(context),
+            //       child: Placeholder(),
+            //       // child: const ScheduleBottomSheet(),
+            //     ),
+            //   ),
+            //   icon: const Icon(Icons.more_vert),
+            // ),
           ],
         ),
         body: Padding(

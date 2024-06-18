@@ -13,7 +13,8 @@ void showExitDialog(BuildContext context) {
       ),
     ),
     onPressed: () {
-      Navigator.of(context).pop();
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, 'welcome'); 
     },
   );
 
@@ -80,7 +81,7 @@ class _LogoffButtonState extends State<LogoffButton> {
             ),
           ),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, 'welcome'); 
+            showExitDialog(context);
           },
           child: const Text(
             "Выйти",

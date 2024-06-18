@@ -18,7 +18,7 @@ void showMenuDialog(BuildContext context) {
 
   final AlertDialog alert = AlertDialog(
     title: const Text(
-      "Jumpscare",
+      "Не реализовано",
       style: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.bold,

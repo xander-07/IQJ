@@ -352,7 +352,7 @@ class _NewsBloc extends State<NewsScreen> {
               print('announcement fallback');
               return AnnouncementWidget(
                 id: '1',
-                text: 'С 35 нояктября по 64 апремая в корпусе В-78 будет закрыт главный вход. ',
+                text: 'Идёт экзаменационная сессия. Желаем успеха!',
                 creationDate: DateTime.now(),
                 expiryDate: DateTime.now(),
               );
